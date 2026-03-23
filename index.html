@@ -9,7 +9,7 @@
     :root {
       --bg: #07111f;
       --bg2: #0a1628;
-      --panel: rgba(13, 22, 39, 0.86);
+      --panel: rgba(13, 22, 39, 0.82);
       --line: rgba(148,163,184,.14);
       --text: #edf4ff;
       --muted: #93a4bf;
@@ -21,36 +21,32 @@
       --max: 1180px;
     }
     * { box-sizing: border-box; margin: 0; padding: 0; }
+    html { scroll-behavior: smooth; }
     body {
       font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
       color: var(--text);
       background:
         radial-gradient(circle at 0% 0%, rgba(96,165,250,.16), transparent 28%),
         radial-gradient(circle at 100% 0%, rgba(167,139,250,.14), transparent 22%),
+        radial-gradient(circle at 50% 20%, rgba(74,222,128,.08), transparent 30%),
         linear-gradient(180deg, var(--bg), var(--bg2));
       min-height: 100vh;
       line-height: 1.6;
+      overflow-x: hidden;
     }
     a { text-decoration: none; color: inherit; }
     .wrap { width: min(var(--max), calc(100% - 28px)); margin: 0 auto; }
     .topbar {
       position: sticky; top: 0; z-index: 20;
-      background: rgba(7,17,31,.74); backdrop-filter: blur(16px);
+      background: rgba(7,17,31,.72); backdrop-filter: blur(16px);
       border-bottom: 1px solid rgba(148,163,184,.08);
     }
-    nav {
-      display: flex; justify-content: space-between; align-items: center;
-      padding: 16px 0;
-    }
-    .brand {
-      display: flex; align-items: center; gap: 12px;
-      font-size: 1.05rem; font-weight: 800; letter-spacing: -.03em;
-    }
+    nav { display: flex; justify-content: space-between; align-items: center; padding: 16px 0; }
+    .brand { display: flex; align-items: center; gap: 12px; font-size: 1.05rem; font-weight: 800; letter-spacing: -.03em; }
     .brand-mark {
-      width: 42px; height: 42px; border-radius: 14px;
-      display: grid; place-items: center;
+      width: 42px; height: 42px; border-radius: 14px; display: grid; place-items: center;
       background: linear-gradient(135deg, rgba(74,222,128,.18), rgba(96,165,250,.18));
-      border: 1px solid var(--line);
+      border: 1px solid var(--line); box-shadow: var(--shadow);
     }
     .brand span { color: var(--green); }
     .nav-links { display: flex; align-items: center; gap: 24px; color: var(--muted); font-size: .94rem; }
@@ -60,10 +56,13 @@
       background: linear-gradient(135deg, var(--green), #86efac); color: #05130b;
       box-shadow: 0 10px 30px rgba(74,222,128,.18);
     }
-    .hero { padding: 76px 0 40px; }
-    .hero-grid {
-      display: grid; grid-template-columns: 1.1fr .9fr; gap: 22px; align-items: stretch;
+    .hero { padding: 76px 0 40px; position: relative; }
+    .orbs::before, .orbs::after {
+      content: ""; position: absolute; border-radius: 999px; filter: blur(60px); pointer-events: none;
     }
+    .orbs::before { width: 260px; height: 260px; background: rgba(96,165,250,.14); top: 40px; right: -80px; }
+    .orbs::after { width: 220px; height: 220px; background: rgba(74,222,128,.12); left: -80px; bottom: 0; }
+    .hero-grid { display: grid; grid-template-columns: 1.1fr .9fr; gap: 22px; align-items: stretch; }
     .card {
       background: var(--panel); border: 1px solid var(--line); border-radius: var(--radius);
       box-shadow: var(--shadow); backdrop-filter: blur(14px);
@@ -76,15 +75,11 @@
     }
     .eyebrow {
       display: inline-flex; align-items: center; gap: 8px;
-      padding: 8px 12px; border-radius: 999px;
-      font-size: .8rem; letter-spacing: .16em; text-transform: uppercase;
-      color: var(--green); background: rgba(74,222,128,.08); border: 1px solid rgba(74,222,128,.16);
-      margin-bottom: 18px;
+      padding: 8px 12px; border-radius: 999px; font-size: .8rem; letter-spacing: .16em;
+      text-transform: uppercase; color: var(--green);
+      background: rgba(74,222,128,.08); border: 1px solid rgba(74,222,128,.16); margin-bottom: 18px;
     }
-    h1 {
-      font-size: clamp(2.5rem, 5vw, 4.7rem);
-      line-height: .95; letter-spacing: -.06em; margin-bottom: 18px; max-width: 11ch;
-    }
+    h1 { font-size: clamp(2.5rem, 5vw, 4.7rem); line-height: .95; letter-spacing: -.06em; margin-bottom: 18px; max-width: 11ch; }
     .gradient {
       background: linear-gradient(135deg, #fff, #a7f3d0 50%, #93c5fd 100%);
       -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
@@ -94,9 +89,11 @@
     .btn-primary, .btn-secondary {
       display: inline-flex; align-items: center; justify-content: center; gap: 10px;
       padding: 14px 20px; border-radius: 14px; font-weight: 700; font-size: .98rem;
+      transition: transform .18s ease, opacity .18s ease, border-color .18s ease, box-shadow .18s ease;
     }
-    .btn-primary { background: linear-gradient(135deg, var(--green), #86efac); color: #04110a; }
+    .btn-primary { background: linear-gradient(135deg, var(--green), #86efac); color: #04110a; box-shadow: 0 14px 30px rgba(74,222,128,.18); }
     .btn-secondary { border: 1px solid var(--line); background: rgba(255,255,255,.03); }
+    .btn-primary:hover, .btn-secondary:hover { transform: translateY(-2px); opacity: .96; }
     .stats { display: grid; grid-template-columns: repeat(3,1fr); gap: 12px; }
     .mini { padding: 16px; border-radius: 18px; background: rgba(255,255,255,.03); border: 1px solid rgba(148,163,184,.08); }
     .mini .label { color: var(--muted); font-size: .76rem; text-transform: uppercase; letter-spacing: .14em; margin-bottom: 8px; }
@@ -117,10 +114,11 @@
     .section-title { font-size: clamp(1.9rem, 3vw, 3rem); line-height: 1; letter-spacing: -.05em; margin-bottom: 12px; }
     .section-copy { color: var(--muted); max-width: 60ch; }
     .grid-3 { display: grid; grid-template-columns: repeat(3,1fr); gap: 16px; }
-    .feature { padding: 22px; }
+    .feature { padding: 22px; transition: transform .18s ease, border-color .18s ease; }
+    .feature:hover { transform: translateY(-4px); border-color: rgba(96,165,250,.22); }
     .feature-icon {
-      width: 46px; height: 46px; border-radius: 14px; display: grid; place-items: center;
-      margin-bottom: 16px; background: linear-gradient(135deg, rgba(74,222,128,.15), rgba(96,165,250,.15)); border: 1px solid rgba(148,163,184,.12);
+      width: 46px; height: 46px; border-radius: 14px; display: grid; place-items: center; margin-bottom: 16px;
+      background: linear-gradient(135deg, rgba(74,222,128,.15), rgba(96,165,250,.15)); border: 1px solid rgba(148,163,184,.12);
     }
     .feature h3 { font-size: 1.1rem; margin-bottom: 10px; letter-spacing: -.03em; }
     .feature p, .feature li { color: var(--muted); font-size: .95rem; }
@@ -129,10 +127,7 @@
     .roadmap { padding: 24px; }
     .roadmap-step { display: flex; gap: 14px; padding: 14px 0; border-top: 1px solid rgba(148,163,184,.08); }
     .roadmap-step:first-child { border-top: 0; }
-    .num {
-      width: 34px; height: 34px; border-radius: 12px; flex-shrink: 0; display: grid; place-items: center;
-      background: rgba(74,222,128,.12); color: var(--green); font-weight: 800;
-    }
+    .num { width: 34px; height: 34px; border-radius: 12px; flex-shrink: 0; display: grid; place-items: center; background: rgba(74,222,128,.12); color: var(--green); font-weight: 800; }
     .quote { padding: 24px; font-size: 1.06rem; color: #dce7f8; }
     .quote strong { color: #fff; }
     .pricing-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
@@ -146,17 +141,28 @@
     }
     .cta-grid { position: relative; display: grid; grid-template-columns: 1.05fr .95fr; gap: 20px; align-items: center; }
     .cta-title { font-size: clamp(2rem, 4vw, 3.4rem); line-height: .96; letter-spacing: -.06em; margin-bottom: 14px; }
-    .footer {
-      border-top: 1px solid rgba(148,163,184,.08); padding: 26px 0 34px; color: var(--muted); font-size: .92rem;
+    .waitlist-box { padding: 22px; }
+    .field { margin-bottom: 14px; }
+    .field label { display: block; margin-bottom: 8px; color: #d7e3f6; font-size: .9rem; }
+    .field input, .field select, .field textarea {
+      width: 100%; padding: 13px 14px; border-radius: 14px; border: 1px solid rgba(148,163,184,.12);
+      background: rgba(255,255,255,.03); color: var(--text); outline: none; font: inherit;
     }
+    .field input:focus, .field select:focus, .field textarea:focus { border-color: rgba(96,165,250,.32); }
+    .fine { color: var(--muted); font-size: .82rem; margin-top: 12px; }
+    .success { display: none; padding: 24px; border-radius: 18px; background: rgba(74,222,128,.08); border: 1px solid rgba(74,222,128,.16); }
+    .success.show { display: block; }
+    .footer { border-top: 1px solid rgba(148,163,184,.08); padding: 26px 0 34px; color: var(--muted); font-size: .92rem; }
     .footer-inner { display: flex; justify-content: space-between; gap: 16px; flex-wrap: wrap; }
+    .reveal { opacity: 0; transform: translateY(18px); transition: opacity .55s ease, transform .55s ease; }
+    .reveal.show { opacity: 1; transform: translateY(0); }
     @media (max-width: 1024px) {
       .hero-grid, .grid-3, .split, .pricing-grid, .cta-grid, .stats { grid-template-columns: 1fr; }
       .nav-links { display: none; }
     }
     @media (max-width: 720px) {
       .wrap { width: min(var(--max), calc(100% - 20px)); }
-      .hero-copy, .hero-panel, .feature, .roadmap, .pricing, .cta-shell, .quote { padding: 22px; }
+      .hero-copy, .hero-panel, .feature, .roadmap, .pricing, .cta-shell, .quote, .waitlist-box { padding: 22px; }
       h1 { max-width: 100%; }
     }
   </style>
@@ -180,11 +186,11 @@
     </div>
   </div>
 
-  <main id="top">
+  <main id="top" class="orbs">
     <section class="hero">
       <div class="wrap">
         <div class="hero-grid">
-          <div class="card hero-copy">
+          <div class="card hero-copy reveal">
             <div class="eyebrow">Built for students who don't want to graduate late</div>
             <h1>Stop guessing. <span class="gradient">Graduate on time.</span></h1>
             <p class="subhead">
@@ -210,7 +216,7 @@
             </div>
           </div>
 
-          <div class="card hero-panel">
+          <div class="card hero-panel reveal">
             <div class="flow-pill">Example AI output</div>
             <div class="panel-box">
               <h3>Drexel student — Business & Engineering</h3>
@@ -233,23 +239,23 @@
 
     <section id="problem">
       <div class="wrap">
-        <div class="section-head">
+        <div class="section-head reveal">
           <div class="section-kicker">The problem</div>
           <h2 class="section-title">College planning is way too fragile.</h2>
           <p class="section-copy">A lot of students don’t graduate late because they’re lazy. They graduate late because the system is messy, advising is inconsistent, and prerequisite chains are easy to mess up.</p>
         </div>
         <div class="grid-3">
-          <div class="card feature">
+          <div class="card feature reveal">
             <div class="feature-icon">🧩</div>
             <h3>Wrong class sequence</h3>
             <p>Students take classes out of order, miss prerequisites, and don’t realize the damage until the next registration cycle.</p>
           </div>
-          <div class="card feature">
+          <div class="card feature reveal">
             <div class="feature-icon">📞</div>
             <h3>Bad advising</h3>
             <p>Advisors are overloaded, inconsistent, or just wrong. Students assume the advice is safe and pay the price later.</p>
           </div>
-          <div class="card feature">
+          <div class="card feature reveal">
             <div class="feature-icon">💸</div>
             <h3>Extra semesters cost real money</h3>
             <p>Tuition, housing, opportunity cost, and delayed career earnings make one mistake a lot more expensive than it looks.</p>
@@ -260,41 +266,16 @@
 
     <section id="solution">
       <div class="wrap split">
-        <div class="card roadmap">
+        <div class="card roadmap reveal">
           <div class="section-kicker">The solution</div>
           <h2 class="section-title">A personal academic roadmap, built by AI.</h2>
           <p class="section-copy" style="margin-bottom:16px;">Import your school, major, credits, and goals. MajorMap AI turns that into an actual semester-by-semester plan instead of vague advice.</p>
-          <div class="roadmap-step">
-            <div class="num">1</div>
-            <div>
-              <strong>Import your context</strong>
-              <div class="section-copy">School, major, current year, AP/transfer credits, and future goals.</div>
-            </div>
-          </div>
-          <div class="roadmap-step">
-            <div class="num">2</div>
-            <div>
-              <strong>Generate the roadmap</strong>
-              <div class="section-copy">A clean semester plan that respects prerequisites, bottlenecks, and graduation targets.</div>
-            </div>
-          </div>
-          <div class="roadmap-step">
-            <div class="num">3</div>
-            <div>
-              <strong>Get opportunity suggestions</strong>
-              <div class="section-copy">Internships, clubs, recruiting windows, certifications, and useful next steps for your major.</div>
-            </div>
-          </div>
-          <div class="roadmap-step">
-            <div class="num">4</div>
-            <div>
-              <strong>Catch mistakes early</strong>
-              <div class="section-copy">See risks before registration season burns a whole semester.</div>
-            </div>
-          </div>
+          <div class="roadmap-step"><div class="num">1</div><div><strong>Import your context</strong><div class="section-copy">School, major, current year, AP/transfer credits, and future goals.</div></div></div>
+          <div class="roadmap-step"><div class="num">2</div><div><strong>Generate the roadmap</strong><div class="section-copy">A clean semester plan that respects prerequisites, bottlenecks, and graduation targets.</div></div></div>
+          <div class="roadmap-step"><div class="num">3</div><div><strong>Get opportunity suggestions</strong><div class="section-copy">Internships, clubs, recruiting windows, certifications, and useful next steps for your major.</div></div></div>
+          <div class="roadmap-step"><div class="num">4</div><div><strong>Catch mistakes early</strong><div class="section-copy">See risks before registration season burns a whole semester.</div></div></div>
         </div>
-
-        <div class="card quote">
+        <div class="card quote reveal">
           <strong>“Your advisor says one thing. Your degree audit says another. The course catalog says something else.”</strong><br><br>
           MajorMap AI is built for that exact mess. The goal is to give students a second brain for academic planning — one that doesn’t forget prerequisites, graduation requirements, or career timing.
         </div>
@@ -303,41 +284,29 @@
 
     <section id="how">
       <div class="wrap">
-        <div class="section-head">
+        <div class="section-head reveal">
           <div class="section-kicker">What students get</div>
           <h2 class="section-title">More than a chatbot. A real plan.</h2>
           <p class="section-copy">This isn’t just “ask AI a question.” It’s structured academic planning with school-specific logic and future-focused recommendations.</p>
         </div>
         <div class="grid-3">
-          <div class="card feature">
+          <div class="card feature reveal">
             <div class="feature-icon">🗂️</div>
             <h3>Semester planner</h3>
             <p>See what to take and when to take it, with warnings if you’re about to mess up your sequence.</p>
-            <ul>
-              <li>Prerequisite-aware roadmap</li>
-              <li>Graduation timeline</li>
-              <li>Course bottleneck warnings</li>
-            </ul>
+            <ul><li>Prerequisite-aware roadmap</li><li>Graduation timeline</li><li>Course bottleneck warnings</li></ul>
           </div>
-          <div class="card feature">
+          <div class="card feature reveal">
             <div class="feature-icon">🎯</div>
             <h3>Future planning</h3>
             <p>Tell the app where you want to go and it points you toward the classes and opportunities that matter.</p>
-            <ul>
-              <li>Career-based recommendations</li>
-              <li>Internship timing suggestions</li>
-              <li>Clubs / research / cert ideas</li>
-            </ul>
+            <ul><li>Career-based recommendations</li><li>Internship timing suggestions</li><li>Clubs / research / cert ideas</li></ul>
           </div>
-          <div class="card feature">
+          <div class="card feature reveal">
             <div class="feature-icon">🚨</div>
             <h3>Risk alerts</h3>
             <p>See when you’re off track before it gets expensive.</p>
-            <ul>
-              <li>Late graduation risk</li>
-              <li>Missing requirements</li>
-              <li>Class availability bottlenecks</li>
-            </ul>
+            <ul><li>Late graduation risk</li><li>Missing requirements</li><li>Class availability bottlenecks</li></ul>
           </div>
         </div>
       </div>
@@ -345,35 +314,25 @@
 
     <section id="pricing">
       <div class="wrap">
-        <div class="section-head">
+        <div class="section-head reveal">
           <div class="section-kicker">Initial pricing idea</div>
           <h2 class="section-title">Start simple. Earn trust first.</h2>
           <p class="section-copy">You can always move upmarket later. The first version should feel like a no-brainer for students and parents.</p>
         </div>
         <div class="pricing-grid">
-          <div class="card pricing">
+          <div class="card pricing reveal">
             <div class="section-kicker">For students</div>
             <h3>MajorMap AI</h3>
             <div class="price">$9–19/mo</div>
             <p class="section-copy">Affordable enough for students, useful enough to save them a semester.</p>
-            <ul>
-              <li>Roadmap generation</li>
-              <li>Prereq checks</li>
-              <li>Semester-by-semester planning</li>
-              <li>Opportunity recommendations</li>
-            </ul>
+            <ul><li>Roadmap generation</li><li>Prereq checks</li><li>Semester-by-semester planning</li><li>Opportunity recommendations</li></ul>
           </div>
-          <div class="card pricing">
+          <div class="card pricing reveal">
             <div class="section-kicker">Later expansion</div>
             <h3>University / Advisor version</h3>
             <div class="price">B2B</div>
             <p class="section-copy">Once the student version proves itself, the same engine can power advising teams or school partnerships.</p>
-            <ul>
-              <li>Bulk student planning</li>
-              <li>Advisor dashboards</li>
-              <li>Risk flags for delayed graduation</li>
-              <li>School-specific deployment</li>
-            </ul>
+            <ul><li>Bulk student planning</li><li>Advisor dashboards</li><li>Risk flags for delayed graduation</li><li>School-specific deployment</li></ul>
           </div>
         </div>
       </div>
@@ -381,20 +340,45 @@
 
     <section id="waitlist">
       <div class="wrap">
-        <div class="card cta-shell">
+        <div class="card cta-shell reveal">
           <div class="cta-grid">
             <div>
               <div class="section-kicker">Waitlist</div>
               <h2 class="cta-title">Want early access when MajorMap AI launches?</h2>
               <p class="section-copy" style="margin-bottom:20px;">Join the early list and get updates when the first version is ready. Start with one school, one major set, and prove the demand.</p>
               <div class="actions">
-                <a class="btn-primary" href="mailto:geo@geoflowai.com?subject=MajorMap%20AI%20Waitlist">Join by Email</a>
-                <a class="btn-secondary" href="mailto:geo@geoflowai.com?subject=MajorMap%20AI%20Demo">Talk to Geo</a>
+                <a class="btn-secondary" href="mailto:geo@geoflowai.com?subject=MajorMap%20AI%20Questions">Talk to Geo</a>
               </div>
             </div>
-            <div class="card quote" style="background: rgba(255,255,255,.03);">
-              <strong>Best first move:</strong><br><br>
-              Start with <strong>one school</strong> and <strong>a few majors</strong>. Nail the roadmap logic, prove students care, then expand. That’s how this turns from a cool idea into a real company.
+            <div class="card waitlist-box" style="background: rgba(255,255,255,.03);">
+              <form id="waitlist-form">
+                <div class="field">
+                  <label>Name</label>
+                  <input type="text" id="name" placeholder="Geo" required />
+                </div>
+                <div class="field">
+                  <label>Email</label>
+                  <input type="email" id="email" placeholder="you@school.edu" required />
+                </div>
+                <div class="field">
+                  <label>School</label>
+                  <input type="text" id="school" placeholder="Drexel University" required />
+                </div>
+                <div class="field">
+                  <label>Major</label>
+                  <input type="text" id="major" placeholder="Business & Engineering" required />
+                </div>
+                <div class="field">
+                  <label>Biggest problem right now?</label>
+                  <textarea id="problem-input" rows="4" placeholder="My advisor gave me confusing info, and I don't know if I'm on track."></textarea>
+                </div>
+                <button class="btn-primary" type="submit" style="width:100%; border:none; cursor:pointer;">Join Waitlist</button>
+                <div class="fine">No spam. Just updates when the product is ready.</div>
+              </form>
+              <div class="success" id="success-box">
+                <strong>✅ You're on the list.</strong><br><br>
+                We got your info. When MajorMap AI is ready, you'll be first to know.
+              </div>
             </div>
           </div>
         </div>
@@ -408,5 +392,51 @@
       <div>Built by Geo · Contact: geo@geoflowai.com</div>
     </div>
   </footer>
+
+  <script>
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) entry.target.classList.add('show');
+      });
+    }, { threshold: 0.12 });
+    document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
+
+    async function sendForm(data) {
+      await fetch('https://formspree.io/f/xojkgevw', {
+        method: 'POST',
+        headers: {
+          'Accept': 'application/json',
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(data)
+      });
+    }
+
+    document.getElementById('waitlist-form').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const btn = e.target.querySelector('button');
+      btn.disabled = true;
+      btn.textContent = 'Joining...';
+
+      const data = {
+        product: 'MajorMap AI',
+        name: document.getElementById('name').value,
+        email: document.getElementById('email').value,
+        school: document.getElementById('school').value,
+        major: document.getElementById('major').value,
+        problem: document.getElementById('problem-input').value,
+      };
+
+      try {
+        await sendForm(data);
+        document.getElementById('waitlist-form').style.display = 'none';
+        document.getElementById('success-box').classList.add('show');
+      } catch (err) {
+        btn.disabled = false;
+        btn.textContent = 'Join Waitlist';
+        alert('Something went wrong. Try again in a sec.');
+      }
+    });
+  </script>
 </body>
 </html>
