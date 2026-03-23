@@ -80,8 +80,8 @@
 
       <div class="form-step active" id="step1">
         <div class="row">
-          <div class="field"><label>School</label><input id="school" value="Drexel University" /></div>
-          <div class="field"><label>Major</label><input id="major" value="Business & Engineering" /></div>
+          <div class="field"><label>School</label><select id="school"><option selected>Drexel University</option><option>Temple University</option></select></div>
+          <div class="field"><label>Major</label><select id="major"><option selected>Business & Engineering</option><option>Computer Science</option><option>Finance</option></select></div>
         </div>
         <div class="row">
           <div class="field"><label>Current Year</label><select id="year"><option>Freshman</option><option selected>Sophomore</option><option>Junior</option><option>Senior</option></select></div>
@@ -139,37 +139,27 @@
           <div class="status">✅ On track</div>
         </div>
         <div class="grid">
-          <div class="mini"><div class="label">Grad Risk</div><div class="value">Low</div></div>
-          <div class="mini"><div class="label">Remaining Credits</div><div class="value">140</div></div>
+          <div class="mini"><div class="label">Grad Risk</div><div class="value" id="riskOut">Low</div></div>
+          <div class="mini"><div class="label">Remaining Credits</div><div class="value" id="creditsOut">140</div></div>
           <div class="mini"><div class="label">Priority</div><div class="value" id="priorityOut">On-Time</div></div>
         </div>
 
         <div class="dashboard">
           <div class="panel">
             <h3>Recommended next semester</h3>
-            <div class="semester">
+            <div class="semester" id="semesterList">
               <div class="course"><div><strong>ECON 201</strong><small>Unlocks upper-level business requirements</small></div><div class="tag yellow">Bottleneck</div></div>
-              <div class="course"><div><strong>ENGR 220</strong><small>Core engineering systems requirement</small></div><div class="tag blue">Core</div></div>
-              <div class="course"><div><strong>STAT 202</strong><small>Supports analytics + internship readiness</small></div><div class="tag green">Recommended</div></div>
-              <div class="course"><div><strong>COOP Prep Seminar</strong><small>Improves internship readiness and timeline</small></div><div class="tag green">Career</div></div>
             </div>
           </div>
 
           <div style="display:grid;gap:14px">
             <div class="panel">
               <h3>Risk alerts</h3>
-              <div class="alerts">
-                <div class="item"><strong>Take ECON 201 next</strong><p>Delaying it could push multiple downstream requirements by a semester.</p></div>
-                <div class="item"><strong>Review transfer credit mapping</strong><p>Your AP/transfer credits may satisfy one elective block but need confirmation.</p></div>
-              </div>
+              <div class="alerts" id="alertsList"></div>
             </div>
             <div class="panel">
               <h3>Opportunities for your path</h3>
-              <div class="opps">
-                <div class="item"><strong>Apply for co-op / internship pipeline</strong><p>Best window: next 4–8 weeks.</p></div>
-                <div class="item"><strong>Join product / startup club</strong><p>Helps if you're aiming for PM / operator roles.</p></div>
-                <div class="item"><strong>Build one portfolio project</strong><p>Something that proves strategy + execution, not just coursework.</p></div>
-              </div>
+              <div class="opps" id="oppsList"></div>
             </div>
           </div>
         </div>
@@ -190,6 +180,73 @@
   </footer>
 
   <script>
+    const PROGRAM_DATA = {
+      'Business & Engineering': {
+        risk: 'Low',
+        remainingCredits: '132',
+        nextSemester: [
+          ['ECON 201', 'Unlocks multiple business core dependencies', 'Bottleneck', 'yellow'],
+          ['STAT 206', 'Needed after STAT 205 to stay on analytics track', 'Core', 'blue'],
+          ['ENGR 131', 'Engineering programming base matters for concentration flexibility', 'Recommended', 'green'],
+          ['Business Minor Elective', 'Keeps minor progress moving without crowding senior year', 'Recommended', 'green']
+        ],
+        alerts: [
+          ['Do not delay ECON 201/202', 'Those courses feed later business requirements and can push sequencing back fast.'],
+          ['Choose your engineering concentration early', 'Some concentration prerequisites may need free electives, so late decisions get expensive.']
+        ],
+        opportunities: [
+          ['Apply for co-op / internship pipeline', 'Best move if you want operator, product, or innovation roles.'],
+          ['Join startup or product clubs', 'Strong fit for business + technical hybrid students.'],
+          ['Build one operations / analytics project', 'Something that proves systems thinking beyond classwork.']
+        ]
+      },
+      'Computer Science': {
+        risk: 'Medium',
+        remainingCredits: '128',
+        nextSemester: [
+          ['CS 171', 'Core programming sequence should start as early as possible', 'Bottleneck', 'yellow'],
+          ['CS 172', 'Needed right after intro programming to avoid downstream delays', 'Core', 'blue'],
+          ['CS 260', 'Data Structures is the biggest upper-level bottleneck', 'Bottleneck', 'yellow'],
+          ['MATH / stats support course', 'Helps with AI, systems, and technical interview readiness', 'Recommended', 'green']
+        ],
+        alerts: [
+          ['Take Data Structures ASAP', 'A lot of upper-level CS and SE work depends on it.'],
+          ['Start portfolio work early', 'Internships care about projects before students feel fully ready.']
+        ],
+        opportunities: [
+          ['Build GitHub portfolio projects', 'Important for internships and technical credibility.'],
+          ['Target co-op and SWE recruiting windows early', 'Waiting too long can cost momentum.'],
+          ['Join AI/security/dev clubs', 'Good way to narrow interests before upper-level electives.']
+        ]
+      },
+      'Finance': {
+        risk: 'Low',
+        remainingCredits: '130',
+        nextSemester: [
+          ['STAT 202', 'Must be finished before upper-level required finance classes', 'Bottleneck', 'yellow'],
+          ['FIN 301', 'Foundation for later finance sequence', 'Core', 'blue'],
+          ['ACCT 116', 'Accounting base supports stronger finance understanding', 'Recommended', 'green'],
+          ['BSAN 160', 'Useful for analytics-heavy finance work and recruiting', 'Recommended', 'green']
+        ],
+        alerts: [
+          ['Finish statistics before upper-level finance', 'STAT 202 is a real prerequisite gate.'],
+          ['Plan recruiting early', 'Finance recruiting often starts before students feel fully prepared.']
+        ],
+        opportunities: [
+          ['Apply to finance / analyst internships', 'Earlier is better in finance recruiting cycles.'],
+          ['Consider ACCT 321 / 322 as electives', 'Helpful if you want valuation, analysis, or stronger accounting depth.'],
+          ['Pick a lane: fintech, portfolio, wealth, or M&A', 'This helps choose the right upper-level finance electives.']
+        ]
+      }
+    };
+
+    function renderList(items, type){
+      if(type === 'semester'){
+        return items.map(([title, copy, tag, cls]) => `<div class="course"><div><strong>${title}</strong><small>${copy}</small></div><div class="tag ${cls}">${tag}</div></div>`).join('');
+      }
+      return items.map(([title, copy]) => `<div class="item"><strong>${title}</strong><p>${copy}</p></div>`).join('');
+    }
+
     function nextStep(n){
       document.querySelectorAll('.form-step').forEach(el=>el.classList.remove('active'));
       document.getElementById('step'+n).classList.add('active');
@@ -209,6 +266,7 @@
       const completed = document.getElementById('completed').value || '?';
       const goal = document.getElementById('goal').value || 'Graduate on time';
       const priority = document.getElementById('priority').value || 'On-time';
+      const profile = PROGRAM_DATA[major] || PROGRAM_DATA['Business & Engineering'];
 
       setTimeout(() => {
         document.getElementById('loader').classList.remove('active');
@@ -217,6 +275,11 @@
         document.getElementById('studentTitle').textContent = `${school} — ${major}`;
         document.getElementById('studentSub').textContent = `${year} · ${completed} credits completed · Goal: ${goal}`;
         document.getElementById('priorityOut').textContent = priority.replace('Graduating ','').replace('Keeping schedule ','').replace('Landing ','');
+        document.getElementById('riskOut').textContent = profile.risk;
+        document.getElementById('creditsOut').textContent = profile.remainingCredits;
+        document.getElementById('semesterList').innerHTML = renderList(profile.nextSemester, 'semester');
+        document.getElementById('alertsList').innerHTML = renderList(profile.alerts, 'list');
+        document.getElementById('oppsList').innerHTML = renderList(profile.opportunities, 'list');
       }, 2200);
     }
 
