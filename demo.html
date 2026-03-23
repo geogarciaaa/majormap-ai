@@ -266,6 +266,73 @@
       return items.map(([title, copy]) => `<div class="item"><strong>${title}</strong><p>${copy}</p></div>`).join('');
     }
 
+    function buildFeedback(profile, inputs) {
+      const completed = Number(inputs.completed || 0);
+      const transfer = Number(inputs.transfer || 0);
+      const year = inputs.year;
+      const goal = inputs.goal;
+      const career = (inputs.career || '').toLowerCase();
+      const notes = (inputs.notes || '').toLowerCase();
+      const issue = (inputs.issue || '').toLowerCase();
+
+      let risk = profile.risk;
+      const alerts = [...profile.alerts];
+      const opps = [...profile.opportunities];
+      const nextSemester = [...profile.nextSemester];
+
+      if (year === 'Freshman' && completed < 20) {
+        risk = risk === 'Low' ? 'Low' : 'Medium';
+        alerts.unshift(['Build your foundation early', 'Your first-year sequencing matters more than it feels right now. Don’t push foundational classes back.']);
+      }
+
+      if (year === 'Junior' || year === 'Senior') {
+        alerts.unshift(['Audit graduation path now', 'At your stage, one missed bottleneck or writing-intensive requirement can create an expensive delay.']);
+      }
+
+      if (completed < 40 && (year === 'Sophomore' || year === 'Junior')) {
+        risk = 'High';
+        alerts.unshift(['Credit pace looks light for your year', 'You may be behind the normal pace, so registration choices matter a lot from here.']);
+      } else if (completed < 70 && year === 'Junior') {
+        risk = 'Medium';
+      }
+
+      if (transfer >= 12) {
+        alerts.unshift(['Verify transfer / AP credit mapping', 'Transferred credits can help a lot, but only if they slot into the right requirement buckets.']);
+      }
+
+      if (goal.toLowerCase().includes('early')) {
+        opps.unshift(['Ask about summer / overloaded path options', 'Graduating early usually means planning summers, bottlenecks, and requirement timing intentionally.']);
+      }
+
+      if (career.includes('product') || career.includes('startup') || notes.includes('startup')) {
+        opps.unshift(['Build one execution-heavy portfolio project', 'A startup or product path gets stronger when you can show systems thinking and real output.']);
+      }
+
+      if (career.includes('software') || career.includes('engineer') || career.includes('developer')) {
+        opps.unshift(['Prioritize technical portfolio work', 'Coursework matters, but internships and technical roles usually want proof outside the classroom too.']);
+      }
+
+      if (career.includes('med') || career.includes('doctor') || career.includes('health') || notes.includes('pre-med')) {
+        opps.unshift(['Track clinical + shadowing hours early', 'For pre-health students, opportunity timing matters almost as much as the course plan.']);
+      }
+
+      if (career.includes('finance') || career.includes('analyst') || career.includes('investment')) {
+        opps.unshift(['Watch recruiting windows early', 'Finance and analyst paths often recruit before students feel fully ready.']);
+      }
+
+      if (issue.includes('advisor') || issue.includes('advis')) {
+        alerts.unshift(['Use this as a second opinion, not blind trust', 'The point is to reduce advisor mistakes and force a cleaner roadmap conversation.']);
+      }
+
+      return {
+        risk,
+        remainingCredits: Math.max(0, Number(profile.remainingCredits || 0) - transfer),
+        alerts: alerts.slice(0, 3),
+        opportunities: opps.slice(0, 3),
+        nextSemester: nextSemester.slice(0, 4)
+      };
+    }
+
     function nextStep(n){
       document.querySelectorAll('.form-step').forEach(el=>el.classList.remove('active'));
       document.getElementById('step'+n).classList.add('active');
@@ -285,7 +352,12 @@
       const completed = document.getElementById('completed').value || '?';
       const goal = document.getElementById('goal').value || 'Graduate on time';
       const priority = document.getElementById('priority').value || 'On-time';
+      const transfer = document.getElementById('credits').value || '0';
+      const career = document.getElementById('career').value || '';
+      const issue = document.getElementById('issue').value || '';
+      const notes = document.getElementById('notes').value || '';
       const profile = PROGRAM_DATA[major] || PROGRAM_DATA['Business & Engineering'];
+      const feedback = buildFeedback(profile, { year, completed, transfer, goal, career, issue, notes });
 
       setTimeout(() => {
         document.getElementById('loader').classList.remove('active');
@@ -294,11 +366,11 @@
         document.getElementById('studentTitle').textContent = `${school} — ${major}`;
         document.getElementById('studentSub').textContent = `${year} · ${completed} credits completed · Goal: ${goal}`;
         document.getElementById('priorityOut').textContent = priority.replace('Graduating ','').replace('Keeping schedule ','').replace('Landing ','');
-        document.getElementById('riskOut').textContent = profile.risk;
-        document.getElementById('creditsOut').textContent = profile.remainingCredits;
-        document.getElementById('semesterList').innerHTML = renderList(profile.nextSemester, 'semester');
-        document.getElementById('alertsList').innerHTML = renderList(profile.alerts, 'list');
-        document.getElementById('oppsList').innerHTML = renderList(profile.opportunities, 'list');
+        document.getElementById('riskOut').textContent = feedback.risk;
+        document.getElementById('creditsOut').textContent = feedback.remainingCredits;
+        document.getElementById('semesterList').innerHTML = renderList(feedback.nextSemester, 'semester');
+        document.getElementById('alertsList').innerHTML = renderList(feedback.alerts, 'list');
+        document.getElementById('oppsList').innerHTML = renderList(feedback.opportunities, 'list');
       }, 2200);
     }
 
