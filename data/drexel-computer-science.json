@@ -1,0 +1,56 @@
+{
+  "school": "Drexel University",
+  "program": "Computer Science",
+  "degree": "BSCS",
+  "calendar": "Quarter",
+  "minimumCredits": 180,
+  "coopOptions": [
+    "Three Co-op (Five years)",
+    "One Co-op (Four years)",
+    "No Co-op / alternate pathways depending on catalog year"
+  ],
+  "keyWarnings": [
+    "Computer Science has a tight foundational sequence; delaying intro programming or data structures creates downstream risk.",
+    "Upper-level CS and SE courses depend on core systems / theory classes being finished in order.",
+    "Co-op timing matters because course sequencing and capstone planning can shift around work cycles.",
+    "Students should build technical portfolio / internship readiness early, not only rely on coursework."
+  ],
+  "coreCourses": {
+    "foundation": [
+      "CS 150",
+      "CS 164",
+      "CS 171",
+      "CS 172",
+      "CS 260",
+      "CS 270",
+      "CS 277",
+      "CS 281",
+      "CS 283"
+    ],
+    "mathAndScienceSignals": [
+      "Applied mathematics foundation required",
+      "Science requirements support systems / computing depth"
+    ],
+    "upperLevelRequirement": "6 additional 300- or 400-level CS or SE courses not already used elsewhere"
+  },
+  "focusAreas": [
+    "Artificial Intelligence and Machine Learning",
+    "Security",
+    "Graphics and Vision",
+    "Game Programming / Development",
+    "Systems and Software"
+  ],
+  "samplePlanSignals": [
+    "Intro programming must happen early; CS 171 and CS 172 are key sequence anchors.",
+    "CS 260 (Data Structures) is a major bottleneck because many upper-level courses build on it.",
+    "CS 270, CS 277, CS 281, and CS 283 define the theory/systems core and should not be pushed too late.",
+    "Capstone and upper-level specialization planning should begin before senior year."
+  ],
+  "mvpRecommendationRules": [
+    "Flag if a student has not completed CS 171/172 or equivalent by the end of the first major year.",
+    "Treat CS 260 as a hard bottleneck and prioritize it as soon as prerequisites allow.",
+    "Recommend internships, co-op readiness, GitHub portfolio work, and project-based opportunities starting early.",
+    "If a student wants AI/ML, suggest earlier statistics/math and upper-level AI-aligned electives once core sequence is completed."
+  ],
+  "source": "https://catalog.drexel.edu/undergraduate/collegeofcomputingandinformatics/computerscience/"
+}
