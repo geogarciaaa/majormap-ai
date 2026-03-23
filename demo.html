@@ -103,6 +103,7 @@
       <div class="form-step" id="step3">
         <div class="field"><label>What matters most?</label><select id="priority"><option selected>Graduating on time</option><option>Landing internships</option><option>Keeping schedule manageable</option></select></div>
         <div class="field"><label>Preferred semester load</label><select id="load"><option>Light</option><option selected>Balanced</option><option>Heavy</option></select></div>
+        <div class="field"><label>Classes already taken</label><select id="takenClasses" multiple size="8"></select><div class="muted" style="margin-top:8px;font-size:.88rem">Hold Ctrl / Cmd to select multiple classes.</div></div>
         <div class="field"><label>Anything else?</label><textarea id="notes">I want to avoid adding an extra semester and I want internship opportunities that actually match my major.</textarea></div>
         <div style="display:flex;gap:10px"><button class="btn btn-secondary" onclick="nextStep(2)">Back</button><button class="btn btn-primary" onclick="generatePlan()">Generate Roadmap</button></div>
       </div>
@@ -184,6 +185,7 @@
       'Business & Engineering': {
         risk: 'Low',
         remainingCredits: '132',
+        keyCourses: ['MATH 121','MATH 122','ECON 201','ECON 202','STAT 205','STAT 206','ENGR 131','BUSN 101','BUSN 102'],
         nextSemester: [
           ['ECON 201', 'Unlocks multiple business core dependencies', 'Bottleneck', 'yellow'],
           ['STAT 206', 'Needed after STAT 205 to stay on analytics track', 'Core', 'blue'],
@@ -203,6 +205,7 @@
       'Computer Science': {
         risk: 'Medium',
         remainingCredits: '128',
+        keyCourses: ['CS 171','CS 172','CS 260','CS 270','CS 277','CS 281','CS 283','MATH Support'],
         nextSemester: [
           ['CS 171', 'Core programming sequence should start as early as possible', 'Bottleneck', 'yellow'],
           ['CS 172', 'Needed right after intro programming to avoid downstream delays', 'Core', 'blue'],
@@ -222,6 +225,7 @@
       'Finance': {
         risk: 'Low',
         remainingCredits: '130',
+        keyCourses: ['STAT 202','FIN 301','FIN 302','FIN 321','FIN 325','ACCT 115','ACCT 116','BSAN 160'],
         nextSemester: [
           ['STAT 202', 'Must be finished before upper-level required finance classes', 'Bottleneck', 'yellow'],
           ['FIN 301', 'Foundation for later finance sequence', 'Core', 'blue'],
@@ -241,6 +245,7 @@
       'Biology (Temple)': {
         risk: 'Medium',
         remainingCredits: '123',
+        keyCourses: ['BIOL 1111','BIOL 1112','BIOL 2207','BIOL 2297','CHEM 1031','CHEM 1032','CHEM 2201','MATH 1041'],
         nextSemester: [
           ['BIOL 2207', 'Genetics is a core bottleneck for the Biology BS path', 'Bottleneck', 'yellow'],
           ['BIOL 2297', 'Research Techniques in Genetics is a writing-intensive anchor', 'Core', 'blue'],
@@ -271,6 +276,7 @@
       const transfer = Number(inputs.transfer || 0);
       const year = inputs.year;
       const goal = inputs.goal;
+      const taken = new Set(inputs.taken || []);
       const career = (inputs.career || '').toLowerCase();
       const notes = (inputs.notes || '').toLowerCase();
       const issue = (inputs.issue || '').toLowerCase();
@@ -280,6 +286,19 @@
       const opps = [...profile.opportunities];
       let nextSemester = [...profile.nextSemester];
       const programTotal = Number(profile.remainingCredits || 0);
+
+      if (taken.size) {
+        nextSemester = nextSemester.filter(([title]) => !taken.has(title));
+        if (taken.has('ECON 201') && taken.has('STAT 205')) {
+          alerts.unshift(['Good progress on core bottlenecks', 'You already cleared some of the classes that usually slow people down.']);
+        }
+        if (taken.has('CS 171') || taken.has('CS 172') || taken.has('CS 260')) {
+          opps.unshift(['You have real technical momentum', 'Since you already cleared core CS classes, start leaning harder into portfolio + internship prep.']);
+        }
+        if (taken.has('BIOL 2207') || taken.has('BIOL 2297')) {
+          opps.unshift(['You are through an early biology bottleneck', 'That gives you room to think more strategically about research, pre-health timing, and electives.']);
+        }
+      }
       const remainingCredits = Math.max(0, programTotal - completed - transfer);
 
       // Year / credit pace logic
@@ -339,6 +358,9 @@
 
       // Make output visually change more by trimming/reordering based on context
       nextSemester = nextSemester.slice(0, 4);
+      if (nextSemester.length === 0) {
+        nextSemester = [['Upper-level elective / requirement check', 'You already marked the obvious bottlenecks as complete, so the next move depends on electives, writing-intensive requirements, and graduation pacing.', 'Review', 'blue']];
+      }
 
       return {
         risk,
@@ -349,7 +371,16 @@
       };
     }
 
+    function updateTakenClasses() {
+      const major = document.getElementById('major').value;
+      const select = document.getElementById('takenClasses');
+      const profile = PROGRAM_DATA[major] || PROGRAM_DATA['Business & Engineering'];
+      const prior = new Set(Array.from(select.selectedOptions).map(o => o.value));
+      select.innerHTML = (profile.keyCourses || []).map(c => `<option value="${c}" ${prior.has(c) ? 'selected' : ''}>${c}</option>`).join('');
+    }
+
     function nextStep(n){
+      if (n === 3) updateTakenClasses();
       document.querySelectorAll('.form-step').forEach(el=>el.classList.remove('active'));
       document.getElementById('step'+n).classList.add('active');
       document.getElementById('p2').style.width = n >= 2 ? '100%' : '0%';
@@ -372,8 +403,9 @@
       const career = document.getElementById('career').value || '';
       const issue = document.getElementById('issue').value || '';
       const notes = document.getElementById('notes').value || '';
+      const taken = Array.from(document.getElementById('takenClasses').selectedOptions).map(o => o.value);
       const profile = PROGRAM_DATA[major] || PROGRAM_DATA['Business & Engineering'];
-      const feedback = buildFeedback(profile, { year, completed, transfer, goal, career, issue, notes });
+      const feedback = buildFeedback(profile, { year, completed, transfer, goal, career, issue, notes, taken });
 
       setTimeout(() => {
         document.getElementById('loader').classList.remove('active');
