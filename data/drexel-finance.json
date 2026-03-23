@@ -1,0 +1,85 @@
+{
+  "school": "Drexel University",
+  "program": "Finance",
+  "degree": "BSBA",
+  "calendar": "Quarter",
+  "minimumCredits": 180,
+  "coopOptions": [
+    "Three Co-op (Five years)",
+    "One Co-op (Four years)",
+    "No Co-op (Four years)"
+  ],
+  "keyWarnings": [
+    "STAT 202 must be completed with at least a C before upper-level required finance courses.",
+    "Core math and statistics should be completed before major finance coursework.",
+    "ACCT 321 and ACCT 322 are strongly recommended as free electives for finance students.",
+    "Business flexible requirements can be taken in different sequences, but prerequisite awareness still matters."
+  ],
+  "coreCourses": {
+    "generalEducationSignals": [
+      "MATH 101",
+      "ENGL 101/102/103",
+      "CIVC 101",
+      "UNIV B101",
+      "UNIV B201"
+    ],
+    "businessFlexibleRequirements": [
+      "INTB 200",
+      "MIS 200",
+      "MKTG 201",
+      "OPM 200",
+      "STAT 201"
+    ],
+    "businessCore": [
+      "ACCT 115",
+      "ACCT 116",
+      "BLAW 201",
+      "BSAN 160",
+      "BUSN 101",
+      "BUSN 102",
+      "BUSN 105",
+      "ECON 201",
+      "ECON 202",
+      "FIN 301",
+      "MGMT 450",
+      "ORGB 300",
+      "STAT 202"
+    ],
+    "requiredFinanceMajorCourses": [
+      "FIN 302",
+      "FIN 321",
+      "FIN 325"
+    ],
+    "financeElectivePool": [
+      "FIN 323",
+      "FIN 330",
+      "FIN 332",
+      "FIN 335",
+      "FIN 339",
+      "FIN 340",
+      "FIN 341",
+      "FIN 342",
+      "FIN 345",
+      "FIN 346",
+      "FIN 440",
+      "FIN 450",
+      "FIN T480",
+      "REMD 375",
+      "REMD 410",
+      "SMT 375"
+    ]
+  },
+  "samplePlanSignals": [
+    "BUSN/BSAN/MATH/ECON foundation dominates year one.",
+    "STAT 202 and FIN 301 should be completed before upper-level finance sequence starts.",
+    "FIN 302, FIN 321, and FIN 325 are anchor finance requirements and should not be delayed.",
+    "Upper-level electives shape specialization in investments, fintech, M&A, portfolio management, wealth management, and credit."
+  ],
+  "mvpRecommendationRules": [
+    "Flag students who have not completed STAT 202 before trying to plan upper-level finance coursework.",
+    "Recommend ACCT 321/322 if a student is serious about deeper finance / valuation roles.",
+    "Surface fintech, portfolio, or wealth-management electives based on career goals.",
+    "Push internship / co-op planning early because finance recruiting can happen before students feel ready."
+  ],
+  "source": "https://catalog.drexel.edu/undergraduate/collegeofbusiness/finance/"
+}
