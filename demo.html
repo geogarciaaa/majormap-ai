@@ -1,0 +1,234 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>MajorMap AI Demo</title>
+  <style>
+    :root {
+      --bg:#07111f; --bg2:#0a1628; --panel:rgba(13,22,39,.84); --line:rgba(148,163,184,.14);
+      --text:#edf4ff; --muted:#93a4bf; --green:#4ade80; --blue:#60a5fa; --red:#f87171; --yellow:#fbbf24;
+      --shadow:0 30px 80px rgba(2,8,23,.45); --radius:24px; --max:1200px;
+    }
+    *{box-sizing:border-box;margin:0;padding:0} html{scroll-behavior:smooth}
+    body{font-family:Inter,ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;color:var(--text);background:
+      radial-gradient(circle at 0% 0%, rgba(96,165,250,.16), transparent 28%),
+      radial-gradient(circle at 100% 0%, rgba(167,139,250,.14), transparent 22%),
+      linear-gradient(180deg,var(--bg),var(--bg2)); min-height:100vh; line-height:1.55}
+    a{text-decoration:none;color:inherit}.wrap{width:min(var(--max),calc(100% - 28px));margin:0 auto}
+    .topbar{position:sticky;top:0;z-index:20;background:rgba(7,17,31,.74);backdrop-filter:blur(16px);border-bottom:1px solid rgba(148,163,184,.08)}
+    nav{display:flex;justify-content:space-between;align-items:center;padding:16px 0}.brand{display:flex;align-items:center;gap:12px;font-size:1.05rem;font-weight:800;letter-spacing:-.03em}
+    .brand-mark{width:42px;height:42px;border-radius:14px;display:grid;place-items:center;background:linear-gradient(135deg, rgba(74,222,128,.18), rgba(96,165,250,.18));border:1px solid var(--line)}
+    .brand span{color:var(--green)} .nav-actions{display:flex;gap:12px;align-items:center;color:var(--muted)}
+    .pill{padding:9px 12px;border-radius:999px;border:1px solid var(--line);background:rgba(255,255,255,.03);font-size:.84rem}
+    .btn{display:inline-flex;align-items:center;justify-content:center;gap:10px;padding:13px 18px;border-radius:14px;font-weight:700;border:none;cursor:pointer;font-size:.96rem}
+    .btn-primary{background:linear-gradient(135deg,var(--green),#86efac);color:#04110a}.btn-secondary{background:rgba(255,255,255,.03);border:1px solid var(--line);color:var(--text)}
+    .hero{padding:38px 0 24px}.hero h1{font-size:clamp(2rem,4vw,3.4rem);line-height:.96;letter-spacing:-.06em;margin-bottom:14px;max-width:12ch}
+    .hero p{color:var(--muted);max-width:60ch}
+    .layout{display:grid;grid-template-columns:.9fr 1.1fr;gap:18px;padding:18px 0 50px}
+    .card{background:var(--panel);border:1px solid var(--line);border-radius:var(--radius);box-shadow:var(--shadow);backdrop-filter:blur(14px)}
+    .left{padding:24px}.right{padding:24px}
+    .eyebrow{display:inline-flex;align-items:center;gap:8px;padding:8px 12px;border-radius:999px;font-size:.78rem;letter-spacing:.16em;text-transform:uppercase;color:var(--green);background:rgba(74,222,128,.08);border:1px solid rgba(74,222,128,.16);margin-bottom:14px}
+    .progress{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin:16px 0 24px}.step{height:8px;border-radius:999px;background:rgba(148,163,184,.12);overflow:hidden}.step span{display:block;height:100%;width:0;background:linear-gradient(90deg,var(--green),#86efac);transition:width .25s ease}
+    .form-step{display:none}.form-step.active{display:block}.field{margin-bottom:14px}.field label{display:block;margin-bottom:8px;color:#d7e3f6;font-size:.9rem}.field input,.field select,.field textarea{width:100%;padding:13px 14px;border-radius:14px;border:1px solid rgba(148,163,184,.12);background:rgba(255,255,255,.03);color:var(--text);outline:none;font:inherit}.field textarea{min-height:90px;resize:vertical}
+    .row{display:grid;grid-template-columns:1fr 1fr;gap:12px}.muted{color:var(--muted)}
+    .demo-shell{display:none}.demo-shell.active{display:block}.demo-top{display:flex;justify-content:space-between;gap:14px;align-items:flex-start;margin-bottom:18px}.demo-title{font-size:1.45rem;font-weight:800;letter-spacing:-.04em}.demo-sub{color:var(--muted);margin-top:6px}
+    .status{display:inline-flex;align-items:center;gap:8px;padding:8px 12px;border-radius:999px;background:rgba(74,222,128,.1);border:1px solid rgba(74,222,128,.18);color:#a7f3d0;font-size:.84rem;font-weight:700}
+    .grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:14px}.mini{padding:16px;border-radius:18px;background:rgba(255,255,255,.03);border:1px solid rgba(148,163,184,.08)}.mini .label{font-size:.76rem;color:var(--muted);text-transform:uppercase;letter-spacing:.14em;margin-bottom:8px}.mini .value{font-size:1.45rem;font-weight:800;letter-spacing:-.04em}
+    .dashboard{display:grid;grid-template-columns:1.1fr .9fr;gap:14px}.panel{padding:18px;border-radius:20px;background:rgba(255,255,255,.03);border:1px solid rgba(148,163,184,.08)}
+    .panel h3{font-size:1rem;margin-bottom:12px}.semester{display:grid;gap:10px}.course{display:flex;justify-content:space-between;gap:12px;padding:12px 14px;border-radius:14px;background:rgba(255,255,255,.03);border:1px solid rgba(148,163,184,.08)}.course small{display:block;color:var(--muted)}
+    .tag{padding:6px 10px;border-radius:999px;font-size:.78rem;font-weight:700;height:fit-content}.tag.green{background:rgba(74,222,128,.1);border:1px solid rgba(74,222,128,.18);color:#a7f3d0}.tag.yellow{background:rgba(251,191,36,.1);border:1px solid rgba(251,191,36,.18);color:#fde68a}.tag.red{background:rgba(248,113,113,.1);border:1px solid rgba(248,113,113,.18);color:#fecaca}.tag.blue{background:rgba(96,165,250,.1);border:1px solid rgba(96,165,250,.18);color:#bfdbfe}
+    .opps,.alerts{display:grid;gap:10px}.item{padding:14px;border-radius:14px;background:rgba(255,255,255,.03);border:1px solid rgba(148,163,184,.08)}.item strong{display:block;margin-bottom:6px}.item p{color:var(--muted);font-size:.92rem}
+    .loader{display:none;text-align:center;padding:48px 24px}.loader.active{display:block}.spinner{width:68px;height:68px;border-radius:50%;border:4px solid rgba(148,163,184,.14);border-top-color:var(--green);margin:0 auto 18px;animation:spin 1s linear infinite}@keyframes spin{to{transform:rotate(360deg)}}
+    .pulse{display:flex;justify-content:center;gap:8px;margin-top:14px}.pulse span{width:8px;height:8px;border-radius:50%;background:var(--muted);animation:bounce 1.2s infinite}.pulse span:nth-child(2){animation-delay:.15s}.pulse span:nth-child(3){animation-delay:.3s}@keyframes bounce{0%,80%,100%{transform:translateY(0);opacity:.5}40%{transform:translateY(-6px);opacity:1}}
+    .footer{padding:20px 0 32px;color:var(--muted);font-size:.9rem}.footer-inner{display:flex;justify-content:space-between;gap:16px;flex-wrap:wrap}
+    @media (max-width: 1024px){.layout,.dashboard,.grid{grid-template-columns:1fr}.row{grid-template-columns:1fr}.nav-actions .pill{display:none}}
+  </style>
+</head>
+<body>
+  <div class="topbar">
+    <div class="wrap">
+      <nav>
+        <a class="brand" href="./index.html"><div class="brand-mark">🎓</div><div>Major<span>Map</span> AI</div></a>
+        <div class="nav-actions">
+          <div class="pill">Clickable Demo</div>
+          <a class="btn btn-secondary" href="./index.html">Back to Site</a>
+        </div>
+      </nav>
+    </div>
+  </div>
+
+  <section class="hero">
+    <div class="wrap">
+      <div class="eyebrow">MajorMap demo</div>
+      <h1>See what a real academic plan could look like.</h1>
+      <p>Enter a student's info, watch the AI “generate” a roadmap, then view a semester plan, graduation risk, and opportunities dashboard.</p>
+    </div>
+  </section>
+
+  <div class="wrap layout">
+    <div class="card left">
+      <div class="eyebrow">Student intake</div>
+      <h2 style="font-size:1.4rem;letter-spacing:-.04em;margin-bottom:8px;">Build a sample roadmap</h2>
+      <p class="muted" style="margin-bottom:14px;">Use the form to simulate how a student would generate a plan.</p>
+      <div class="progress">
+        <div class="step"><span style="width:100%"></span></div>
+        <div class="step"><span id="p2" style="width:0%"></span></div>
+        <div class="step"><span id="p3" style="width:0%"></span></div>
+        <div class="step"><span id="p4" style="width:0%"></span></div>
+      </div>
+
+      <div class="form-step active" id="step1">
+        <div class="row">
+          <div class="field"><label>School</label><input id="school" value="Drexel University" /></div>
+          <div class="field"><label>Major</label><input id="major" value="Business & Engineering" /></div>
+        </div>
+        <div class="row">
+          <div class="field"><label>Current Year</label><select id="year"><option>Freshman</option><option selected>Sophomore</option><option>Junior</option><option>Senior</option></select></div>
+          <div class="field"><label>Graduation Goal</label><select id="goal"><option selected>Graduate on time</option><option>Graduate early</option><option>Maximize GPA</option></select></div>
+        </div>
+        <button class="btn btn-primary" onclick="nextStep(2)">Next</button>
+      </div>
+
+      <div class="form-step" id="step2">
+        <div class="row">
+          <div class="field"><label>AP / Transfer Credits</label><input id="credits" value="12" /></div>
+          <div class="field"><label>Credits Completed</label><input id="completed" value="48" /></div>
+        </div>
+        <div class="field"><label>Career Goal</label><input id="career" value="Product manager or startup operator" /></div>
+        <div class="field"><label>Biggest issue right now</label><textarea id="issue">I’m not sure if I’m on track and I don’t trust my advising enough to just wing next semester.</textarea></div>
+        <div style="display:flex;gap:10px"><button class="btn btn-secondary" onclick="nextStep(1)">Back</button><button class="btn btn-primary" onclick="nextStep(3)">Next</button></div>
+      </div>
+
+      <div class="form-step" id="step3">
+        <div class="field"><label>What matters most?</label><select id="priority"><option selected>Graduating on time</option><option>Landing internships</option><option>Keeping schedule manageable</option></select></div>
+        <div class="field"><label>Preferred semester load</label><select id="load"><option>Light</option><option selected>Balanced</option><option>Heavy</option></select></div>
+        <div class="field"><label>Anything else?</label><textarea id="notes">I want to avoid adding an extra semester and I want internship opportunities that actually match my major.</textarea></div>
+        <div style="display:flex;gap:10px"><button class="btn btn-secondary" onclick="nextStep(2)">Back</button><button class="btn btn-primary" onclick="generatePlan()">Generate Roadmap</button></div>
+      </div>
+
+      <div class="loader" id="loader">
+        <div class="spinner"></div>
+        <h3 style="font-size:1.25rem;letter-spacing:-.03em;margin-bottom:8px;">Generating your academic roadmap...</h3>
+        <p class="muted">Checking prerequisites, degree requirements, and opportunity fit.</p>
+        <div class="pulse"><span></span><span></span><span></span></div>
+      </div>
+    </div>
+
+    <div class="card right">
+      <div class="demo-shell active" id="preview-shell">
+        <div class="eyebrow">Preview</div>
+        <h2 style="font-size:1.45rem;letter-spacing:-.04em;margin-bottom:8px;">What the output feels like</h2>
+        <p class="muted">Once a student finishes onboarding, the AI produces a roadmap dashboard with clear next steps instead of vague advising.</p>
+        <div class="panel" style="margin-top:16px">
+          <h3>Demo includes</h3>
+          <div class="opps">
+            <div class="item"><strong>Semester plan</strong><p>Recommended course sequence and bottleneck awareness.</p></div>
+            <div class="item"><strong>Graduation risk</strong><p>Flag if a student is drifting off-track before registration gets expensive.</p></div>
+            <div class="item"><strong>Opportunities</strong><p>Internships, clubs, research, and certifications tied to the major and goals.</p></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="demo-shell" id="result-shell">
+        <div class="demo-top">
+          <div>
+            <div class="demo-title" id="studentTitle">Drexel — Business & Engineering</div>
+            <div class="demo-sub" id="studentSub">Sophomore · 48 credits completed · Goal: Graduate on time</div>
+          </div>
+          <div class="status">✅ On track</div>
+        </div>
+        <div class="grid">
+          <div class="mini"><div class="label">Grad Risk</div><div class="value">Low</div></div>
+          <div class="mini"><div class="label">Remaining Credits</div><div class="value">140</div></div>
+          <div class="mini"><div class="label">Priority</div><div class="value" id="priorityOut">On-Time</div></div>
+        </div>
+
+        <div class="dashboard">
+          <div class="panel">
+            <h3>Recommended next semester</h3>
+            <div class="semester">
+              <div class="course"><div><strong>ECON 201</strong><small>Unlocks upper-level business requirements</small></div><div class="tag yellow">Bottleneck</div></div>
+              <div class="course"><div><strong>ENGR 220</strong><small>Core engineering systems requirement</small></div><div class="tag blue">Core</div></div>
+              <div class="course"><div><strong>STAT 202</strong><small>Supports analytics + internship readiness</small></div><div class="tag green">Recommended</div></div>
+              <div class="course"><div><strong>COOP Prep Seminar</strong><small>Improves internship readiness and timeline</small></div><div class="tag green">Career</div></div>
+            </div>
+          </div>
+
+          <div style="display:grid;gap:14px">
+            <div class="panel">
+              <h3>Risk alerts</h3>
+              <div class="alerts">
+                <div class="item"><strong>Take ECON 201 next</strong><p>Delaying it could push multiple downstream requirements by a semester.</p></div>
+                <div class="item"><strong>Review transfer credit mapping</strong><p>Your AP/transfer credits may satisfy one elective block but need confirmation.</p></div>
+              </div>
+            </div>
+            <div class="panel">
+              <h3>Opportunities for your path</h3>
+              <div class="opps">
+                <div class="item"><strong>Apply for co-op / internship pipeline</strong><p>Best window: next 4–8 weeks.</p></div>
+                <div class="item"><strong>Join product / startup club</strong><p>Helps if you're aiming for PM / operator roles.</p></div>
+                <div class="item"><strong>Build one portfolio project</strong><p>Something that proves strategy + execution, not just coursework.</p></div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div style="display:flex;gap:10px;flex-wrap:wrap;margin-top:18px">
+          <button class="btn btn-secondary" onclick="resetDemo()">Start Over</button>
+          <a class="btn btn-primary" href="mailto:geo@geoflowai.com?subject=MajorMap%20AI%20Demo">Talk to Geo</a>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <footer class="footer">
+    <div class="wrap footer-inner">
+      <div>© 2026 MajorMap AI Demo</div>
+      <div>Built by Geo · geo@geoflowai.com</div>
+    </div>
+  </footer>
+
+  <script>
+    function nextStep(n){
+      document.querySelectorAll('.form-step').forEach(el=>el.classList.remove('active'));
+      document.getElementById('step'+n).classList.add('active');
+      document.getElementById('p2').style.width = n >= 2 ? '100%' : '0%';
+      document.getElementById('p3').style.width = n >= 3 ? '100%' : '0%';
+      document.getElementById('p4').style.width = n >= 4 ? '100%' : '0%';
+    }
+
+    function generatePlan(){
+      document.querySelectorAll('.form-step').forEach(el=>el.classList.remove('active'));
+      document.getElementById('loader').classList.add('active');
+      document.getElementById('p4').style.width = '100%';
+
+      const school = document.getElementById('school').value || 'Your school';
+      const major = document.getElementById('major').value || 'Your major';
+      const year = document.getElementById('year').value || 'Student';
+      const completed = document.getElementById('completed').value || '?';
+      const goal = document.getElementById('goal').value || 'Graduate on time';
+      const priority = document.getElementById('priority').value || 'On-time';
+
+      setTimeout(() => {
+        document.getElementById('loader').classList.remove('active');
+        document.getElementById('preview-shell').classList.remove('active');
+        document.getElementById('result-shell').classList.add('active');
+        document.getElementById('studentTitle').textContent = `${school} — ${major}`;
+        document.getElementById('studentSub').textContent = `${year} · ${completed} credits completed · Goal: ${goal}`;
+        document.getElementById('priorityOut').textContent = priority.replace('Graduating ','').replace('Keeping schedule ','').replace('Landing ','');
+      }, 2200);
+    }
+
+    function resetDemo(){
+      document.getElementById('result-shell').classList.remove('active');
+      document.getElementById('preview-shell').classList.add('active');
+      document.getElementById('loader').classList.remove('active');
+      document.getElementById('p2').style.width = '0%';
+      document.getElementById('p3').style.width = '0%';
+      document.getElementById('p4').style.width = '0%';
+      nextStep(1);
+    }
+  </script>
+</body>
+</html>
