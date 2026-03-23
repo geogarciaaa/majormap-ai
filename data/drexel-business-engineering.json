@@ -1,0 +1,120 @@
+{
+  "school": "Drexel University",
+  "program": "Business and Engineering",
+  "degree": "BSBAE",
+  "calendar": "Quarter",
+  "minimumCredits": 180,
+  "coopOptions": [
+    "Three Co-op (Five years)",
+    "One Co-op (Four years)",
+    "No Co-op (Four years)"
+  ],
+  "keyWarnings": [
+    "Students must complete a business minor; Business Administration minor is not allowed due to overlap.",
+    "Students must choose an engineering concentration and complete all five required courses for it.",
+    "Prerequisites for engineering concentration courses may need to be covered using free electives.",
+    "Writing-intensive courses should be spread out starting sophomore year; avoid clustering them at the end."
+  ],
+  "businessMinorOptions": [
+    "Accounting",
+    "Economics",
+    "Entrepreneurship",
+    "Finance",
+    "International Economics",
+    "Legal Studies",
+    "Management Information Systems",
+    "Marketing",
+    "Operations & Supply Chain Management",
+    "Technology Innovation Management"
+  ],
+  "engineeringConcentrations": [
+    "Biomedical Engineering",
+    "Chemical Engineering",
+    "Civil Engineering",
+    "Electrical and Computer Engineering",
+    "General Engineering",
+    "Mechanical Engineering",
+    "Software Engineering"
+  ],
+  "coreCourses": {
+    "generalEducation": [
+      "CIVC 101",
+      "COM 310",
+      "COOP 101",
+      "ENGL 101/111",
+      "ENGL 102/112",
+      "ENGL 103/113",
+      "CAEE 231 or ECE 231",
+      "MATH 121",
+      "MATH 122",
+      "UNIV B101",
+      "UNIV B201",
+      "CHEM 101",
+      "PHYS 101"
+    ],
+    "businessCore": [
+      "ACCT 115",
+      "ACCT 116",
+      "BLAW 201",
+      "BUSN 101",
+      "BUSN 102",
+      "ECON 201",
+      "ECON 202",
+      "FIN 301",
+      "INTB 200",
+      "MGMT 201",
+      "MGMT 450",
+      "MIS 200",
+      "MKTG 201",
+      "OPM 200",
+      "ORGB 300",
+      "STAT 205",
+      "STAT 206"
+    ],
+    "businessEngineeringFocus": {
+      "quantitativeDecisionMakingRequired": "OPR 320",
+      "quantitativeDecisionMakingChooseOne": [
+        "MKTG 366",
+        "MKTG 367",
+        "OPR 330",
+        "OPR 340",
+        "STAT 325",
+        "STAT 331"
+      ],
+      "technologyInnovationManagementChooseOne": [
+        "MGMT 301",
+        "MGMT 302",
+        "MGMT 364"
+      ],
+      "operationsManagementChooseOne": [
+        "OPM 315",
+        "OPM 324",
+        "OPM 342"
+      ],
+      "projectManagementChooseOne": [
+        "MIS 361",
+        "PROJ 401"
+      ]
+    },
+    "engineeringBase": [
+      "ENGR 111",
+      "ENGR 113",
+      "ENGR 131"
+    ]
+  },
+  "samplePlanSignals": [
+    "BUSN 101 and ENGL 101/111 are first-quarter anchors.",
+    "MATH 121 and 122 happen in year one.",
+    "STAT 205 must come before STAT 206.",
+    "ECON 201 and ECON 202 should be taken by year two.",
+    "FIN 301, OPR 320, ORGB 300, and COM 310 appear in years three/four.",
+    "Engineering concentration courses begin by year three in sample plans."
+  ],
+  "mvpRecommendationRules": [
+    "Prioritize math, statistics, and economics early because later business/analytics work stacks on them.",
+    "Surface engineering concentration prerequisites early so students do not waste electives.",
+    "Flag if STAT 205/206, ECON 201/202, or foundational engineering courses are delayed beyond second year.",
+    "Ask the student which co-op path they are on before generating a term-by-term plan."
+  ],
+  "source": "https://catalog.drexel.edu/undergraduate/collegeofbusiness/businessandengineering/"
+}
