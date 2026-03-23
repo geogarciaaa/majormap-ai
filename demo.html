@@ -278,58 +278,74 @@
       let risk = profile.risk;
       const alerts = [...profile.alerts];
       const opps = [...profile.opportunities];
-      const nextSemester = [...profile.nextSemester];
+      let nextSemester = [...profile.nextSemester];
+      const programTotal = Number(profile.remainingCredits || 0);
+      const remainingCredits = Math.max(0, programTotal - completed - transfer);
 
-      if (year === 'Freshman' && completed < 20) {
-        risk = risk === 'Low' ? 'Low' : 'Medium';
-        alerts.unshift(['Build your foundation early', 'Your first-year sequencing matters more than it feels right now. Don’t push foundational classes back.']);
+      // Year / credit pace logic
+      if (year === 'Freshman' && completed < 10) {
+        alerts.unshift(['Start the foundation now', 'Your first-year sequencing matters more than it feels right now. Don’t push foundational classes back.']);
       }
 
       if (year === 'Junior' || year === 'Senior') {
         alerts.unshift(['Audit graduation path now', 'At your stage, one missed bottleneck or writing-intensive requirement can create an expensive delay.']);
       }
 
-      if (completed < 40 && (year === 'Sophomore' || year === 'Junior')) {
+      if ((year === 'Sophomore' && completed < 35) || (year === 'Junior' && completed < 65) || (year === 'Senior' && completed < 95)) {
         risk = 'High';
-        alerts.unshift(['Credit pace looks light for your year', 'You may be behind the normal pace, so registration choices matter a lot from here.']);
-      } else if (completed < 70 && year === 'Junior') {
-        risk = 'Medium';
+        alerts.unshift(['Credit pace looks behind', 'Based on your year and completed credits, you may be drifting off the normal graduation pace.']);
+      } else if ((year === 'Sophomore' && completed < 45) || (year === 'Junior' && completed < 80) || (year === 'Senior' && completed < 120)) {
+        if (risk !== 'High') risk = 'Medium';
       }
 
       if (transfer >= 12) {
         alerts.unshift(['Verify transfer / AP credit mapping', 'Transferred credits can help a lot, but only if they slot into the right requirement buckets.']);
       }
 
+      // Goal-based changes
       if (goal.toLowerCase().includes('early')) {
-        opps.unshift(['Ask about summer / overloaded path options', 'Graduating early usually means planning summers, bottlenecks, and requirement timing intentionally.']);
+        opps.unshift(['Use summers strategically', 'Graduating early usually means planning summers, overloads, and bottlenecks intentionally.']);
+        nextSemester = nextSemester.map((item, i) => i === 0 ? [item[0], item[1] + ' This becomes even more important if you want to graduate early.', item[2], item[3]] : item);
+      }
+      if (goal.toLowerCase().includes('gpa')) {
+        alerts.unshift(['Balance difficulty intentionally', 'If GPA is the priority, avoid stacking too many hard bottleneck classes in one term.']);
       }
 
+      // Career alignment changes
       if (career.includes('product') || career.includes('startup') || notes.includes('startup')) {
         opps.unshift(['Build one execution-heavy portfolio project', 'A startup or product path gets stronger when you can show systems thinking and real output.']);
       }
-
       if (career.includes('software') || career.includes('engineer') || career.includes('developer')) {
         opps.unshift(['Prioritize technical portfolio work', 'Coursework matters, but internships and technical roles usually want proof outside the classroom too.']);
+        nextSemester.unshift(['Technical Project / Portfolio Sprint', 'Make one project that proves skill outside class.', 'Career', 'green']);
       }
-
       if (career.includes('med') || career.includes('doctor') || career.includes('health') || notes.includes('pre-med')) {
         opps.unshift(['Track clinical + shadowing hours early', 'For pre-health students, opportunity timing matters almost as much as the course plan.']);
+        alerts.unshift(['Protect your science sequence', 'Pre-health paths get risky fast if core bio/chem timing slips.']);
       }
-
       if (career.includes('finance') || career.includes('analyst') || career.includes('investment')) {
         opps.unshift(['Watch recruiting windows early', 'Finance and analyst paths often recruit before students feel fully ready.']);
+        nextSemester.unshift(['Career Prep: Resume + Recruiting', 'For finance-track students, recruiting timing matters almost as much as classes.', 'Career', 'green']);
       }
 
+      // User issue based adjustments
       if (issue.includes('advisor') || issue.includes('advis')) {
-        alerts.unshift(['Use this as a second opinion, not blind trust', 'The point is to reduce advisor mistakes and force a cleaner roadmap conversation.']);
+        alerts.unshift(['Use this as a second opinion', 'The point is to reduce advisor mistakes and force a cleaner roadmap conversation.']);
       }
+      if (issue.includes('off track') || issue.includes('behind') || issue.includes('late')) {
+        risk = 'High';
+        alerts.unshift(['Schedule recovery mode', 'You may need a more aggressive next semester plan or summer strategy to get back on pace.']);
+      }
+
+      // Make output visually change more by trimming/reordering based on context
+      nextSemester = nextSemester.slice(0, 4);
 
       return {
         risk,
-        remainingCredits: Math.max(0, Number(profile.remainingCredits || 0) - transfer),
-        alerts: alerts.slice(0, 3),
-        opportunities: opps.slice(0, 3),
-        nextSemester: nextSemester.slice(0, 4)
+        remainingCredits,
+        alerts: alerts.slice(0, 4),
+        opportunities: opps.slice(0, 4),
+        nextSemester
       };
     }
 
