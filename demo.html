@@ -531,7 +531,21 @@
       const box = document.getElementById('takenClasses');
       const profile = PROGRAM_DATA[major] || PROGRAM_DATA['Business & Engineering'];
       const prior = new Set(Array.from(box.querySelectorAll('.chip-option.active')).map(el => el.dataset.value));
-      const coursePool = (profile.yearCourses && profile.yearCourses[year]) ? profile.yearCourses[year] : (profile.keyCourses || []);
+
+      let coursePool = [];
+      if (profile.yearCourses) {
+        const yearOrder = {
+          'Freshman': ['Freshman', 'Sophomore'],
+          'Sophomore': ['Freshman', 'Sophomore', 'Junior'],
+          'Junior': ['Freshman', 'Sophomore', 'Junior', 'Senior'],
+          'Senior': ['Freshman', 'Sophomore', 'Junior', 'Senior']
+        };
+        const allowedYears = yearOrder[year] || [year];
+        coursePool = allowedYears.flatMap(y => profile.yearCourses[y] || []);
+      }
+      if (!coursePool.length) coursePool = profile.keyCourses || [];
+      coursePool = [...new Set(coursePool)];
+
       box.innerHTML = coursePool.map(c => `<button type="button" class="chip-option ${prior.has(c) ? 'active' : ''}" data-value="${c}" onclick="toggleTakenClass(this)"><span class="chip-check">✓</span><span>${c}</span></button>`).join('');
       filterTakenClasses();
     }
