@@ -23,7 +23,8 @@
     .pill{padding:9px 12px;border-radius:999px;border:1px solid var(--line);background:rgba(255,255,255,.03);font-size:.84rem}
     .btn{display:inline-flex;align-items:center;justify-content:center;gap:10px;padding:13px 18px;border-radius:14px;font-weight:700;border:none;cursor:pointer;font-size:.96rem;transition:transform .18s ease,opacity .18s ease,box-shadow .18s ease,border-color .18s ease}
     .btn:hover{transform:translateY(-1px)}
-    .btn-primary{background:linear-gradient(135deg,var(--green),#86efac);color:#04110a;box-shadow:0 14px 30px rgba(74,222,128,.18)}.btn-secondary{background:rgba(255,255,255,.03);border:1px solid var(--line);color:var(--text)
+    .btn-primary{background:linear-gradient(135deg,var(--green),#86efac);color:#04110a;box-shadow:0 14px 30px rgba(74,222,128,.18)}
+    .btn-secondary{background:rgba(255,255,255,.03);border:1px solid var(--line);color:var(--text)}
     .hero{padding:38px 0 24px}.hero h1{font-size:clamp(2rem,4vw,3.4rem);line-height:.96;letter-spacing:-.06em;margin-bottom:14px;max-width:12ch}
     .hero p{color:var(--muted);max-width:60ch}
     .layout{display:grid;grid-template-columns:.88fr 1.12fr;gap:22px;padding:18px 0 56px;align-items:start}
@@ -36,6 +37,8 @@
     .row{display:grid;grid-template-columns:1fr 1fr;gap:12px}.muted{color:var(--muted)}
     .demo-shell{display:none;opacity:0;transform:translateY(8px)}.demo-shell.active{display:block;opacity:1;transform:translateY(0);transition:opacity .28s ease,transform .28s ease}.demo-top{display:flex;justify-content:space-between;gap:14px;align-items:flex-start;margin-bottom:18px}.demo-title{font-size:1.45rem;font-weight:800;letter-spacing:-.04em}.demo-sub{color:var(--muted);margin-top:6px}
     .status{display:inline-flex;align-items:center;gap:8px;padding:8px 12px;border-radius:999px;background:rgba(74,222,128,.1);border:1px solid rgba(74,222,128,.18);color:#86efac;font-size:.84rem;font-weight:700}
+    .status.medium{background:rgba(251,191,36,.1);border-color:rgba(251,191,36,.18);color:#fde68a}
+    .status.high{background:rgba(248,113,113,.1);border-color:rgba(248,113,113,.18);color:#fecaca}
     .grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:14px}.mini{padding:18px;border-radius:20px;background:rgba(255,255,255,.035);border:1px solid rgba(148,163,184,.08);transition:transform .18s ease,border-color .18s ease}.mini:hover{transform:translateY(-2px);border-color:rgba(74,222,128,.18)}.mini .label{font-size:.74rem;color:var(--muted);text-transform:uppercase;letter-spacing:.16em;margin-bottom:8px}.mini .value{font-size:1.52rem;font-weight:800;letter-spacing:-.05em}
     .dashboard{display:grid;grid-template-columns:minmax(0,1.1fr) minmax(0,.9fr);gap:16px;align-items:start}.panel{padding:22px;border-radius:22px;background:rgba(255,255,255,.035);border:1px solid rgba(148,163,184,.08);transition:transform .18s ease,border-color .18s ease,background .18s ease}.panel:hover{transform:translateY(-2px);border-color:rgba(96,165,250,.18);background:rgba(255,255,255,.04)}
     .panel h3{font-size:1.02rem;margin-bottom:12px;letter-spacing:-.02em}.semester{display:grid;gap:10px}.course{display:flex;justify-content:space-between;gap:12px;padding:14px 15px;border-radius:16px;background:rgba(255,255,255,.028);border:1px solid rgba(148,163,184,.08);transition:transform .18s ease,border-color .18s ease}.course:hover{transform:translateY(-1px);border-color:rgba(96,165,250,.16)}.course small{display:block;color:var(--muted)}.summary{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px;margin-bottom:18px}.summary-box{padding:18px 18px;border-radius:18px;background:rgba(255,255,255,.03);border:1px solid rgba(148,163,184,.08)}.summary-box strong{display:block;margin-bottom:8px;letter-spacing:-.01em;font-size:.96rem}.summary-box p{color:var(--muted);font-size:.94rem;line-height:1.55}.report-stack{display:grid;gap:16px}.section-label{font-size:.72rem;color:var(--muted);text-transform:uppercase;letter-spacing:.16em;margin-bottom:10px}
@@ -139,7 +142,7 @@
             <div class="demo-title" id="studentTitle">Drexel — Business & Engineering</div>
             <div class="demo-sub" id="studentSub">Sophomore · 48 credits completed · Goal: Graduate on time</div>
           </div>
-          <div class="status">✅ On track</div>
+          <div class="status" id="statusBadge">✅ On track</div>
         </div>
         <div class="grid">
           <div class="mini"><div class="label">Grad Risk</div><div class="value" id="riskOut">Low</div></div>
@@ -497,15 +500,24 @@
       let statusSummary = `You currently look ${risk === 'Low' ? 'mostly on track' : risk === 'Medium' ? 'a little vulnerable' : 'at real risk of falling behind'} for ${inputs.school} ${inputs.major || ''}.`;
       let whySummary = `This is based on your year (${year}), completed credits (${completed}), transfer credits (${transfer}), classes already taken, and goal (${goal}).`;
       let nextSummary = `Your next move is to prioritize ${nextSemester[0]?.[0] || 'the next bottleneck requirement'} and clear any sequencing risks before registration.`;
+      let aiSummary = `If I were planning this path, I’d focus on ${nextSemester[0]?.[0] || 'the next key requirement'} first, keep the sequencing tight, and use your stated goal (${goal}) to decide what gets prioritized after that.`;
 
       if (career) {
         nextSummary += ` Since you want ${career}, the plan also leans toward opportunities that support that path.`;
+        aiSummary += ` Because you're aiming for ${career}, I’d also bias electives, projects, and opportunities toward that outcome instead of treating every class as equal.`;
       }
       if (taken.size >= 3) {
         whySummary += ` You already completed ${taken.size} key classes, so the recommendations are shifted forward instead of starting from scratch.`;
       }
       if (issue.includes('advisor') || issue.includes('advis')) {
         statusSummary += ' You also flagged advisor confusion, so the system is treating this like a second-opinion check.';
+        aiSummary += ' Since advising trust is low here, I’d use this roadmap to pressure-test every next registration decision.';
+      }
+      if (goal.toLowerCase().includes('gpa')) {
+        aiSummary += ' I would avoid stacking too many hard bottlenecks in one term if GPA is the main target.';
+      }
+      if (goal.toLowerCase().includes('early')) {
+        aiSummary += ' For an early graduation goal, I’d think in sequences and summer options, not just one semester at a time.';
       }
 
       return {
@@ -517,7 +529,8 @@
         samplePlanStudy: profile.samplePlanStudy || [],
         statusSummary,
         whySummary,
-        nextSummary
+        nextSummary,
+        aiSummary
       };
     }
 
@@ -613,6 +626,18 @@
         document.getElementById('alertsList').innerHTML = renderList(feedback.alerts, 'list');
         document.getElementById('oppsList').innerHTML = renderList(feedback.opportunities, 'list');
         document.getElementById('samplePlanList').innerHTML = renderList(feedback.samplePlanStudy, 'list');
+
+        const statusBadge = document.getElementById('statusBadge');
+        statusBadge.classList.remove('medium', 'high');
+        if (feedback.risk === 'High') {
+          statusBadge.classList.add('high');
+          statusBadge.textContent = '🚨 High risk';
+        } else if (feedback.risk === 'Medium') {
+          statusBadge.classList.add('medium');
+          statusBadge.textContent = '⚠️ Needs attention';
+        } else {
+          statusBadge.textContent = '✅ On track';
+        }
       }, 2200);
     }
 
