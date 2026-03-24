@@ -37,14 +37,14 @@
     .demo-shell{display:none;opacity:0;transform:translateY(8px)}.demo-shell.active{display:block;opacity:1;transform:translateY(0);transition:opacity .28s ease,transform .28s ease}.demo-top{display:flex;justify-content:space-between;gap:14px;align-items:flex-start;margin-bottom:18px}.demo-title{font-size:1.45rem;font-weight:800;letter-spacing:-.04em}.demo-sub{color:var(--muted);margin-top:6px}
     .status{display:inline-flex;align-items:center;gap:8px;padding:8px 12px;border-radius:999px;background:rgba(74,222,128,.1);border:1px solid rgba(74,222,128,.18);color:#86efac;font-size:.84rem;font-weight:700}
     .grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:14px}.mini{padding:18px;border-radius:20px;background:rgba(255,255,255,.035);border:1px solid rgba(148,163,184,.08);transition:transform .18s ease,border-color .18s ease}.mini:hover{transform:translateY(-2px);border-color:rgba(74,222,128,.18)}.mini .label{font-size:.74rem;color:var(--muted);text-transform:uppercase;letter-spacing:.16em;margin-bottom:8px}.mini .value{font-size:1.52rem;font-weight:800;letter-spacing:-.05em}
-    .dashboard{display:grid;grid-template-columns:1.1fr .9fr;gap:14px}.panel{padding:20px;border-radius:22px;background:rgba(255,255,255,.035);border:1px solid rgba(148,163,184,.08);transition:transform .18s ease,border-color .18s ease,background .18s ease}.panel:hover{transform:translateY(-2px);border-color:rgba(96,165,250,.18);background:rgba(255,255,255,.035)}
-    .panel h3{font-size:1rem;margin-bottom:12px;letter-spacing:-.02em}.semester{display:grid;gap:10px}.course{display:flex;justify-content:space-between;gap:12px;padding:14px 15px;border-radius:16px;background:rgba(255,255,255,.03);border:1px solid rgba(148,163,184,.08);transition:transform .18s ease,border-color .18s ease}.course:hover{transform:translateY(-1px);border-color:rgba(96,165,250,.16)}.course small{display:block;color:var(--muted)}.summary{display:grid;gap:10px;margin-bottom:16px}.summary-box{padding:16px 18px;border-radius:18px;background:rgba(255,255,255,.035);border:1px solid rgba(148,163,184,.08)}.summary-box strong{display:block;margin-bottom:6px;letter-spacing:-.01em}.summary-box p{color:var(--muted);font-size:.94rem}
+    .dashboard{display:grid;grid-template-columns:minmax(0,1.1fr) minmax(0,.9fr);gap:16px;align-items:start}.panel{padding:22px;border-radius:22px;background:rgba(255,255,255,.035);border:1px solid rgba(148,163,184,.08);transition:transform .18s ease,border-color .18s ease,background .18s ease}.panel:hover{transform:translateY(-2px);border-color:rgba(96,165,250,.18);background:rgba(255,255,255,.04)}
+    .panel h3{font-size:1.02rem;margin-bottom:12px;letter-spacing:-.02em}.semester{display:grid;gap:10px}.course{display:flex;justify-content:space-between;gap:12px;padding:14px 15px;border-radius:16px;background:rgba(255,255,255,.028);border:1px solid rgba(148,163,184,.08);transition:transform .18s ease,border-color .18s ease}.course:hover{transform:translateY(-1px);border-color:rgba(96,165,250,.16)}.course small{display:block;color:var(--muted)}.summary{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px;margin-bottom:18px}.summary-box{padding:18px 18px;border-radius:18px;background:rgba(255,255,255,.03);border:1px solid rgba(148,163,184,.08)}.summary-box strong{display:block;margin-bottom:8px;letter-spacing:-.01em;font-size:.96rem}.summary-box p{color:var(--muted);font-size:.94rem;line-height:1.55}.report-stack{display:grid;gap:16px}.section-label{font-size:.72rem;color:var(--muted);text-transform:uppercase;letter-spacing:.16em;margin-bottom:10px}
     .tag{padding:6px 10px;border-radius:999px;font-size:.78rem;font-weight:700;height:fit-content}.tag.green{background:rgba(74,222,128,.1);border:1px solid rgba(74,222,128,.18);color:#86efac}.tag.yellow{background:rgba(251,191,36,.1);border:1px solid rgba(251,191,36,.18);color:#86efac}.tag.red{background:rgba(248,113,113,.1);border:1px solid rgba(248,113,113,.18);color:#fecaca}.tag.blue{background:rgba(96,165,250,.1);border:1px solid rgba(96,165,250,.18);color:#bfdbfe}
     .opps,.alerts{display:grid;gap:10px}.item{padding:15px 16px;border-radius:16px;background:rgba(255,255,255,.035);border:1px solid rgba(148,163,184,.08);transition:transform .18s ease,border-color .18s ease}.item:hover{transform:translateY(-1px);border-color:rgba(167,139,250,.18)}.item strong{display:block;margin-bottom:6px;letter-spacing:-.01em}.item p{color:var(--muted);font-size:.92rem}
     .loader{display:none;text-align:center;padding:54px 24px}.loader.active{display:block}.spinner{width:68px;height:68px;border-radius:50%;border:4px solid rgba(148,163,184,.14);border-top-color:var(--green);margin:0 auto 18px;animation:spin 1s linear infinite;box-shadow:0 0 0 14px rgba(74,222,128,.03)}@keyframes spin{to{transform:rotate(360deg)}}
     .pulse{display:flex;justify-content:center;gap:8px;margin-top:14px}.pulse span{width:8px;height:8px;border-radius:50%;background:var(--muted);animation:bounce 1.2s infinite}.pulse span:nth-child(2){animation-delay:.15s}.pulse span:nth-child(3){animation-delay:.3s}@keyframes bounce{0%,80%,100%{transform:translateY(0);opacity:.5}40%{transform:translateY(-6px);opacity:1}}
     .footer{padding:20px 0 32px;color:var(--muted);font-size:.9rem}.footer-inner{display:flex;justify-content:space-between;gap:16px;flex-wrap:wrap}
-    @media (max-width: 1024px){.layout,.dashboard,.grid{grid-template-columns:1fr}.row{grid-template-columns:1fr}.nav-actions .pill{display:none}.right{position:static;top:auto}}
+    @media (max-width: 1024px){.layout,.dashboard,.grid,.summary{grid-template-columns:1fr}.row{grid-template-columns:1fr}.nav-actions .pill{display:none}.right{position:static;top:auto}}
   </style>
 </head>
 <body>
@@ -148,32 +148,38 @@
         </div>
 
         <div class="summary">
-          <div class="summary-box"><strong>Your status</strong><p id="statusSummary">You look on pace right now, but your next registration choices still matter.</p></div>
-          <div class="summary-box"><strong>Why we're saying that</strong><p id="whySummary">This is based on your school, major, credits completed, classes already taken, and future goal.</p></div>
-          <div class="summary-box"><strong>What to do next</strong><p id="nextSummary">Prioritize bottlenecks, confirm your roadmap, and move early on opportunities tied to your goal.</p></div>
-          <div class="summary-box"><strong>AI guidance</strong><p id="aiSummary">Based on your inputs, here’s the bigger picture and what I’d focus on if I were planning your next move.</p></div>
+          <div class="summary-box"><div class="section-label">Status</div><strong>Your status</strong><p id="statusSummary">You look on pace right now, but your next registration choices still matter.</p></div>
+          <div class="summary-box"><div class="section-label">Reasoning</div><strong>Why we're saying that</strong><p id="whySummary">This is based on your school, major, credits completed, classes already taken, and future goal.</p></div>
+          <div class="summary-box"><div class="section-label">Action</div><strong>What to do next</strong><p id="nextSummary">Prioritize bottlenecks, confirm your roadmap, and move early on opportunities tied to your goal.</p></div>
+          <div class="summary-box"><div class="section-label">Guidance</div><strong>AI guidance</strong><p id="aiSummary">Based on your inputs, here’s the bigger picture and what I’d focus on if I were planning your next move.</p></div>
         </div>
 
         <div class="dashboard">
-          <div class="panel">
-            <h3>Recommended next semester</h3>
-            <div class="semester" id="semesterList">
-              <div class="course"><div><strong>ECON 201</strong><small>Unlocks upper-level business requirements</small></div><div class="tag yellow">Bottleneck</div></div>
+          <div class="report-stack">
+            <div class="panel">
+              <div class="section-label">Semester plan</div>
+              <h3>Recommended next semester</h3>
+              <div class="semester" id="semesterList">
+                <div class="course"><div><strong>ECON 201</strong><small>Unlocks upper-level business requirements</small></div><div class="tag yellow">Bottleneck</div></div>
+              </div>
+            </div>
+            <div class="panel">
+              <div class="section-label">Path overview</div>
+              <h3>Sample plan of study</h3>
+              <div class="opps" id="samplePlanList"></div>
             </div>
           </div>
 
-          <div style="display:grid;gap:14px">
+          <div class="report-stack">
             <div class="panel">
+              <div class="section-label">Watchouts</div>
               <h3>Risk alerts</h3>
               <div class="alerts" id="alertsList"></div>
             </div>
             <div class="panel">
+              <div class="section-label">Career alignment</div>
               <h3>Opportunities for your path</h3>
               <div class="opps" id="oppsList"></div>
-            </div>
-            <div class="panel">
-              <h3>Sample plan of study</h3>
-              <div class="opps" id="samplePlanList"></div>
             </div>
           </div>
         </div>
