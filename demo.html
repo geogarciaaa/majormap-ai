@@ -86,7 +86,7 @@
           <div class="field"><label>Major</label><select id="major" onchange="updateTakenClasses()"><option selected>Business & Engineering</option><option>Computer Science</option><option>Finance</option></select></div>
         </div>
         <div class="row">
-          <div class="field"><label>Current Year</label><select id="year"><option>Freshman</option><option selected>Sophomore</option><option>Junior</option><option>Senior</option></select></div>
+          <div class="field"><label>Current Year</label><select id="year" onchange="updateTakenClasses()"><option>Freshman</option><option selected>Sophomore</option><option>Junior</option><option>Senior</option></select></div>
           <div class="field"><label>Graduation Goal</label><select id="goal"><option selected>Graduate on time</option><option>Graduate early</option><option>Maximize GPA</option></select></div>
         </div>
         <button class="btn btn-primary" onclick="nextStep(2)">Next</button>
@@ -204,6 +204,10 @@
         risk: 'Low',
         remainingCredits: '132',
         keyCourses: ['UNIV B101','UNIV B201','COOP 101','CIVC 101','ENGL 101/111','ENGL 102/112','ENGL 103/113','MATH 121','MATH 122','BUSN 101','BUSN 102','ECON 201','ECON 202','STAT 205','STAT 206','ENGR 111','ENGR 113','ENGR 131','CHEM 101','PHYS 101','CAEE 231 / ECE 231'],
+        yearCourses: {
+          'Freshman': ['UNIV B101','COOP 101','CIVC 101','ENGL 101/111','BUSN 101','BUSN 102','MATH 121','MATH 122','ENGR 111','ENGR 113','ENGR 131','CHEM 101','PHYS 101'],
+          'Sophomore': ['ECON 201','ECON 202','STAT 205','STAT 206','CAEE 231 / ECE 231']
+        },
         freshmanPlan: [
           ['BUSN 101', 'First-quarter anchor in the sample plan of study.', 'Required', 'blue'],
           ['ENGL 101/111', 'Writing foundation starts immediately in year one.', 'Required', 'blue'],
@@ -254,6 +258,10 @@
         risk: 'Medium',
         remainingCredits: '128',
         keyCourses: ['UNIV CI101','COOP 101','ENG 0802/0812/0902','IH 0851','IH 0852','CS 171','CS 172','CS 260','CS 270','CS 277','CS 281','CS 283','MATH Support'],
+        yearCourses: {
+          'Freshman': ['UNIV CI101','COOP 101','ENG 0802/0812/0902','IH 0851','IH 0852','CS 171','CS 172'],
+          'Sophomore': ['CS 260','CS 270','CS 277','CS 281','CS 283']
+        },
         scheduleFillers: [
           ['Math / science support course', 'Keep the broader CS degree foundation moving.', 'Flexible', 'blue'],
           ['Technical elective / project slot', 'Use this for portfolio or a technical elective when core bottlenecks are handled.', 'Flexible', 'green']
@@ -284,6 +292,10 @@
         risk: 'Low',
         remainingCredits: '130',
         keyCourses: ['UNIV B101','UNIV B201','CIVC 101','ENGL 101/102/103','BUSN 101','BUSN 102','BSAN 160','ACCT 115','ACCT 116','STAT 202','FIN 301','FIN 302','FIN 321','FIN 325'],
+        yearCourses: {
+          'Freshman': ['UNIV B101','CIVC 101','BUSN 101','BUSN 102','BSAN 160','ACCT 115','ACCT 116'],
+          'Sophomore': ['STAT 202','FIN 301','ECON 201','ECON 202']
+        },
         scheduleFillers: [
           ['Business flexible requirement', 'One flexible business requirement can help round out the term.', 'Flexible', 'blue'],
           ['Accounting / analytics support', 'Helpful support course for deeper finance paths.', 'Flexible', 'green']
@@ -314,6 +326,11 @@
         risk: 'Medium',
         remainingCredits: '123',
         keyCourses: ['BIOL 1111','BIOL 1112','BIOL 2207','BIOL 2297','BIOL 2227 / BIOL 3101','BIOL 3204 / BIOL 3324 / BIOL 4375','CHEM 1031','CHEM 1032','CHEM 2201','CHEM 2202','MATH 1041','MATH 1042 / MATH 1044','SCTC 1013','PHYS 1021 / 1061 / 2021','PHYS 1022 / 1062 / 2022'],
+        yearCourses: {
+          'Freshman': ['BIOL 1111','BIOL 1112','CHEM 1031','CHEM 1032','MATH 1041','SCTC 1013'],
+          'Sophomore': ['BIOL 2207','BIOL 2297','BIOL 2227 / BIOL 3101','CHEM 2201','CHEM 2202','MATH 1042 / MATH 1044'],
+          'Junior': ['BIOL 3204 / BIOL 3324 / BIOL 4375','PHYS 1021 / 1061 / 2021','PHYS 1022 / 1062 / 2022']
+        },
         scheduleFillers: [
           ['Physics / quantitative support', 'Temple Biology students usually need the broader science stack moving too.', 'Flexible', 'blue'],
           ['Writing-intensive / major support course', 'Useful to prevent senior-year requirement compression.', 'Flexible', 'green']
@@ -510,10 +527,12 @@
 
     function updateTakenClasses() {
       const major = document.getElementById('major').value;
+      const year = document.getElementById('year')?.value || 'Sophomore';
       const box = document.getElementById('takenClasses');
       const profile = PROGRAM_DATA[major] || PROGRAM_DATA['Business & Engineering'];
       const prior = new Set(Array.from(box.querySelectorAll('.chip-option.active')).map(el => el.dataset.value));
-      box.innerHTML = (profile.keyCourses || []).map(c => `<button type="button" class="chip-option ${prior.has(c) ? 'active' : ''}" data-value="${c}" onclick="toggleTakenClass(this)"><span class="chip-check">✓</span><span>${c}</span></button>`).join('');
+      const coursePool = (profile.yearCourses && profile.yearCourses[year]) ? profile.yearCourses[year] : (profile.keyCourses || []);
+      box.innerHTML = coursePool.map(c => `<button type="button" class="chip-option ${prior.has(c) ? 'active' : ''}" data-value="${c}" onclick="toggleTakenClass(this)"><span class="chip-check">✓</span><span>${c}</span></button>`).join('');
       filterTakenClasses();
     }
 
