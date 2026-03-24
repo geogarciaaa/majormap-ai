@@ -36,7 +36,7 @@
     .status{display:inline-flex;align-items:center;gap:8px;padding:8px 12px;border-radius:999px;background:rgba(74,222,128,.1);border:1px solid rgba(74,222,128,.18);color:#a7f3d0;font-size:.84rem;font-weight:700}
     .grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:14px}.mini{padding:16px;border-radius:18px;background:rgba(255,255,255,.03);border:1px solid rgba(148,163,184,.08)}.mini .label{font-size:.76rem;color:var(--muted);text-transform:uppercase;letter-spacing:.14em;margin-bottom:8px}.mini .value{font-size:1.45rem;font-weight:800;letter-spacing:-.04em}
     .dashboard{display:grid;grid-template-columns:1.1fr .9fr;gap:14px}.panel{padding:18px;border-radius:20px;background:rgba(255,255,255,.03);border:1px solid rgba(148,163,184,.08)}
-    .panel h3{font-size:1rem;margin-bottom:12px}.semester{display:grid;gap:10px}.course{display:flex;justify-content:space-between;gap:12px;padding:12px 14px;border-radius:14px;background:rgba(255,255,255,.03);border:1px solid rgba(148,163,184,.08)}.course small{display:block;color:var(--muted)}
+    .panel h3{font-size:1rem;margin-bottom:12px}.semester{display:grid;gap:10px}.course{display:flex;justify-content:space-between;gap:12px;padding:12px 14px;border-radius:14px;background:rgba(255,255,255,.03);border:1px solid rgba(148,163,184,.08)}.course small{display:block;color:var(--muted)}.summary{display:grid;gap:10px;margin-bottom:14px}.summary-box{padding:14px 16px;border-radius:16px;background:rgba(255,255,255,.03);border:1px solid rgba(148,163,184,.08)}.summary-box strong{display:block;margin-bottom:6px}.summary-box p{color:var(--muted);font-size:.94rem}
     .tag{padding:6px 10px;border-radius:999px;font-size:.78rem;font-weight:700;height:fit-content}.tag.green{background:rgba(74,222,128,.1);border:1px solid rgba(74,222,128,.18);color:#a7f3d0}.tag.yellow{background:rgba(251,191,36,.1);border:1px solid rgba(251,191,36,.18);color:#fde68a}.tag.red{background:rgba(248,113,113,.1);border:1px solid rgba(248,113,113,.18);color:#fecaca}.tag.blue{background:rgba(96,165,250,.1);border:1px solid rgba(96,165,250,.18);color:#bfdbfe}
     .opps,.alerts{display:grid;gap:10px}.item{padding:14px;border-radius:14px;background:rgba(255,255,255,.03);border:1px solid rgba(148,163,184,.08)}.item strong{display:block;margin-bottom:6px}.item p{color:var(--muted);font-size:.92rem}
     .loader{display:none;text-align:center;padding:48px 24px}.loader.active{display:block}.spinner{width:68px;height:68px;border-radius:50%;border:4px solid rgba(148,163,184,.14);border-top-color:var(--green);margin:0 auto 18px;animation:spin 1s linear infinite}@keyframes spin{to{transform:rotate(360deg)}}
@@ -143,6 +143,12 @@
           <div class="mini"><div class="label">Grad Risk</div><div class="value" id="riskOut">Low</div></div>
           <div class="mini"><div class="label">Remaining Credits</div><div class="value" id="creditsOut">140</div></div>
           <div class="mini"><div class="label">Priority</div><div class="value" id="priorityOut">On-Time</div></div>
+        </div>
+
+        <div class="summary">
+          <div class="summary-box"><strong>Your status</strong><p id="statusSummary">You look on pace right now, but your next registration choices still matter.</p></div>
+          <div class="summary-box"><strong>Why we're saying that</strong><p id="whySummary">This is based on your school, major, credits completed, classes already taken, and future goal.</p></div>
+          <div class="summary-box"><strong>What to do next</strong><p id="nextSummary">Prioritize bottlenecks, confirm your roadmap, and move early on opportunities tied to your goal.</p></div>
         </div>
 
         <div class="dashboard">
@@ -404,12 +410,29 @@
         nextSemester = [['Upper-level elective / requirement check', 'You already marked the obvious bottlenecks as complete, so the next move depends on electives, writing-intensive requirements, and graduation pacing.', 'Review', 'blue']];
       }
 
+      let statusSummary = `You currently look ${risk === 'Low' ? 'mostly on track' : risk === 'Medium' ? 'a little vulnerable' : 'at real risk of falling behind'} for ${inputs.school} ${inputs.major || ''}.`;
+      let whySummary = `This is based on your year (${year}), completed credits (${completed}), transfer credits (${transfer}), classes already taken, and goal (${goal}).`;
+      let nextSummary = `Your next move is to prioritize ${nextSemester[0]?.[0] || 'the next bottleneck requirement'} and clear any sequencing risks before registration.`;
+
+      if (career) {
+        nextSummary += ` Since you want ${career}, the plan also leans toward opportunities that support that path.`;
+      }
+      if (taken.size >= 3) {
+        whySummary += ` You already completed ${taken.size} key classes, so the recommendations are shifted forward instead of starting from scratch.`;
+      }
+      if (issue.includes('advisor') || issue.includes('advis')) {
+        statusSummary += ' You also flagged advisor confusion, so the system is treating this like a second-opinion check.';
+      }
+
       return {
         risk,
         remainingCredits,
         alerts: alerts.slice(0, 4),
         opportunities: opps.slice(0, 4),
-        nextSemester
+        nextSemester,
+        statusSummary,
+        whySummary,
+        nextSummary
       };
     }
 
@@ -481,6 +504,9 @@
         document.getElementById('priorityOut').textContent = priority.replace('Graduating ','').replace('Keeping schedule ','').replace('Landing ','');
         document.getElementById('riskOut').textContent = feedback.risk;
         document.getElementById('creditsOut').textContent = feedback.remainingCredits;
+        document.getElementById('statusSummary').textContent = feedback.statusSummary;
+        document.getElementById('whySummary').textContent = feedback.whySummary;
+        document.getElementById('nextSummary').textContent = feedback.nextSummary;
         document.getElementById('semesterList').innerHTML = renderList(feedback.nextSemester, 'semester');
         document.getElementById('alertsList').innerHTML = renderList(feedback.alerts, 'list');
         document.getElementById('oppsList').innerHTML = renderList(feedback.opportunities, 'list');
