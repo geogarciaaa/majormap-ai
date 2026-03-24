@@ -248,10 +248,10 @@
           ['Free elective / engineering prereq', 'Can be used strategically for engineering concentration preparation.', 'Flexible', 'green']
         ],
         nextSemester: [
-          ['ECON 201', 'Unlocks multiple business core dependencies', 'Bottleneck', 'yellow'],
-          ['STAT 206', 'Needed after STAT 205 to stay on analytics track', 'Core', 'blue'],
-          ['ENGR 131', 'Engineering programming base matters for concentration flexibility', 'Recommended', 'green'],
-          ['Business Minor Elective', 'Keeps minor progress moving without crowding senior year', 'Recommended', 'green']
+          ['ECON 201', 'Prereq chain: BUSN 101/102 → ECON 201 → ECON 202. This is one of the main business bottlenecks.', 'Bottleneck', 'yellow'],
+          ['STAT 206', 'Prereq chain: STAT 205 → STAT 206. If 205 is done, push 206 quickly so analytics options stay open.', 'Core', 'blue'],
+          ['ENGR 131', 'Engineering / programming foundation that supports concentration flexibility and later technical planning.', 'Recommended', 'green'],
+          ['Business Minor Elective', 'Keeps minor progress moving without crowding senior year or stealing space from bottlenecks later.', 'Recommended', 'green']
         ],
         alerts: [
           ['Do not delay ECON 201/202', 'Those courses feed later business requirements and can push sequencing back fast.'],
@@ -520,6 +520,17 @@
         aiSummary += ' For an early graduation goal, I’d think in sequences and summer options, not just one semester at a time.';
       }
 
+      const prereqMap = inputs.major === 'Business & Engineering'
+        ? [
+            ['BUSN 101/102 → ECON 201 → ECON 202', 'Protect the business/econ chain early so later business requirements do not compress.'],
+            ['MATH 121 → MATH 122 → technical progression', 'Your math sequence affects engineering concentration flexibility and later technical planning.'],
+            ['STAT 205 → STAT 206', 'This keeps the analytics side of B&E open instead of getting pushed late.']
+          ]
+        : [
+            ['Next bottleneck first', 'Focus on the first real prerequisite gate before layering on electives.'],
+            ['Sequence before variety', 'Getting the order right matters more than taking random interesting classes.']
+          ];
+
       return {
         risk,
         remainingCredits,
@@ -527,6 +538,7 @@
         opportunities: opps.slice(0, 4),
         nextSemester,
         samplePlanStudy: profile.samplePlanStudy || [],
+        prereqMap,
         statusSummary,
         whySummary,
         nextSummary,
@@ -648,6 +660,27 @@
       document.getElementById('p2').style.width = '0%';
       document.getElementById('p3').style.width = '0%';
       document.getElementById('p4').style.width = '0%';
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+      nextStep(1);
+    }
+
+    updateMajorOptions();
+  </script>
+</body>
+</html>
+Id('p4').style.width = '0%';
+      nextStep(1);
+    }
+
+    updateMajorOptions();
+  </script>
+</body>
+</html>
+orOptions();
+  </script>
+</body>
+</html>
+Id('p4').style.width = '0%';
       nextStep(1);
     }
 
