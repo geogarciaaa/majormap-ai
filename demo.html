@@ -6,16 +6,16 @@
   <title>MajorMap AI Demo</title>
   <style>
     :root {
-      --bg:#eef2f6; --bg2:#e5ebf2; --panel:rgba(255,255,255,.9); --line:rgba(148,163,184,.18);
+      --bg:#e4eaf1; --bg2:#d7e0ea; --panel:rgba(255,255,255,.92); --line:rgba(148,163,184,.18);
       --text:#102033; --muted:#60728c; --green:#22c55e; --blue:#3b82f6; --red:#ef4444; --yellow:#facc15;
-      --blue-soft:#2563eb; --green-soft:#16a34a; --white-glow:rgba(255,255,255,.9);
+      --blue-soft:#2563eb; --green-soft:#16a34a; --white-glow:rgba(255,255,255,.92);
       --shadow:0 24px 60px rgba(15,23,42,.10); --radius:24px; --max:1200px;
     }
     *{box-sizing:border-box;margin:0;padding:0} html{scroll-behavior:smooth}
     body{font-family:Inter,ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;color:var(--text);background:
-      radial-gradient(circle at 0% 0%, rgba(59,130,246,.10), transparent 28%),
-      radial-gradient(circle at 100% 0%, rgba(34,197,94,.08), transparent 24%),
-      radial-gradient(circle at 50% 22%, rgba(255,255,255,.55), transparent 28%),
+      radial-gradient(circle at 0% 0%, rgba(59,130,246,.12), transparent 28%),
+      radial-gradient(circle at 100% 0%, rgba(34,197,94,.09), transparent 24%),
+      radial-gradient(circle at 50% 22%, rgba(255,255,255,.34), transparent 28%),
       linear-gradient(180deg,var(--bg),var(--bg2)); min-height:100vh; line-height:1.55}
     a{text-decoration:none;color:inherit}.wrap{width:min(var(--max),calc(100% - 28px));margin:0 auto}
     .topbar{position:sticky;top:0;z-index:20;background:rgba(255,255,255,.82);backdrop-filter:blur(16px);border-bottom:1px solid rgba(148,163,184,.12)}
@@ -42,8 +42,19 @@
     .status.medium{background:rgba(251,191,36,.1);border-color:rgba(251,191,36,.18);color:#fde68a}
     .status.high{background:rgba(248,113,113,.1);border-color:rgba(248,113,113,.18);color:#fecaca}
     .grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:14px}.mini{padding:18px;border-radius:20px;background:linear-gradient(180deg, rgba(255,255,255,.05), rgba(255,255,255,.025));border:1px solid rgba(148,163,184,.10);transition:transform .18s ease,border-color .18s ease,box-shadow .18s ease}.mini:hover{transform:translateY(-2px);border-color:rgba(79,140,255,.18);box-shadow:0 12px 28px rgba(79,140,255,.10)}.mini .label{font-size:.74rem;color:var(--muted);text-transform:uppercase;letter-spacing:.16em;margin-bottom:8px}.mini .value{font-size:1.52rem;font-weight:800;letter-spacing:-.05em}
-    .dashboard{display:grid;grid-template-columns:minmax(0,1.1fr) minmax(0,.9fr);gap:16px;align-items:start}.panel{padding:22px;border-radius:22px;background:rgba(255,255,255,.035);border:1px solid rgba(148,163,184,.08);transition:transform .18s ease,border-color .18s ease,background .18s ease}.panel:hover{transform:translateY(-2px);border-color:rgba(96,165,250,.18);background:rgba(255,255,255,.04)}
-    .panel h3{font-size:1.02rem;margin-bottom:12px;letter-spacing:-.02em}.semester{display:grid;gap:10px}.course{display:flex;justify-content:space-between;gap:12px;padding:14px 15px;border-radius:16px;background:rgba(255,255,255,.028);border:1px solid rgba(148,163,184,.08);transition:transform .18s ease,border-color .18s ease}.course:hover{transform:translateY(-1px);border-color:rgba(96,165,250,.16)}.course small{display:block;color:var(--muted)}.summary{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px;margin-bottom:18px}.summary-box{padding:18px 18px;border-radius:18px;background:rgba(255,255,255,.03);border:1px solid rgba(148,163,184,.08)}.summary-box strong{display:block;margin-bottom:8px;letter-spacing:-.01em;font-size:.96rem}.summary-box p{color:var(--muted);font-size:.94rem;line-height:1.55}.report-stack{display:grid;gap:16px}.section-label{font-size:.72rem;color:var(--muted);text-transform:uppercase;letter-spacing:.16em;margin-bottom:10px}
+    .dashboard{display:grid;grid-template-columns:minmax(0,1.1fr) minmax(0,.9fr);gap:16px;align-items:start}.panel{padding:22px;border-radius:22px;background:rgba(255,255,255,.58);border:1px solid rgba(148,163,184,.10);transition:transform .18s ease,border-color .18s ease,background .18s ease}.panel:hover{transform:translateY(-2px);border-color:rgba(96,165,250,.18);background:rgba(255,255,255,.72)}
+    .panel h3{font-size:1.02rem;margin-bottom:12px;letter-spacing:-.02em}.semester{display:grid;gap:10px}.course{display:flex;justify-content:space-between;gap:12px;padding:14px 15px;border-radius:16px;background:rgba(255,255,255,.52);border:1px solid rgba(148,163,184,.10);transition:transform .18s ease,border-color .18s ease}.course:hover{transform:translateY(-1px);border-color:rgba(96,165,250,.16)}.course small{display:block;color:var(--muted)}.summary{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px;margin-bottom:18px}.summary-box{padding:18px 18px;border-radius:18px;background:rgba(255,255,255,.52);border:1px solid rgba(148,163,184,.10)}.summary-box strong{display:block;margin-bottom:8px;letter-spacing:-.01em;font-size:.96rem}.summary-box p{color:var(--muted);font-size:.94rem;line-height:1.55}.report-stack{display:grid;gap:16px}.section-label{font-size:.72rem;color:var(--muted);text-transform:uppercase;letter-spacing:.16em;margin-bottom:10px}
+    .ai-panel{margin-bottom:16px;padding:18px;border-radius:20px;background:linear-gradient(135deg, rgba(59,130,246,.08), rgba(34,197,94,.06));border:1px solid rgba(59,130,246,.14)}
+    .ai-topline{display:flex;justify-content:space-between;gap:12px;align-items:center;margin-bottom:10px;flex-wrap:wrap}
+    .ai-badge{display:inline-flex;align-items:center;gap:8px;padding:8px 12px;border-radius:999px;background:rgba(59,130,246,.10);border:1px solid rgba(59,130,246,.16);color:var(--blue-soft);font-size:.78rem;font-weight:700;letter-spacing:.08em;text-transform:uppercase}
+    .ai-confidence{font-size:.82rem;color:var(--muted)}
+    .ai-reasoning{color:var(--muted);font-size:.94rem;line-height:1.6}
+    .sample-plan{display:grid;gap:12px}
+    .study-phase{display:grid;grid-template-columns:110px 1fr;gap:14px;padding:16px;border-radius:18px;background:linear-gradient(180deg, rgba(255,255,255,.72), rgba(255,255,255,.52));border:1px solid rgba(148,163,184,.12)}
+    .study-phase:hover{border-color:rgba(59,130,246,.18)}
+    .study-year{display:flex;align-items:flex-start;justify-content:center;padding:10px 12px;border-radius:14px;background:rgba(59,130,246,.08);color:var(--blue-soft);font-weight:800;letter-spacing:-.02em}
+    .study-copy strong{display:block;margin-bottom:6px;font-size:1rem}
+    .study-copy p{color:var(--muted);font-size:.94rem;line-height:1.55}
     .tag{padding:6px 10px;border-radius:999px;font-size:.78rem;font-weight:700;height:fit-content}.tag.green{background:rgba(52,211,153,.1);border:1px solid rgba(52,211,153,.18);color:#bbf7d0}.tag.yellow{background:rgba(250,204,21,.1);border:1px solid rgba(250,204,21,.18);color:#fde68a}.tag.red{background:rgba(248,113,113,.1);border:1px solid rgba(248,113,113,.18);color:#fecaca}.tag.blue{background:rgba(79,140,255,.1);border:1px solid rgba(79,140,255,.18);color:#bfdbfe}
     .opps,.alerts{display:grid;gap:10px}.item{padding:15px 16px;border-radius:16px;background:rgba(255,255,255,.035);border:1px solid rgba(148,163,184,.08);transition:transform .18s ease,border-color .18s ease,box-shadow .18s ease}.item:hover{transform:translateY(-1px);border-color:rgba(79,140,255,.18);box-shadow:0 10px 24px rgba(79,140,255,.08)}.item strong{display:block;margin-bottom:6px;letter-spacing:-.01em}.item p{color:var(--muted);font-size:.92rem}
     .loader{display:none;text-align:center;padding:54px 24px}.loader.active{display:block}.spinner{width:68px;height:68px;border-radius:50%;border:4px solid rgba(148,163,184,.14);border-top-color:var(--green);margin:0 auto 18px;animation:spin 1s linear infinite;box-shadow:0 0 0 14px rgba(74,222,128,.03)}@keyframes spin{to{transform:rotate(360deg)}}
@@ -118,7 +129,7 @@
       <div class="loader" id="loader">
         <div class="spinner"></div>
         <h3 style="font-size:1.25rem;letter-spacing:-.03em;margin-bottom:8px;">Generating your academic roadmap...</h3>
-        <p class="muted">Checking prerequisites, degree requirements, and opportunity fit.</p>
+        <p class="muted">Checking prerequisites, credit pace, bottlenecks, and career fit before choosing the best next move.</p>
         <div class="pulse"><span></span><span></span><span></span></div>
       </div>
     </div>
@@ -152,6 +163,14 @@
           <div class="mini"><div class="label">Priority</div><div class="value" id="priorityOut">On-Time</div></div>
         </div>
 
+        <div class="ai-panel">
+          <div class="ai-topline">
+            <div class="ai-badge">AI roadmap engine</div>
+            <div class="ai-confidence" id="confidenceText">Confidence: building recommendation set...</div>
+          </div>
+          <div class="ai-reasoning" id="aiReasoning">The model is weighing prerequisite pressure, credit pace, stated goal, and career direction to decide what should move first.</div>
+        </div>
+
         <div class="summary">
           <div class="summary-box"><div class="section-label">Status</div><strong>Your status</strong><p id="statusSummary">You look on pace right now, but your next registration choices still matter.</p></div>
           <div class="summary-box"><div class="section-label">Reasoning</div><strong>Why we're saying that</strong><p id="whySummary">This is based on your school, major, credits completed, classes already taken, and future goal.</p></div>
@@ -171,7 +190,7 @@
             <div class="panel">
               <div class="section-label">Path overview</div>
               <h3>Sample plan of study</h3>
-              <div class="opps" id="samplePlanList"></div>
+              <div class="sample-plan" id="samplePlanList"></div>
             </div>
           </div>
 
@@ -374,6 +393,9 @@
       if(type === 'semester'){
         return items.map(([title, copy, tag, cls]) => `<div class="course"><div><strong>${title}</strong><small>${copy}</small></div><div class="tag ${cls}">${tag}</div></div>`).join('');
       }
+      if(type === 'study'){
+        return items.map(([title, copy]) => `<div class="study-phase"><div class="study-year">${title}</div><div class="study-copy"><strong>${title} focus</strong><p>${copy}</p></div></div>`).join('');
+      }
       return items.map(([title, copy]) => `<div class="item"><strong>${title}</strong><p>${copy}</p></div>`).join('');
     }
 
@@ -503,17 +525,21 @@
       let whySummary = `This is based on your year (${year}), completed credits (${completed}), transfer credits (${transfer}), classes already taken, and goal (${goal}).`;
       let nextSummary = `Your next move is to prioritize ${nextSemester[0]?.[0] || 'the next bottleneck requirement'} and clear any sequencing risks before registration.`;
       let aiSummary = `If I were planning this path, I’d focus on ${nextSemester[0]?.[0] || 'the next key requirement'} first, keep the sequencing tight, and use your stated goal (${goal}) to decide what gets prioritized after that.`;
+      let aiReasoning = `I prioritized ${nextSemester[0]?.[0] || 'the next key requirement'} because it has the highest mix of sequencing pressure, graduation impact, and fit with your stated goal.`;
 
       if (career) {
         nextSummary += ` Since you want ${career}, the plan also leans toward opportunities that support that path.`;
         aiSummary += ` Because you're aiming for ${career}, I’d also bias electives, projects, and opportunities toward that outcome instead of treating every class as equal.`;
+        aiReasoning += ` Career alignment for ${career} also raised the weight on recommendations that build toward that path.`;
       }
       if (taken.size >= 3) {
         whySummary += ` You already completed ${taken.size} key classes, so the recommendations are shifted forward instead of starting from scratch.`;
+        aiReasoning += ` Since you already marked ${taken.size} relevant classes complete, the model pushed the plan forward instead of repeating early requirements.`;
       }
       if (issue.includes('advisor') || issue.includes('advis')) {
         statusSummary += ' You also flagged advisor confusion, so the system is treating this like a second-opinion check.';
         aiSummary += ' Since advising trust is low here, I’d use this roadmap to pressure-test every next registration decision.';
+        aiReasoning += ' Advisor uncertainty increased the weight on prerequisite safety and bottleneck protection.';
       }
       if (goal.toLowerCase().includes('gpa')) {
         aiSummary += ' I would avoid stacking too many hard bottlenecks in one term if GPA is the main target.';
@@ -521,6 +547,8 @@
       if (goal.toLowerCase().includes('early')) {
         aiSummary += ' For an early graduation goal, I’d think in sequences and summer options, not just one semester at a time.';
       }
+
+      const confidence = risk === 'Low' ? 'Confidence: high fit for this next-semester recommendation' : risk === 'Medium' ? 'Confidence: medium fit — path is workable but needs attention' : 'Confidence: caution — recommendation is strong, but schedule recovery matters';
 
       return {
         risk,
@@ -532,7 +560,9 @@
         statusSummary,
         whySummary,
         nextSummary,
-        aiSummary
+        aiSummary,
+        aiReasoning,
+        confidence
       };
     }
 
@@ -624,10 +654,12 @@
         document.getElementById('whySummary').textContent = feedback.whySummary;
         document.getElementById('nextSummary').textContent = feedback.nextSummary;
         document.getElementById('aiSummary').textContent = feedback.aiSummary;
+        document.getElementById('aiReasoning').textContent = feedback.aiReasoning;
+        document.getElementById('confidenceText').textContent = feedback.confidence;
         document.getElementById('semesterList').innerHTML = renderList(feedback.nextSemester, 'semester');
         document.getElementById('alertsList').innerHTML = renderList(feedback.alerts, 'list');
         document.getElementById('oppsList').innerHTML = renderList(feedback.opportunities, 'list');
-        document.getElementById('samplePlanList').innerHTML = renderList(feedback.samplePlanStudy, 'list');
+        document.getElementById('samplePlanList').innerHTML = renderList(feedback.samplePlanStudy, 'study');
 
         const statusBadge = document.getElementById('statusBadge');
         statusBadge.classList.remove('medium', 'high');
