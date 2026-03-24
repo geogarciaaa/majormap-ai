@@ -185,7 +185,7 @@
       'Business & Engineering': {
         risk: 'Low',
         remainingCredits: '132',
-        keyCourses: ['MATH 121','MATH 122','ECON 201','ECON 202','STAT 205','STAT 206','ENGR 131','BUSN 101','BUSN 102'],
+        keyCourses: ['UNIV B101','UNIV B201','COOP 101','CIVC 101','ENGL 101/111','ENGL 102/112','ENGL 103/113','MATH 121','MATH 122','ECON 201','ECON 202','STAT 205','STAT 206','ENGR 131','BUSN 101','BUSN 102'],
         nextSemester: [
           ['ECON 201', 'Unlocks multiple business core dependencies', 'Bottleneck', 'yellow'],
           ['STAT 206', 'Needed after STAT 205 to stay on analytics track', 'Core', 'blue'],
@@ -205,7 +205,7 @@
       'Computer Science': {
         risk: 'Medium',
         remainingCredits: '128',
-        keyCourses: ['CS 171','CS 172','CS 260','CS 270','CS 277','CS 281','CS 283','MATH Support'],
+        keyCourses: ['UNIV CI101','COOP 101','ENG 0802/0812/0902','IH 0851','IH 0852','CS 171','CS 172','CS 260','CS 270','CS 277','CS 281','CS 283','MATH Support'],
         nextSemester: [
           ['CS 171', 'Core programming sequence should start as early as possible', 'Bottleneck', 'yellow'],
           ['CS 172', 'Needed right after intro programming to avoid downstream delays', 'Core', 'blue'],
@@ -225,7 +225,7 @@
       'Finance': {
         risk: 'Low',
         remainingCredits: '130',
-        keyCourses: ['STAT 202','FIN 301','FIN 302','FIN 321','FIN 325','ACCT 115','ACCT 116','BSAN 160'],
+        keyCourses: ['UNIV B101','UNIV B201','CIVC 101','ENGL 101/102/103','BUSN 101','BUSN 102','BSAN 160','ACCT 115','ACCT 116','STAT 202','FIN 301','FIN 302','FIN 321','FIN 325'],
         nextSemester: [
           ['STAT 202', 'Must be finished before upper-level required finance classes', 'Bottleneck', 'yellow'],
           ['FIN 301', 'Foundation for later finance sequence', 'Core', 'blue'],
@@ -304,6 +304,17 @@
       // Year / credit pace logic
       if (year === 'Freshman' && completed < 10) {
         alerts.unshift(['Start the foundation now', 'Your first-year sequencing matters more than it feels right now. Don’t push foundational classes back.']);
+      }
+
+      if (inputs.school === 'Drexel University' && year === 'Freshman') {
+        const freshmanDrexel = [];
+        ['UNIV B101','UNIV B201','COOP 101','CIVC 101'].forEach(c => {
+          if (!taken.has(c) && profile.keyCourses?.includes(c)) freshmanDrexel.push([c, 'Important first-year Drexel requirement that students often overlook in planning.', 'Required', 'blue']);
+        });
+        if (freshmanDrexel.length) {
+          nextSemester = [...freshmanDrexel, ...nextSemester];
+          alerts.unshift(['Don’t forget Drexel first-year requirements', 'UNIV / COOP / CIVC style requirements are part of staying truly on track, not just the major classes.']);
+        }
       }
 
       if (year === 'Junior' || year === 'Senior') {
