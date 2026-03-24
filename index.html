@@ -27,9 +27,9 @@
       font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
       color: var(--text);
       background:
-        radial-gradient(circle at 0% 0%, rgba(59,130,246,.10), transparent 28%),
-        radial-gradient(circle at 100% 0%, rgba(34,197,94,.08), transparent 22%),
-        radial-gradient(circle at 50% 20%, rgba(255,255,255,.55), transparent 34%),
+        radial-gradient(circle at 0% 0%, rgba(59,130,246,.12), transparent 28%),
+        radial-gradient(circle at 100% 0%, rgba(34,197,94,.09), transparent 22%),
+        radial-gradient(circle at 50% 20%, rgba(255,255,255,.34), transparent 30%),
         linear-gradient(180deg, var(--bg), var(--bg2));
       min-height: 100vh;
       line-height: 1.6;
@@ -61,8 +61,8 @@
     .orbs::before, .orbs::after {
       content: ""; position: absolute; border-radius: 999px; filter: blur(60px); pointer-events: none;
     }
-    .orbs::before { width: 260px; height: 260px; background: rgba(96,165,250,.14); top: 40px; right: -80px; }
-    .orbs::after { width: 220px; height: 220px; background: rgba(74,222,128,.12); left: -80px; bottom: 0; }
+    .orbs::before { width: 260px; height: 260px; background: rgba(59,130,246,.12); top: 40px; right: -80px; }
+    .orbs::after { width: 220px; height: 220px; background: rgba(34,197,94,.10); left: -80px; bottom: 0; }
     .hero-grid { display: grid; grid-template-columns: 1.1fr .9fr; gap: 22px; align-items: stretch; }
     .card {
       background: var(--panel); border: 1px solid var(--line); border-radius: var(--radius);
@@ -151,7 +151,7 @@
     }
     .field input:focus, .field select:focus, .field textarea:focus { border-color: rgba(96,165,250,.32); }
     .fine { color: var(--muted); font-size: .82rem; margin-top: 12px; }
-    .success { display: none; padding: 24px; border-radius: 18px; background: rgba(74,222,128,.08); border: 1px solid rgba(74,222,128,.16); }
+    .success { display: none; padding: 24px; border-radius: 18px; background: rgba(34,197,94,.10); border: 1px solid rgba(34,197,94,.18); }
     .success.show { display: block; }
     .footer { border-top: 1px solid rgba(148,163,184,.08); padding: 26px 0 34px; color: var(--muted); font-size: .92rem; }
     .footer-inner { display: flex; justify-content: space-between; gap: 16px; flex-wrap: wrap; }
@@ -441,3 +441,11 @@
   </script>
 </body>
 </html>
+
+hing went wrong. Try again in a sec.');
+      }
+    });
+  </script>
+</body>
+</html>
+
