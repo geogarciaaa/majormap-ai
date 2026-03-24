@@ -308,12 +308,12 @@
 
       if (inputs.school === 'Drexel University' && year === 'Freshman') {
         const freshmanDrexel = [];
-        ['UNIV B101','UNIV B201','COOP 101','CIVC 101'].forEach(c => {
-          if (!taken.has(c) && profile.keyCourses?.includes(c)) freshmanDrexel.push([c, 'Important first-year Drexel requirement that students often overlook in planning.', 'Required', 'blue']);
+        ['UNIV B101','COOP 101','CIVC 101'].forEach(c => {
+          if (!taken.has(c) && profile.keyCourses?.includes(c)) freshmanDrexel.push([c, 'Important early Drexel requirement that students often overlook in planning.', 'Required', 'blue']);
         });
         if (freshmanDrexel.length) {
           nextSemester = [...freshmanDrexel, ...nextSemester];
-          alerts.unshift(['Don’t forget Drexel first-year requirements', 'UNIV / COOP / CIVC style requirements are part of staying truly on track, not just the major classes.']);
+          alerts.unshift(['Don’t forget Drexel early requirements', 'UNIV / COOP / CIVC style requirements are part of staying truly on track, not just the major classes.']);
         }
       }
 
