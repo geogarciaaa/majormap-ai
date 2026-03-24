@@ -168,6 +168,10 @@
               <h3>Opportunities for your path</h3>
               <div class="opps" id="oppsList"></div>
             </div>
+            <div class="panel">
+              <h3>Sample plan of study</h3>
+              <div class="opps" id="samplePlanList"></div>
+            </div>
           </div>
         </div>
 
@@ -216,6 +220,12 @@
           ['STAT 206', 'Needed after STAT 205 to stay on analytics track.', 'Core', 'blue'],
           ['CAEE 231 / ECE 231', 'Technical requirement listed in the broader B&E sample structure.', 'Required', 'blue']
         ],
+        samplePlanStudy: [
+          ['Year 1', 'BUSN 101/102, ENGL sequence, MATH 121/122, ENGR 111/113, CHEM 101, PHYS 101, ENGR 131'],
+          ['Year 2', 'ECON 201/202, STAT 205/206, technical requirement like CAEE/ECE 231, business core progression'],
+          ['Year 3', 'FIN 301, ORGB 300, engineering concentration buildup, minor progress, co-op timing matters'],
+          ['Year 4+', 'Advanced business-engineering focus, management capstone, minor completion, concentration finish']
+        ],
         scheduleFillers: [
           ['General Education / Writing requirement', 'Use one slot to keep university core progress moving.', 'Flexible', 'blue'],
           ['Business minor elective', 'Keeping the minor moving early prevents schedule compression later.', 'Flexible', 'green'],
@@ -245,6 +255,12 @@
           ['Math / science support course', 'Keep the broader CS degree foundation moving.', 'Flexible', 'blue'],
           ['Technical elective / project slot', 'Use this for portfolio or a technical elective when core bottlenecks are handled.', 'Flexible', 'green']
         ],
+        samplePlanStudy: [
+          ['Year 1', 'Intro programming sequence, early math / science support, co-op and university requirements'],
+          ['Year 2', 'CS 260 data structures, systems / theory core begins'],
+          ['Year 3', 'Upper-level CS core, specialization direction, portfolio and internship push'],
+          ['Year 4+', 'Capstone planning, advanced electives, career-focused specialization']
+        ],
         nextSemester: [
           ['CS 171', 'Core programming sequence should start as early as possible', 'Bottleneck', 'yellow'],
           ['CS 172', 'Needed right after intro programming to avoid downstream delays', 'Core', 'blue'],
@@ -269,6 +285,12 @@
           ['Business flexible requirement', 'One flexible business requirement can help round out the term.', 'Flexible', 'blue'],
           ['Accounting / analytics support', 'Helpful support course for deeper finance paths.', 'Flexible', 'green']
         ],
+        samplePlanStudy: [
+          ['Year 1', 'BUSN foundation, economics, accounting, math / stats setup, university requirements'],
+          ['Year 2', 'STAT 202, FIN 301, stronger analytics and accounting progression'],
+          ['Year 3', 'FIN 302 / 321 / 325 and recruiting-focused semesters'],
+          ['Year 4+', 'Upper-level finance electives shaped by fintech, portfolio, wealth, or analyst path']
+        ],
         nextSemester: [
           ['STAT 202', 'Must be finished before upper-level required finance classes', 'Bottleneck', 'yellow'],
           ['FIN 301', 'Foundation for later finance sequence', 'Core', 'blue'],
@@ -292,6 +314,12 @@
         scheduleFillers: [
           ['Physics / quantitative support', 'Temple Biology students usually need the broader science stack moving too.', 'Flexible', 'blue'],
           ['Writing-intensive / major support course', 'Useful to prevent senior-year requirement compression.', 'Flexible', 'green']
+        ],
+        samplePlanStudy: [
+          ['Year 1', 'BIOL 1111/1112, chemistry start, calculus / quantitative support'],
+          ['Year 2', 'Ecology/evolution path, genetics, research techniques in genetics'],
+          ['Year 3', 'Organic chemistry, physics, and upper-level biology begin to stack'],
+          ['Year 4', 'Advanced biology electives, writing-intensive completion, research / pre-health alignment']
         ],
         nextSemester: [
           ['BIOL 2207', 'Genetics is a core bottleneck for the Biology BS path', 'Bottleneck', 'yellow'],
@@ -460,6 +488,7 @@
         alerts: alerts.slice(0, 4),
         opportunities: opps.slice(0, 4),
         nextSemester,
+        samplePlanStudy: profile.samplePlanStudy || [],
         statusSummary,
         whySummary,
         nextSummary
@@ -523,7 +552,7 @@
       const notes = document.getElementById('notes').value || '';
       const taken = Array.from(document.querySelectorAll('#takenClasses .chip-option.active')).map(el => el.dataset.value);
       const profile = PROGRAM_DATA[major] || PROGRAM_DATA['Business & Engineering'];
-      const feedback = buildFeedback(profile, { year, completed, transfer, goal, career, issue, notes, taken });
+      const feedback = buildFeedback(profile, { school, major, year, completed, transfer, goal, career, issue, notes, taken });
 
       setTimeout(() => {
         document.getElementById('loader').classList.remove('active');
@@ -540,6 +569,7 @@
         document.getElementById('semesterList').innerHTML = renderList(feedback.nextSemester, 'semester');
         document.getElementById('alertsList').innerHTML = renderList(feedback.alerts, 'list');
         document.getElementById('oppsList').innerHTML = renderList(feedback.opportunities, 'list');
+        document.getElementById('samplePlanList').innerHTML = renderList(feedback.samplePlanStudy, 'list');
       }, 2200);
     }
 
