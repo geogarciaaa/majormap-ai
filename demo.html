@@ -216,6 +216,11 @@
           ['STAT 206', 'Needed after STAT 205 to stay on analytics track.', 'Core', 'blue'],
           ['CAEE 231 / ECE 231', 'Technical requirement listed in the broader B&E sample structure.', 'Required', 'blue']
         ],
+        scheduleFillers: [
+          ['General Education / Writing requirement', 'Use one slot to keep university core progress moving.', 'Flexible', 'blue'],
+          ['Business minor elective', 'Keeping the minor moving early prevents schedule compression later.', 'Flexible', 'green'],
+          ['Free elective / engineering prereq', 'Can be used strategically for engineering concentration preparation.', 'Flexible', 'green']
+        ],
         nextSemester: [
           ['ECON 201', 'Unlocks multiple business core dependencies', 'Bottleneck', 'yellow'],
           ['STAT 206', 'Needed after STAT 205 to stay on analytics track', 'Core', 'blue'],
@@ -236,6 +241,10 @@
         risk: 'Medium',
         remainingCredits: '128',
         keyCourses: ['UNIV CI101','COOP 101','ENG 0802/0812/0902','IH 0851','IH 0852','CS 171','CS 172','CS 260','CS 270','CS 277','CS 281','CS 283','MATH Support'],
+        scheduleFillers: [
+          ['Math / science support course', 'Keep the broader CS degree foundation moving.', 'Flexible', 'blue'],
+          ['Technical elective / project slot', 'Use this for portfolio or a technical elective when core bottlenecks are handled.', 'Flexible', 'green']
+        ],
         nextSemester: [
           ['CS 171', 'Core programming sequence should start as early as possible', 'Bottleneck', 'yellow'],
           ['CS 172', 'Needed right after intro programming to avoid downstream delays', 'Core', 'blue'],
@@ -256,6 +265,10 @@
         risk: 'Low',
         remainingCredits: '130',
         keyCourses: ['UNIV B101','UNIV B201','CIVC 101','ENGL 101/102/103','BUSN 101','BUSN 102','BSAN 160','ACCT 115','ACCT 116','STAT 202','FIN 301','FIN 302','FIN 321','FIN 325'],
+        scheduleFillers: [
+          ['Business flexible requirement', 'One flexible business requirement can help round out the term.', 'Flexible', 'blue'],
+          ['Accounting / analytics support', 'Helpful support course for deeper finance paths.', 'Flexible', 'green']
+        ],
         nextSemester: [
           ['STAT 202', 'Must be finished before upper-level required finance classes', 'Bottleneck', 'yellow'],
           ['FIN 301', 'Foundation for later finance sequence', 'Core', 'blue'],
@@ -276,6 +289,10 @@
         risk: 'Medium',
         remainingCredits: '123',
         keyCourses: ['BIOL 1111','BIOL 1112','BIOL 2207','BIOL 2297','CHEM 1031','CHEM 1032','CHEM 2201','MATH 1041'],
+        scheduleFillers: [
+          ['Physics / quantitative support', 'Temple Biology students usually need the broader science stack moving too.', 'Flexible', 'blue'],
+          ['Writing-intensive / major support course', 'Useful to prevent senior-year requirement compression.', 'Flexible', 'green']
+        ],
         nextSemester: [
           ['BIOL 2207', 'Genetics is a core bottleneck for the Biology BS path', 'Bottleneck', 'yellow'],
           ['BIOL 2297', 'Research Techniques in Genetics is a writing-intensive anchor', 'Core', 'blue'],
@@ -299,6 +316,22 @@
         return items.map(([title, copy, tag, cls]) => `<div class="course"><div><strong>${title}</strong><small>${copy}</small></div><div class="tag ${cls}">${tag}</div></div>`).join('');
       }
       return items.map(([title, copy]) => `<div class="item"><strong>${title}</strong><p>${copy}</p></div>`).join('');
+    }
+
+    function buildSemester(primary = [], secondary = [], fillers = [], taken = new Set(), count = 4) {
+      const out = [];
+      const seen = new Set();
+      const pushUnique = (item) => {
+        if (!item || !item[0]) return;
+        if (taken.has(item[0])) return;
+        if (seen.has(item[0])) return;
+        seen.add(item[0]);
+        out.push(item);
+      };
+      primary.forEach(pushUnique);
+      secondary.forEach(pushUnique);
+      fillers.forEach(pushUnique);
+      return out.slice(0, count);
     }
 
     function buildFeedback(profile, inputs) {
@@ -341,17 +374,14 @@
         ['UNIV B101','COOP 101','CIVC 101'].forEach(c => {
           if (!taken.has(c) && profile.keyCourses?.includes(c)) freshmanDrexel.push([c, 'Important early Drexel requirement that students often overlook in planning.', 'Required', 'blue']);
         });
-        if (profile.freshmanPlan) {
-          nextSemester = profile.freshmanPlan.filter(([title]) => !taken.has(title));
-        }
+        nextSemester = buildSemester(freshmanDrexel, profile.freshmanPlan || [], profile.scheduleFillers || [], taken, 4);
         if (freshmanDrexel.length) {
-          nextSemester = [...freshmanDrexel, ...nextSemester];
           alerts.unshift(['Don’t forget Drexel early requirements', 'UNIV / COOP / CIVC style requirements are part of staying truly on track, not just the major classes.']);
         }
       }
 
       if (inputs.school === 'Drexel University' && year === 'Sophomore' && profile.sophomorePlan) {
-        nextSemester = profile.sophomorePlan.filter(([title]) => !taken.has(title));
+        nextSemester = buildSemester(profile.sophomorePlan, profile.nextSemester || [], profile.scheduleFillers || [], taken, 4);
       }
 
       if (year === 'Junior' || year === 'Senior') {
@@ -405,7 +435,7 @@
       }
 
       // Make output visually change more by trimming/reordering based on context
-      nextSemester = nextSemester.slice(0, 4);
+      nextSemester = buildSemester(nextSemester, profile.nextSemester || [], profile.scheduleFillers || [], taken, 4);
       if (nextSemester.length === 0) {
         nextSemester = [['Upper-level elective / requirement check', 'You already marked the obvious bottlenecks as complete, so the next move depends on electives, writing-intensive requirements, and graduation pacing.', 'Review', 'blue']];
       }
