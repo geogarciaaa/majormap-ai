@@ -80,8 +80,8 @@
 
       <div class="form-step active" id="step1">
         <div class="row">
-          <div class="field"><label>School</label><select id="school"><option selected>Drexel University</option><option>Temple University</option></select></div>
-          <div class="field"><label>Major</label><select id="major"><option selected>Business & Engineering</option><option>Computer Science</option><option>Finance</option><option>Biology (Temple)</option></select></div>
+          <div class="field"><label>School</label><select id="school" onchange="updateMajorOptions()"><option selected>Drexel University</option><option>Temple University</option></select></div>
+          <div class="field"><label>Major</label><select id="major" onchange="updateTakenClasses()"><option selected>Business & Engineering</option><option>Computer Science</option><option>Finance</option></select></div>
         </div>
         <div class="row">
           <div class="field"><label>Current Year</label><select id="year"><option>Freshman</option><option selected>Sophomore</option><option>Junior</option><option>Senior</option></select></div>
@@ -181,6 +181,11 @@
   </footer>
 
   <script>
+    const SCHOOL_MAJORS = {
+      'Drexel University': ['Business & Engineering', 'Computer Science', 'Finance'],
+      'Temple University': ['Biology (Temple)']
+    };
+
     const PROGRAM_DATA = {
       'Business & Engineering': {
         risk: 'Low',
@@ -408,6 +413,16 @@
       };
     }
 
+    function updateMajorOptions() {
+      const school = document.getElementById('school').value;
+      const majorSelect = document.getElementById('major');
+      const allowed = SCHOOL_MAJORS[school] || [];
+      const current = majorSelect.value;
+      majorSelect.innerHTML = allowed.map(m => `<option ${m === current ? 'selected' : ''}>${m}</option>`).join('');
+      if (!allowed.includes(current) && allowed.length) majorSelect.value = allowed[0];
+      updateTakenClasses();
+    }
+
     function updateTakenClasses() {
       const major = document.getElementById('major').value;
       const box = document.getElementById('takenClasses');
@@ -481,6 +496,8 @@
       document.getElementById('p4').style.width = '0%';
       nextStep(1);
     }
+
+    updateMajorOptions();
   </script>
 </body>
 </html>
