@@ -185,7 +185,26 @@
       'Business & Engineering': {
         risk: 'Low',
         remainingCredits: '132',
-        keyCourses: ['UNIV B101','UNIV B201','COOP 101','CIVC 101','ENGL 101/111','ENGL 102/112','ENGL 103/113','MATH 121','MATH 122','ECON 201','ECON 202','STAT 205','STAT 206','ENGR 131','BUSN 101','BUSN 102'],
+        keyCourses: ['UNIV B101','UNIV B201','COOP 101','CIVC 101','ENGL 101/111','ENGL 102/112','ENGL 103/113','MATH 121','MATH 122','BUSN 101','BUSN 102','ECON 201','ECON 202','STAT 205','STAT 206','ENGR 111','ENGR 113','ENGR 131','CHEM 101','PHYS 101','CAEE 231 / ECE 231'],
+        freshmanPlan: [
+          ['BUSN 101', 'First-quarter anchor in the sample plan of study.', 'Required', 'blue'],
+          ['ENGL 101/111', 'Writing foundation starts immediately in year one.', 'Required', 'blue'],
+          ['MATH 121', 'Core first-year math requirement in the sample plan.', 'Bottleneck', 'yellow'],
+          ['ENGR 111', 'Early engineering foundation course from the sample plan.', 'Required', 'blue'],
+          ['CHEM 101', 'Science base starts early for the B&E path.', 'Required', 'blue'],
+          ['ENGR 113', 'Early engineering sequence requirement.', 'Required', 'blue'],
+          ['BUSN 102', 'Second anchor business course in the early plan.', 'Required', 'blue'],
+          ['MATH 122', 'Second math course should follow MATH 121 quickly.', 'Bottleneck', 'yellow'],
+          ['PHYS 101', 'Physics appears early in the sample plan and supports later engineering work.', 'Required', 'blue'],
+          ['ENGR 131', 'Programming / engineering systems base that supports concentration flexibility.', 'Required', 'blue']
+        ],
+        sophomorePlan: [
+          ['ECON 201', 'Unlocks multiple business core dependencies.', 'Bottleneck', 'yellow'],
+          ['ECON 202', 'Should follow ECON 201 without getting pushed too late.', 'Required', 'blue'],
+          ['STAT 205', 'Statistics starts becoming important in year two.', 'Bottleneck', 'yellow'],
+          ['STAT 206', 'Needed after STAT 205 to stay on analytics track.', 'Core', 'blue'],
+          ['CAEE 231 / ECE 231', 'Technical requirement listed in the broader B&E sample structure.', 'Required', 'blue']
+        ],
         nextSemester: [
           ['ECON 201', 'Unlocks multiple business core dependencies', 'Bottleneck', 'yellow'],
           ['STAT 206', 'Needed after STAT 205 to stay on analytics track', 'Core', 'blue'],
@@ -311,10 +330,17 @@
         ['UNIV B101','COOP 101','CIVC 101'].forEach(c => {
           if (!taken.has(c) && profile.keyCourses?.includes(c)) freshmanDrexel.push([c, 'Important early Drexel requirement that students often overlook in planning.', 'Required', 'blue']);
         });
+        if (profile.freshmanPlan) {
+          nextSemester = profile.freshmanPlan.filter(([title]) => !taken.has(title));
+        }
         if (freshmanDrexel.length) {
           nextSemester = [...freshmanDrexel, ...nextSemester];
           alerts.unshift(['Don’t forget Drexel early requirements', 'UNIV / COOP / CIVC style requirements are part of staying truly on track, not just the major classes.']);
         }
+      }
+
+      if (inputs.school === 'Drexel University' && year === 'Sophomore' && profile.sophomorePlan) {
+        nextSemester = profile.sophomorePlan.filter(([title]) => !taken.has(title));
       }
 
       if (year === 'Junior' || year === 'Senior') {
