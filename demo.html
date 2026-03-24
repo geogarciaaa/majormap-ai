@@ -151,6 +151,7 @@
           <div class="summary-box"><strong>Your status</strong><p id="statusSummary">You look on pace right now, but your next registration choices still matter.</p></div>
           <div class="summary-box"><strong>Why we're saying that</strong><p id="whySummary">This is based on your school, major, credits completed, classes already taken, and future goal.</p></div>
           <div class="summary-box"><strong>What to do next</strong><p id="nextSummary">Prioritize bottlenecks, confirm your roadmap, and move early on opportunities tied to your goal.</p></div>
+          <div class="summary-box"><strong>AI guidance</strong><p id="aiSummary">Based on your inputs, here’s the bigger picture and what I’d focus on if I were planning your next move.</p></div>
         </div>
 
         <div class="dashboard">
@@ -568,6 +569,7 @@
         document.getElementById('statusSummary').textContent = feedback.statusSummary;
         document.getElementById('whySummary').textContent = feedback.whySummary;
         document.getElementById('nextSummary').textContent = feedback.nextSummary;
+        document.getElementById('aiSummary').textContent = feedback.aiSummary;
         document.getElementById('semesterList').innerHTML = renderList(feedback.nextSemester, 'semester');
         document.getElementById('alertsList').innerHTML = renderList(feedback.alerts, 'list');
         document.getElementById('oppsList').innerHTML = renderList(feedback.opportunities, 'list');
