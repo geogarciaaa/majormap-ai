@@ -114,6 +114,15 @@
     .modal-backdrop{position:fixed;inset:0;background:rgba(3,8,20,.72);backdrop-filter:blur(6px);z-index:60;display:none;align-items:center;justify-content:center;padding:20px}
     .modal-backdrop.show{display:flex}
     .modal{width:min(560px,100%);max-height:88vh;overflow:auto;border-radius:22px}
+    .modal.wide{width:min(920px,100%)}
+    .live-table{width:100%;border-collapse:collapse;font-size:.82rem}
+    .live-table th{text-align:left;font-size:.68rem;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);padding:8px 10px;position:sticky;top:0;background:rgba(13,22,39,.96);border-bottom:1px solid var(--line)}
+    .live-table td{padding:9px 10px;border-bottom:1px solid rgba(148,163,184,.08);vertical-align:top}
+    .live-table tr:hover td{background:rgba(255,255,255,.02)}
+    .seat-bar{height:5px;border-radius:999px;background:rgba(148,163,184,.16);overflow:hidden;margin-top:4px;width:70px}
+    .seat-bar span{display:block;height:100%;border-radius:999px}
+    .rmp{font-weight:700}
+    .live-sec{padding:10px 11px;border-radius:12px;border:1px solid var(--line);background:rgba(255,255,255,.03);font-size:.8rem}
     .step-dot{height:7px;border-radius:999px;background:rgba(148,163,184,.16);overflow:hidden;flex:1}
     .step-dot span{display:block;height:100%;width:0;background:linear-gradient(90deg,var(--green),#86efac);transition:width .3s ease}
     .toast{position:fixed;bottom:22px;left:50%;transform:translateX(-50%) translateY(20px);background:rgba(13,22,39,.96);border:1px solid var(--line);padding:12px 18px;border-radius:14px;font-size:.9rem;font-weight:600;opacity:0;pointer-events:none;transition:all .25s ease;z-index:80;box-shadow:0 20px 50px rgba(2,8,23,.6)}
@@ -240,6 +249,7 @@
         <div id="wsSub" class="text-sm mt-1" style="color:var(--muted)">Sophomore · Goal: Software Engineer · Balanced load</div>
       </div>
       <div class="flex flex-wrap gap-2">
+        <button id="liveBtn" class="btn btn-secondary px-4 py-2.5 text-sm" onclick="openLive()">📡 Live Sections</button>
         <button class="btn btn-secondary px-4 py-2.5 text-sm" onclick="autoOptimize()">✨ Auto-Optimize</button>
         <button class="btn btn-secondary px-4 py-2.5 text-sm" onclick="saveMap()">💾 Save</button>
         <div class="relative">
@@ -336,6 +346,10 @@
         <div class="text-[.7rem] uppercase tracking-widest mb-1.5" style="color:var(--muted)">Unlocks</div>
         <div id="mUnlocks" class="text-sm"></div>
       </div>
+      <div id="mLiveWrap" class="mb-4" hidden>
+        <div class="text-[.7rem] uppercase tracking-widest mb-1.5" style="color:var(--muted)">📡 Live sections this term</div>
+        <div id="mLive" class="flex flex-col gap-2"></div>
+      </div>
       <div class="rounded-2xl p-4" style="background:rgba(167,139,250,.08);border:1px solid rgba(167,139,250,.25)">
         <div class="flex items-center gap-2 text-sm font-bold mb-1.5">🤖 Why the AI recommended this</div>
         <p id="mWhy" class="text-sm leading-relaxed" style="color:#dcd5ff"></p>
@@ -344,6 +358,52 @@
         <div class="text-xs" style="color:var(--muted)">Move to:</div>
         <select id="mMoveTo" class="!w-auto !py-1.5 !px-3 text-sm" onchange="moveViaModal(this.value)"></select>
       </div>
+    </div>
+  </div>
+
+  <!-- ===== LIVE DREXEL SECTIONS MODAL ===== -->
+  <div class="modal-backdrop" id="liveModal" onclick="if(event.target===this)closeLive()">
+    <div class="modal wide glass p-6 shadow-2xl">
+      <div class="flex items-start justify-between gap-3 mb-1">
+        <div>
+          <div class="text-xl font-extrabold tracking-tight">📡 Live Drexel Sections</div>
+          <div id="liveSub" class="text-sm mt-0.5" style="color:var(--muted)">Real Term Master Schedule data — import a <code>data.json</code> from the Drexel scraper.</div>
+        </div>
+        <button class="btn btn-ghost w-9 h-9 !p-0 text-lg" onclick="closeLive()">✕</button>
+      </div>
+
+      <!-- import controls -->
+      <div class="rounded-2xl p-3 mb-4" style="background:rgba(96,165,250,.06);border:1px solid rgba(96,165,250,.2)">
+        <div class="flex flex-wrap items-center gap-2">
+          <label class="btn btn-secondary px-4 py-2.5 text-sm" style="cursor:pointer">
+            📂 Import data.json
+            <input type="file" accept="application/json,.json" onchange="onLiveFile(this)" style="display:none" />
+          </label>
+          <button class="btn btn-secondary px-4 py-2.5 text-sm" onclick="loadSampleLive()">⚡ Load sample term</button>
+          <span id="liveStatus" class="text-xs ml-1" style="color:var(--muted)">No data loaded yet.</span>
+        </div>
+        <div class="text-xs mt-2" style="color:var(--muted)">
+          Sections match your map by subject + course number. Run the
+          <a href="https://github.com/Zohair-coder/drexel-scraper" target="_blank" rel="noopener" style="color:var(--blue)">drexel-scraper</a>
+          yourself (it needs your Drexel login) to generate live data.
+        </div>
+      </div>
+
+      <!-- filters -->
+      <div id="liveControls" class="flex flex-wrap gap-2 mb-3" hidden>
+        <input id="liveSearch" placeholder="Search title, subject, CRN, instructor…" oninput="renderLiveTable()" class="!w-auto" style="flex:1;min-width:220px" />
+        <select id="liveSubject" onchange="renderLiveTable()" class="!w-auto"></select>
+        <label class="flex items-center gap-2 text-xs px-2" style="color:var(--muted)"><input id="liveMineOnly" type="checkbox" onchange="renderLiveTable()" style="width:auto" /> Only courses on my map</label>
+        <label class="flex items-center gap-2 text-xs px-2" style="color:var(--muted)"><input id="liveOpenOnly" type="checkbox" onchange="renderLiveTable()" style="width:auto" /> Open seats only</label>
+      </div>
+
+      <div id="liveTableWrap" style="max-height:52vh;overflow:auto;border-radius:14px;border:1px solid var(--line)" hidden>
+        <table class="live-table">
+          <thead><tr><th>Course</th><th>Title</th><th>Sec / CRN</th><th>Days &amp; Time</th><th>Instructor</th><th>Seats</th><th>Cr</th></tr></thead>
+          <tbody id="liveTableBody"></tbody>
+        </table>
+      </div>
+      <div id="liveEmpty" class="text-center text-sm py-10" style="color:var(--muted)">Import a <code>data.json</code> or load the sample term to browse real sections.</div>
     </div>
   </div>
 
@@ -733,7 +793,10 @@
         <div class="meta">
           <span class="cat-dot" style="background:${cat.color}"></span>
           <span class="text-[.66rem]" style="color:var(--muted)">${cat.label}</span>
-          ${c.careers && c.careers.includes(state.career) ? '<span class="badge ml-auto" style="background:rgba(74,222,128,.14);color:var(--green)">★ Goal</span>':''}
+          <span class="ml-auto flex items-center gap-1.5">
+            ${c.careers && c.careers.includes(state.career) ? '<span class="badge" style="background:rgba(74,222,128,.14);color:var(--green)">★ Goal</span>':''}
+            ${liveBadgeHTML(id)}
+          </span>
         </div>
       </div>`;
   }
@@ -869,6 +932,9 @@
 
     // 3) career-boosting tips
     careerTips(c).forEach(t=> items.push(t));
+
+    // 3b) live Drexel availability (only when a schedule has been imported)
+    const la = liveAdvice(); if(la) items.push(la);
 
     // 4) underloaded early semesters (accelerate)
     const firstLight = state.plan.findIndex((sem,i)=> Math.floor(i/2) >= currentYearIndex() && sem.reduce((s,id)=>s+(c[id]?.cr||0),0) < target-4 && sem.length);
@@ -1020,6 +1086,19 @@
 
     el('mWhy').textContent = whyRecommended(id);
 
+    // live sections (if Drexel data imported)
+    const secs = matchedSections(id);
+    if(liveData && secs.length){
+      el('mLiveWrap').hidden = false;
+      el('mLive').innerHTML = secs.slice(0,4).map(sectionRowHTML).join('') +
+        (secs.length>4?`<div class="text-xs" style="color:var(--muted)">+${secs.length-4} more — see 📡 Live Sections</div>`:'');
+    } else if(liveData){
+      el('mLiveWrap').hidden = false;
+      el('mLive').innerHTML = `<div class="live-sec" style="color:var(--muted)">Not offered in the imported term (${liveData.term}).</div>`;
+    } else {
+      el('mLiveWrap').hidden = true;
+    }
+
     // move-to dropdown
     el('mMoveTo').innerHTML = '<option value="">—</option>' + SEMESTER_LABELS.map((l,i)=>`<option value="${i}" ${semesterOf(id)===i?'selected':''}>${l}</option>`).join('');
     el('mMoveTo').dataset.course = id;
@@ -1132,7 +1211,154 @@
     const t = el('toast'); t.textContent = msg; t.classList.add('show');
     clearTimeout(toastTimer); toastTimer = setTimeout(()=> t.classList.remove('show'), 2400);
   }
-  document.addEventListener('keydown', e=>{ if(e.key==='Escape'){ closeModal(); el('exportMenu').hidden=true; } });
+  document.addEventListener('keydown', e=>{ if(e.key==='Escape'){ closeModal(); closeLive(); el('exportMenu').hidden=true; } });
+
+  /* =========================================================================
+     LIVE DREXEL SECTIONS  (import a data.json produced by the drexel-scraper)
+     Scraper output shape: { "<crn>": {subject_code, course_number, section, crn,
+       enroll, max_enroll, course_title, days[], start_time, end_time,
+       instructors:[{name, rating?}], prereqs, credits}, ... }
+     ========================================================================= */
+  const SAMPLE_LIVE = {"10007":{"subject_code":"CS","course_number":"101","instruction_type":"Lecture","instruction_method":"Hybrid","section":"001","crn":10007,"enroll":"FULL","max_enroll":"FULL","course_title":"Intro to Programming","days":["Wednesday"],"start_time":"15:30","end_time":"16:30","instructors":[{"name":"Daniel Dougherty","rating":{"quality":3.9,"difficulty":3.3}}],"prereqs":"None","credits":"4.0"},"10016":{"subject_code":"CS","course_number":"101","instruction_type":"Lecture","instruction_method":"Online","section":"002","crn":10016,"enroll":"29","max_enroll":"30","course_title":"Intro to Programming","days":["Monday","Wednesday","Friday"],"start_time":"08:00","end_time":"09:00","instructors":[{"name":"Maria Schultheis","rating":{"quality":4.2,"difficulty":2.7}}],"prereqs":"None","credits":"4.0"},"10026":{"subject_code":"CS","course_number":"102","instruction_type":"Lecture","instruction_method":"Face To Face","section":"001","crn":10026,"enroll":"24","max_enroll":"30","course_title":"Object-Oriented Programming","days":null,"start_time":null,"end_time":null,"instructors":[{"name":"Jeffrey Popyack","rating":{"quality":4.1,"difficulty":3.2}}],"prereqs":"CS 101 [Min Grade: C]","credits":"4.0"},"10046":{"subject_code":"CS","course_number":"102","instruction_type":"Lecture","instruction_method":"Online","section":"002","crn":10046,"enroll":"FULL","max_enroll":"FULL","course_title":"Object-Oriented Programming","days":["Tuesday","Thursday"],"start_time":"11:00","end_time":"12:00","instructors":[{"name":"Mark Boady","rating":{"quality":4.4,"difficulty":3.0}},{"name":"Amy Ruymann","rating":{"quality":4.6,"difficulty":2.4}}],"prereqs":"CS 101 [Min Grade: C]","credits":"4.0"},"10055":{"subject_code":"CS","course_number":"201","instruction_type":"Lecture","instruction_method":"Online","section":"001","crn":10055,"enroll":"18","max_enroll":"30","course_title":"Data Structures","days":["Monday","Wednesday"],"start_time":"08:00","end_time":"10:00","instructors":[{"name":"Daniel Dougherty","rating":{"quality":3.9,"difficulty":3.3}},{"name":"Ellen Bass","rating":{"quality":4.3,"difficulty":2.9}}],"prereqs":"CS 102 [Min Grade: C]","credits":"4.0"},"10068":{"subject_code":"CS","course_number":"201","instruction_type":"Lecture","instruction_method":"Face To Face","section":"002","crn":10068,"enroll":"43","max_enroll":"45","course_title":"Data Structures","days":["Wednesday"],"start_time":"14:00","end_time":"16:00","instructors":[{"name":"Brian Mitchell","rating":{"quality":3.2,"difficulty":3.8}},{"name":"Amy Ruymann","rating":{"quality":4.6,"difficulty":2.4}}],"prereqs":"CS 102 [Min Grade: C]","credits":"4.0"},"10080":{"subject_code":"CS","course_number":"201","instruction_type":"Lecture","instruction_method":"Online","section":"003","crn":10080,"enroll":"52","max_enroll":"60","course_title":"Data Structures","days":null,"start_time":null,"end_time":null,"instructors":[{"name":"Amy Ruymann","rating":{"quality":4.6,"difficulty":2.4}},{"name":"Amy Ruymann","rating":{"quality":4.6,"difficulty":2.4}}],"prereqs":"CS 102 [Min Grade: C]","credits":"4.0"},"10096":{"subject_code":"CS","course_number":"320","instruction_type":"Lecture","instruction_method":"Hybrid","section":"001","crn":10096,"enroll":"28","max_enroll":"60","course_title":"Software Engineering","days":["Tuesday","Thursday"],"start_time":"18:00","end_time":"19:00","instructors":[{"name":"Geoffrey Mainland","rating":{"quality":3.7,"difficulty":4.1}},{"name":"Geoffrey Mainland","rating":{"quality":3.7,"difficulty":4.1}}],"prereqs":"CS 201 [Min Grade: C]","credits":"3.0"},"10110":{"subject_code":"CS","course_number":"320","instruction_type":"Lecture","instruction_method":"Face To Face","section":"002","crn":10110,"enroll":"53","max_enroll":"60","course_title":"Software Engineering","days":null,"start_time":null,"end_time":null,"instructors":[{"name":"Santiago Ontanon","rating":{"quality":4.0,"difficulty":3.5}}],"prereqs":"CS 201 [Min Grade: C]","credits":"3.0"},"10128":{"subject_code":"CS","course_number":"320","instruction_type":"Lecture","instruction_method":"Online","section":"003","crn":10128,"enroll":"39","max_enroll":"45","course_title":"Software Engineering","days":["Monday","Wednesday","Friday"],"start_time":"08:00","end_time":"10:00","instructors":[{"name":"Ellen Bass","rating":{"quality":4.3,"difficulty":2.9}}],"prereqs":"CS 201 [Min Grade: C]","credits":"3.0"},"10142":{"subject_code":"CS","course_number":"340","instruction_type":"Lecture","instruction_method":"Face To Face","section":"001","crn":10142,"enroll":"FULL","max_enroll":"FULL","course_title":"Machine Learning","days":["Monday","Wednesday","Friday"],"start_time":"12:30","end_time":"13:30","instructors":[{"name":"Santiago Ontanon","rating":{"quality":4.0,"difficulty":3.5}}],"prereqs":"CS 202 [Min Grade: C] and STAT 201","credits":"3.0"},"10149":{"subject_code":"CS","course_number":"340","instruction_type":"Lecture","instruction_method":"Online","section":"002","crn":10149,"enroll":"FULL","max_enroll":"FULL","course_title":"Machine Learning","days":["Tuesday","Thursday"],"start_time":"12:30","end_time":"13:30","instructors":[{"name":"Daniel Dougherty","rating":{"quality":3.9,"difficulty":3.3}}],"prereqs":"CS 202 [Min Grade: C] and STAT 201","credits":"3.0"},"10160":{"subject_code":"CS","course_number":"340","instruction_type":"Lecture","instruction_method":"Online","section":"003","crn":10160,"enroll":"62","max_enroll":"90","course_title":"Machine Learning","days":["Tuesday","Thursday"],"start_time":"18:00","end_time":"19:00","instructors":[{"name":"Ellen Bass","rating":{"quality":4.3,"difficulty":2.9}},{"name":"Brian Mitchell","rating":{"quality":3.2,"difficulty":3.8}}],"prereqs":"CS 202 [Min Grade: C] and STAT 201","credits":"3.0"},"10165":{"subject_code":"MATH","course_number":"121","instruction_type":"Lecture","instruction_method":"Hybrid","section":"001","crn":10165,"enroll":"FULL","max_enroll":"FULL","course_title":"Calculus I","days":["Tuesday","Thursday"],"start_time":"09:30","end_time":"10:30","instructors":[{"name":"Santiago Ontanon","rating":{"quality":4.0,"difficulty":3.5}}],"prereqs":"MATH 100 [Min Grade: C] or Placement","credits":"4.0"},"10177":{"subject_code":"MATH","course_number":"121","instruction_type":"Lecture","instruction_method":"Face To Face","section":"002","crn":10177,"enroll":"28","max_enroll":"45","course_title":"Calculus I","days":["Monday","Wednesday","Friday"],"start_time":"09:30","end_time":"10:30","instructors":[{"name":"Daniel Dougherty","rating":{"quality":3.9,"difficulty":3.3}},{"name":"Maria Schultheis","rating":{"quality":4.2,"difficulty":2.7}}],"prereqs":"MATH 100 [Min Grade: C] or Placement","credits":"4.0"},"10181":{"subject_code":"MATH","course_number":"122","instruction_type":"Lecture","instruction_method":"Online","section":"001","crn":10181,"enroll":"61","max_enroll":"90","course_title":"Calculus II","days":["Wednesday"],"start_time":"18:00","end_time":"20:00","instructors":[{"name":"Rachel Greene","rating":{"quality":4.8,"difficulty":2.1}}],"prereqs":"MATH 121 [Min Grade: C]","credits":"4.0"},"10196":{"subject_code":"MATH","course_number":"122","instruction_type":"Lecture","instruction_method":"Online","section":"002","crn":10196,"enroll":"19","max_enroll":"40","course_title":"Calculus II","days":["Monday","Wednesday","Friday"],"start_time":"09:30","end_time":"10:30","instructors":[{"name":"Jeffrey Popyack","rating":{"quality":4.1,"difficulty":3.2}},{"name":"Amy Ruymann","rating":{"quality":4.6,"difficulty":2.4}}],"prereqs":"MATH 121 [Min Grade: C]","credits":"4.0"},"10199":{"subject_code":"MATH","course_number":"122","instruction_type":"Lecture","instruction_method":"Hybrid","section":"003","crn":10199,"enroll":"27","max_enroll":"40","course_title":"Calculus II","days":null,"start_time":null,"end_time":null,"instructors":[{"name":"Amy Ruymann","rating":{"quality":4.6,"difficulty":2.4}}],"prereqs":"MATH 121 [Min Grade: C]","credits":"4.0"},"10214":{"subject_code":"STAT","course_number":"201","instruction_type":"Lecture","instruction_method":"Face To Face","section":"001","crn":10214,"enroll":"33","max_enroll":"45","course_title":"Statistics","days":["Tuesday","Thursday"],"start_time":"15:30","end_time":"16:30","instructors":[{"name":"Rachel Greene","rating":{"quality":4.8,"difficulty":2.1}}],"prereqs":"MATH 122 [Min Grade: D]","credits":"3.0"},"10231":{"subject_code":"STAT","course_number":"201","instruction_type":"Lecture","instruction_method":"Online","section":"002","crn":10231,"enroll":"FULL","max_enroll":"FULL","course_title":"Statistics","days":["Wednesday"],"start_time":"12:30","end_time":"13:30","instructors":[{"name":"Santiago Ontanon","rating":{"quality":4.0,"difficulty":3.5}},{"name":"Rachel Greene","rating":{"quality":4.8,"difficulty":2.1}}],"prereqs":"MATH 122 [Min Grade: D]","credits":"3.0"},"10239":{"subject_code":"ACCT","course_number":"101","instruction_type":"Lecture","instruction_method":"Hybrid","section":"001","crn":10239,"enroll":"FULL","max_enroll":"FULL","course_title":"Financial Accounting","days":null,"start_time":null,"end_time":null,"instructors":[{"name":"Mark Boady","rating":{"quality":4.4,"difficulty":3.0}}],"prereqs":"None","credits":"3.0"},"10259":{"subject_code":"ACCT","course_number":"101","instruction_type":"Lecture","instruction_method":"Hybrid","section":"002","crn":10259,"enroll":"20","max_enroll":"30","course_title":"Financial Accounting","days":["Monday","Wednesday","Friday"],"start_time":"18:00","end_time":"20:00","instructors":[{"name":"Mark Boady","rating":{"quality":4.4,"difficulty":3.0}}],"prereqs":"None","credits":"3.0"},"10273":{"subject_code":"ACCT","course_number":"101","instruction_type":"Lecture","instruction_method":"Hybrid","section":"003","crn":10273,"enroll":"50","max_enroll":"90","course_title":"Financial Accounting","days":["Tuesday","Thursday"],"start_time":"14:00","end_time":"16:00","instructors":[{"name":"Brian Mitchell","rating":{"quality":3.2,"difficulty":3.8}}],"prereqs":"None","credits":"3.0"},"10283":{"subject_code":"ACCT","course_number":"102","instruction_type":"Lecture","instruction_method":"Online","section":"001","crn":10283,"enroll":"20","max_enroll":"30","course_title":"Managerial Accounting","days":["Tuesday","Thursday"],"start_time":"14:00","end_time":"15:00","instructors":[{"name":"Brian Mitchell","rating":{"quality":3.2,"difficulty":3.8}}],"prereqs":"ACCT 101 [Min Grade: D]","credits":"3.0"},"10297":{"subject_code":"ACCT","course_number":"102","instruction_type":"Lecture","instruction_method":"Face To Face","section":"002","crn":10297,"enroll":"29","max_enroll":"45","course_title":"Managerial Accounting","days":["Wednesday"],"start_time":"18:00","end_time":"20:00","instructors":[{"name":"Amy Ruymann","rating":{"quality":4.6,"difficulty":2.4}}],"prereqs":"ACCT 101 [Min Grade: D]","credits":"3.0"},"10315":{"subject_code":"ACCT","course_number":"310","instruction_type":"Lecture","instruction_method":"Face To Face","section":"001","crn":10315,"enroll":"75","max_enroll":"90","course_title":"Federal Taxation I","days":["Tuesday","Thursday"],"start_time":"11:00","end_time":"12:00","instructors":[{"name":"Geoffrey Mainland","rating":{"quality":3.7,"difficulty":4.1}}],"prereqs":"ACCT 201 [Min Grade: C]","credits":"3.0"},"10320":{"subject_code":"ACCT","course_number":"310","instruction_type":"Lecture","instruction_method":"Online","section":"002","crn":10320,"enroll":"21","max_enroll":"40","course_title":"Federal Taxation I","days":["Monday","Wednesday","Friday"],"start_time":"12:30","end_time":"14:30","instructors":[{"name":"Geoffrey Mainland","rating":{"quality":3.7,"difficulty":4.1}},{"name":"Amy Ruymann","rating":{"quality":4.6,"difficulty":2.4}}],"prereqs":"ACCT 201 [Min Grade: C]","credits":"3.0"},"10335":{"subject_code":"ECON","course_number":"101","instruction_type":"Lecture","instruction_method":"Face To Face","section":"001","crn":10335,"enroll":"17","max_enroll":"30","course_title":"Microeconomics","days":["Wednesday"],"start_time":"12:30","end_time":"14:30","instructors":[{"name":"Mark Boady","rating":{"quality":4.4,"difficulty":3.0}}],"prereqs":"None","credits":"3.0"},"10352":{"subject_code":"ECON","course_number":"101","instruction_type":"Lecture","instruction_method":"Face To Face","section":"002","crn":10352,"enroll":"46","max_enroll":"60","course_title":"Microeconomics","days":["Tuesday","Thursday"],"start_time":"14:00","end_time":"16:00","instructors":[{"name":"Daniel Dougherty","rating":{"quality":3.9,"difficulty":3.3}},{"name":"Mark Boady","rating":{"quality":4.4,"difficulty":3.0}}],"prereqs":"None","credits":"3.0"},"10355":{"subject_code":"ECON","course_number":"101","instruction_type":"Lecture","instruction_method":"Online","section":"003","crn":10355,"enroll":"16","max_enroll":"30","course_title":"Microeconomics","days":["Monday","Wednesday","Friday"],"start_time":"18:00","end_time":"20:00","instructors":[{"name":"Brian Mitchell","rating":{"quality":3.2,"difficulty":3.8}}],"prereqs":"None","credits":"3.0"},"10366":{"subject_code":"ECON","course_number":"102","instruction_type":"Lecture","instruction_method":"Online","section":"001","crn":10366,"enroll":"70","max_enroll":"90","course_title":"Macroeconomics","days":["Tuesday","Thursday"],"start_time":"11:00","end_time":"13:00","instructors":[{"name":"Jeffrey Popyack","rating":{"quality":4.1,"difficulty":3.2}}],"prereqs":"None","credits":"3.0"},"10380":{"subject_code":"ECON","course_number":"102","instruction_type":"Lecture","instruction_method":"Face To Face","section":"002","crn":10380,"enroll":"68","max_enroll":"90","course_title":"Macroeconomics","days":["Wednesday"],"start_time":"15:30","end_time":"17:30","instructors":[{"name":"Mark Boady","rating":{"quality":4.4,"difficulty":3.0}},{"name":"Daniel Dougherty","rating":{"quality":3.9,"difficulty":3.3}}],"prereqs":"None","credits":"3.0"},"10383":{"subject_code":"FIN","course_number":"301","instruction_type":"Lecture","instruction_method":"Face To Face","section":"001","crn":10383,"enroll":"16","max_enroll":"30","course_title":"Investments","days":["Wednesday"],"start_time":"18:00","end_time":"19:00","instructors":[{"name":"Rachel Greene","rating":{"quality":4.8,"difficulty":2.1}}],"prereqs":"FIN 201 [Min Grade: D]","credits":"3.0"},"10389":{"subject_code":"FIN","course_number":"301","instruction_type":"Lecture","instruction_method":"Hybrid","section":"002","crn":10389,"enroll":"28","max_enroll":"30","course_title":"Investments","days":null,"start_time":null,"end_time":null,"instructors":[{"name":"Rachel Greene","rating":{"quality":4.8,"difficulty":2.1}},{"name":"Amy Ruymann","rating":{"quality":4.6,"difficulty":2.4}}],"prereqs":"FIN 201 [Min Grade: D]","credits":"3.0"},"10409":{"subject_code":"FIN","course_number":"301","instruction_type":"Lecture","instruction_method":"Online","section":"003","crn":10409,"enroll":"28","max_enroll":"30","course_title":"Investments","days":["Monday","Wednesday","Friday"],"start_time":"09:30","end_time":"10:30","instructors":[{"name":"Jeffrey Popyack","rating":{"quality":4.1,"difficulty":3.2}},{"name":"Amy Ruymann","rating":{"quality":4.6,"difficulty":2.4}}],"prereqs":"FIN 201 [Min Grade: D]","credits":"3.0"},"10422":{"subject_code":"MKT","course_number":"201","instruction_type":"Lecture","instruction_method":"Hybrid","section":"001","crn":10422,"enroll":"48","max_enroll":"90","course_title":"Principles of Marketing","days":null,"start_time":null,"end_time":null,"instructors":[{"name":"Rachel Greene","rating":{"quality":4.8,"difficulty":2.1}}],"prereqs":"BUS 101 [Min Grade: D]","credits":"3.0"},"10441":{"subject_code":"MKT","course_number":"201","instruction_type":"Lecture","instruction_method":"Hybrid","section":"002","crn":10441,"enroll":"39","max_enroll":"60","course_title":"Principles of Marketing","days":null,"start_time":null,"end_time":null,"instructors":[{"name":"Santiago Ontanon","rating":{"quality":4.0,"difficulty":3.5}},{"name":"Daniel Dougherty","rating":{"quality":3.9,"difficulty":3.3}}],"prereqs":"BUS 101 [Min Grade: D]","credits":"3.0"},"10458":{"subject_code":"MGT","course_number":"201","instruction_type":"Lecture","instruction_method":"Online","section":"001","crn":10458,"enroll":"39","max_enroll":"60","course_title":"Principles of Management","days":["Tuesday","Thursday"],"start_time":"12:30","end_time":"13:30","instructors":[{"name":"Brian Mitchell","rating":{"quality":3.2,"difficulty":3.8}}],"prereqs":"BUS 101 [Min Grade: D]","credits":"3.0"},"10470":{"subject_code":"MGT","course_number":"201","instruction_type":"Lecture","instruction_method":"Face To Face","section":"002","crn":10470,"enroll":"FULL","max_enroll":"FULL","course_title":"Principles of Management","days":["Monday","Wednesday","Friday"],"start_time":"18:00","end_time":"19:00","instructors":[{"name":"Brian Mitchell","rating":{"quality":3.2,"difficulty":3.8}}],"prereqs":"BUS 101 [Min Grade: D]","credits":"3.0"},"10476":{"subject_code":"BUS","course_number":"310","instruction_type":"Lecture","instruction_method":"Online","section":"001","crn":10476,"enroll":"FULL","max_enroll":"FULL","course_title":"Business Analytics","days":["Wednesday"],"start_time":"12:30","end_time":"13:30","instructors":[{"name":"Ellen Bass","rating":{"quality":4.3,"difficulty":2.9}},{"name":"Geoffrey Mainland","rating":{"quality":3.7,"difficulty":4.1}}],"prereqs":"STAT 205 [Min Grade: D]","credits":"3.0"},"10492":{"subject_code":"BUS","course_number":"310","instruction_type":"Lecture","instruction_method":"Hybrid","section":"002","crn":10492,"enroll":"FULL","max_enroll":"FULL","course_title":"Business Analytics","days":["Tuesday","Thursday"],"start_time":"11:00","end_time":"12:00","instructors":[{"name":"Rachel Greene","rating":{"quality":4.8,"difficulty":2.1}}],"prereqs":"STAT 205 [Min Grade: D]","credits":"3.0"},"10495":{"subject_code":"BUS","course_number":"310","instruction_type":"Lecture","instruction_method":"Face To Face","section":"003","crn":10495,"enroll":"20","max_enroll":"45","course_title":"Business Analytics","days":["Wednesday"],"start_time":"11:00","end_time":"13:00","instructors":[{"name":"Amy Ruymann","rating":{"quality":4.6,"difficulty":2.4}}],"prereqs":"STAT 205 [Min Grade: D]","credits":"3.0"},"10506":{"subject_code":"ENGL","course_number":"101","instruction_type":"Lecture","instruction_method":"Online","section":"001","crn":10506,"enroll":"20","max_enroll":"40","course_title":"Composition & Rhetoric I","days":["Monday","Wednesday"],"start_time":"08:00","end_time":"10:00","instructors":[{"name":"Santiago Ontanon","rating":{"quality":4.0,"difficulty":3.5}},{"name":"Ellen Bass","rating":{"quality":4.3,"difficulty":2.9}}],"prereqs":"None","credits":"3.0"},"10513":{"subject_code":"ENGL","course_number":"101","instruction_type":"Lecture","instruction_method":"Online","section":"002","crn":10513,"enroll":"80","max_enroll":"90","course_title":"Composition & Rhetoric I","days":null,"start_time":null,"end_time":null,"instructors":[{"name":"Santiago Ontanon","rating":{"quality":4.0,"difficulty":3.5}}],"prereqs":"None","credits":"3.0"},"10521":{"subject_code":"PHYS","course_number":"101","instruction_type":"Lecture","instruction_method":"Face To Face","section":"001","crn":10521,"enroll":"20","max_enroll":"30","course_title":"Fundamentals of Physics I","days":["Wednesday"],"start_time":"08:00","end_time":"09:00","instructors":[{"name":"Brian Mitchell","rating":{"quality":3.2,"difficulty":3.8}},{"name":"Amy Ruymann","rating":{"quality":4.6,"difficulty":2.4}}],"prereqs":"MATH 121 [Min Grade: D]","credits":"4.0"},"10532":{"subject_code":"PHYS","course_number":"101","instruction_type":"Lecture","instruction_method":"Hybrid","section":"002","crn":10532,"enroll":"53","max_enroll":"90","course_title":"Fundamentals of Physics I","days":["Monday","Wednesday","Friday"],"start_time":"12:30","end_time":"13:30","instructors":[{"name":"Jeffrey Popyack","rating":{"quality":4.1,"difficulty":3.2}}],"prereqs":"MATH 121 [Min Grade: D]","credits":"4.0"},"10542":{"subject_code":"BLAW","course_number":"201","instruction_type":"Lecture","instruction_method":"Online","section":"001","crn":10542,"enroll":"FULL","max_enroll":"FULL","course_title":"Business Law I","days":["Monday","Wednesday","Friday"],"start_time":"09:30","end_time":"10:30","instructors":[{"name":"Santiago Ontanon","rating":{"quality":4.0,"difficulty":3.5}},{"name":"Daniel Dougherty","rating":{"quality":3.9,"difficulty":3.3}}],"prereqs":"None","credits":"3.0"},"10551":{"subject_code":"BLAW","course_number":"201","instruction_type":"Lecture","instruction_method":"Online","section":"002","crn":10551,"enroll":"16","max_enroll":"40","course_title":"Business Law I","days":["Monday","Wednesday"],"start_time":"12:30","end_time":"14:30","instructors":[{"name":"Jeffrey Popyack","rating":{"quality":4.1,"difficulty":3.2}}],"prereqs":"None","credits":"3.0"},"10554":{"subject_code":"BLAW","course_number":"201","instruction_type":"Lecture","instruction_method":"Online","section":"003","crn":10554,"enroll":"68","max_enroll":"90","course_title":"Business Law I","days":null,"start_time":null,"end_time":null,"instructors":[{"name":"Rachel Greene","rating":{"quality":4.8,"difficulty":2.1}}],"prereqs":"None","credits":"3.0"}};
+  let liveData = null; // { term, sections:[], byKey:Map }
+
+  const DAY_ABBR = {Monday:'M',Tuesday:'T',Wednesday:'W',Thursday:'R',Friday:'F',Saturday:'S',Sunday:'U'};
+  const normKey = (subj, num) => (String(subj)+String(num)).toUpperCase().replace(/\s+/g,'');
+  function courseKey(id){ const c = courseData()[id]; if(!c) return null; const p = c.code.split(/\s+/); return p.length>=2 ? normKey(p[0],p[1]) : null; }
+
+  function ingestLiveData(raw, term){
+    // accept the scraper dict (keyed by CRN) or an array of section objects
+    const sections = Array.isArray(raw) ? raw : Object.values(raw || {});
+    if(!sections.length) throw new Error('empty');
+    // quick shape check
+    if(!sections[0] || !('subject_code' in sections[0]) || !('course_number' in sections[0]))
+      throw new Error('unrecognized format');
+    const byKey = new Map();
+    for(const s of sections){
+      const k = normKey(s.subject_code, s.course_number);
+      if(!byKey.has(k)) byKey.set(k, []);
+      byKey.get(k).push(s);
+    }
+    liveData = { term: term || 'Imported schedule', sections, byKey };
+    el('liveBtn').textContent = `📡 ${sections.length} sections`;
+    renderMap(); runAdvisor();
+    if(!el('liveModal').classList.contains('show')) toast(`📡 Loaded ${sections.length} live sections`);
+  }
+  function loadSampleLive(){ ingestLiveData(SAMPLE_LIVE, 'Fall 2026 · sample data'); refreshLiveUI(); }
+  function onLiveFile(input){
+    const f = input.files && input.files[0]; if(!f) return;
+    const r = new FileReader();
+    r.onload = () => {
+      try { ingestLiveData(JSON.parse(r.result), 'Imported: '+f.name); refreshLiveUI(); }
+      catch(e){ toast('Could not read that file — expected the scraper’s data.json'); el('liveStatus').textContent = 'Import failed: '+(e.message||'invalid JSON'); }
+    };
+    r.readAsText(f);
+    input.value = '';
+  }
+
+  function matchedSections(id){ if(!liveData) return []; const k = courseKey(id); return (k && liveData.byKey.get(k)) || []; }
+  function isSectionOpen(s){ return !(s.enroll==='FULL' || s.max_enroll==='FULL' || Number(s.enroll) >= Number(s.max_enroll)); }
+  function liveBadgeHTML(id){
+    const secs = matchedSections(id); if(!secs.length) return '';
+    const open = secs.some(isSectionOpen);
+    return open
+      ? `<span class="badge" style="background:rgba(96,165,250,.16);color:var(--blue)">📡 ${secs.length}</span>`
+      : `<span class="badge" style="background:rgba(248,113,113,.14);color:var(--red)">📡 Full</span>`;
+  }
+
+  function t12(hhmm){ if(!hhmm) return ''; let [h,m]=hhmm.split(':').map(Number); const ap=h>=12?'PM':'AM'; h=h%12||12; return `${h}:${String(m).padStart(2,'0')} ${ap}`; }
+  function timeHTML(s){ if(!s.days || !s.start_time) return '<span style="color:var(--muted)">TBD / async</span>'; return `${s.days.map(d=>DAY_ABBR[d]||'').join('')} ${t12(s.start_time)}–${t12(s.end_time)}`; }
+  function instrHTML(list){
+    if(!list || !list.length) return '<span style="color:var(--muted)">STAFF</span>';
+    return list.map(i=>{
+      if(i.rating && (i.rating.quality!=null)){
+        const q = i.rating.quality; const col = q>=4?'var(--green)':q>=3?'var(--yellow)':'var(--red)';
+        return `${i.name} <span class="rmp" style="color:${col}">★${q}</span>`;
+      }
+      return i.name;
+    }).join(', ');
+  }
+  function seatCellHTML(s){
+    if(s.enroll==='FULL' || s.max_enroll==='FULL') return `<span style="color:var(--red);font-weight:700">Full</span>`;
+    const en=Number(s.enroll), mx=Number(s.max_enroll)||1; const open=Math.max(0,mx-en); const pct=Math.min(100,Math.round(en/mx*100));
+    const col = open===0?'var(--red)':open<=5?'var(--yellow)':'var(--green)';
+    return `<span style="color:${col};font-weight:700">${open} open</span><span style="color:var(--muted)"> / ${mx}</span>
+      <div class="seat-bar"><span style="width:${pct}%;background:${col}"></span></div>`;
+  }
+  function sectionRowHTML(s){
+    return `<div class="live-sec flex items-center justify-between gap-3">
+      <div><b>Sec ${s.section}</b> · CRN ${s.crn} · ${s.instruction_method||''}
+        <div style="color:var(--muted);margin-top:2px">${timeHTML(s)} · ${instrHTML(s.instructors)}</div></div>
+      <div style="text-align:right;white-space:nowrap">${seatCellHTML(s)}</div>
+    </div>`;
+  }
+
+  function openLive(){ el('liveModal').classList.add('show'); refreshLiveUI(); }
+  function closeLive(){ el('liveModal').classList.remove('show'); }
+  function refreshLiveUI(){
+    const has = !!liveData;
+    el('liveControls').hidden = !has;
+    el('liveTableWrap').hidden = !has;
+    el('liveEmpty').hidden = has;
+    if(!has){ el('liveStatus').textContent = 'No data loaded yet.'; return; }
+    el('liveStatus').textContent = `${liveData.sections.length} sections · ${liveData.term}`;
+    el('liveSub').textContent = `Real Term Master Schedule data — ${liveData.term}`;
+    // subject filter
+    const subj = el('liveSubject');
+    if(subj.dataset.built !== liveData.term){
+      const subjects = [...new Set(liveData.sections.map(s=>s.subject_code))].sort();
+      subj.innerHTML = '<option value="">All subjects</option>' + subjects.map(x=>`<option>${x}</option>`).join('');
+      subj.dataset.built = liveData.term;
+    }
+    renderLiveTable();
+  }
+  function renderLiveTable(){
+    if(!liveData) return;
+    const q = (el('liveSearch').value||'').toLowerCase();
+    const subj = el('liveSubject').value;
+    const openOnly = el('liveOpenOnly').checked;
+    const mineOnly = el('liveMineOnly').checked;
+    const mineKeys = new Set();
+    if(mineOnly){ state.plan.forEach(sem=> sem.forEach(id=>{ const k=courseKey(id); if(k) mineKeys.add(k); })); }
+    const rows = liveData.sections.filter(s=>{
+      if(subj && s.subject_code!==subj) return false;
+      if(openOnly && !isSectionOpen(s)) return false;
+      if(mineOnly && !mineKeys.has(normKey(s.subject_code,s.course_number))) return false;
+      if(q){
+        const hay = `${s.subject_code} ${s.course_number} ${s.course_title} ${s.crn} ${(s.instructors||[]).map(i=>i.name).join(' ')}`.toLowerCase();
+        if(!hay.includes(q)) return false;
+      }
+      return true;
+    });
+    el('liveTableBody').innerHTML = rows.length ? rows.map(s=>`
+      <tr>
+        <td><b>${s.subject_code} ${s.course_number}</b></td>
+        <td>${s.course_title}</td>
+        <td>${s.section}<div style="color:var(--muted)">${s.crn}</div></td>
+        <td>${timeHTML(s)}</td>
+        <td>${instrHTML(s.instructors)}</td>
+        <td>${seatCellHTML(s)}</td>
+        <td>${s.credits||''}</td>
+      </tr>`).join('') : `<tr><td colspan="7" style="text-align:center;color:var(--muted);padding:24px">No sections match your filters.</td></tr>`;
+  }
+
+  // advisor tip that references live availability of this year's planned courses
+  function liveAdvice(){
+    if(!liveData) return null;
+    const yi = currentYearIndex();
+    const sems = [yi*2, yi*2+1].filter(i=>i<state.plan.length);
+    let matched=0, full=0, samples=[];
+    sems.forEach(i=> state.plan[i].forEach(id=>{
+      const secs = matchedSections(id);
+      if(secs.length){ matched++; if(!secs.some(isSectionOpen)){ full++; samples.push(courseData()[id].code); } }
+    }));
+    if(!matched) return null;
+    return full
+      ? {sev:'warn', icon:'📡', h:`${full} of this year's courses are full`,
+         b:`${samples.join(', ')} ${full===1?'has':'have'} no open seats in ${liveData.term}. Register early or line up a backup section.`}
+      : {sev:'good', icon:'📡', h:`${matched} of this year's courses are offered now`,
+         b:`Live Drexel data shows open sections for your Year ${yi+1} plan in ${liveData.term}. Click a course to see times, seats, and professor ratings.`};
+  }
 
   // deep-link: ?major=Computer%20Science to preselect
   (function init(){
