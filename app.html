@@ -1,0 +1,1167 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>MajorMap AI — Degree Planner</title>
+  <meta name="description" content="Build your interactive 4-year degree map with a live AI advisor that catches sequencing mistakes before they cost you a semester." />
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: { sans: ['Inter', 'ui-sans-serif', 'system-ui', 'sans-serif'] },
+          colors: {
+            ink: '#07111f', ink2: '#0a1628',
+            brand: { green: '#4ade80', blue: '#60a5fa', purple: '#a78bfa' }
+          }
+        }
+      }
+    };
+  </script>
+  <!-- Fallback: if the Tailwind CDN is blocked/offline, inject the exact utilities this page uses so it never looks broken. No-op when Tailwind loads. -->
+  <script>
+    window.addEventListener('DOMContentLoaded', function(){
+      if (typeof window.tailwind !== 'undefined') return; // Tailwind loaded — nothing to do
+      var s = document.createElement('style'); s.id = 'tw-fallback';
+      s.textContent = `
+      *{box-sizing:border-box}
+      .min-h-screen{min-height:100vh}.relative{position:relative}.absolute{position:absolute}.sticky{position:sticky}
+      .flex{display:flex}.inline-flex{display:inline-flex}.grid{display:grid}.hidden{display:none}
+      .flex-col{flex-direction:column}.flex-row{flex-direction:row}.flex-wrap{flex-wrap:wrap}.flex-1{flex:1 1 0%}
+      .items-center{align-items:center}.items-start{align-items:flex-start}.items-end{align-items:flex-end}
+      .justify-between{justify-content:space-between}.justify-center{justify-content:center}
+      .place-items-center{place-items:center}.text-center{text-align:center}.text-left{text-align:left}
+      .grid-cols-2{grid-template-columns:repeat(2,minmax(0,1fr))}
+      .gap-1{gap:.25rem}.gap-1\\.5{gap:.375rem}.gap-2{gap:.5rem}.gap-2\\.5{gap:.625rem}.gap-3{gap:.75rem}.gap-4{gap:1rem}.gap-5{gap:1.25rem}
+      .mx-auto{margin-left:auto;margin-right:auto}.ml-auto{margin-left:auto}.pr-1{padding-right:.25rem}.mr-3{margin-right:.75rem}
+      .mb-1{margin-bottom:.25rem}.mb-1\\.5{margin-bottom:.375rem}.mb-2{margin-bottom:.5rem}.mb-3{margin-bottom:.75rem}.mb-4{margin-bottom:1rem}.mb-5{margin-bottom:1.25rem}.mb-6{margin-bottom:1.5rem}.mb-8{margin-bottom:2rem}
+      .mt-0\\.5{margin-top:.125rem}.mt-1{margin-top:.25rem}.mt-2{margin-top:.5rem}.mt-3{margin-top:.75rem}.mt-5{margin-top:1.25rem}.mt-6{margin-top:1.5rem}.mt-7{margin-top:1.75rem}
+      .p-0{padding:0}.p-1\\.5{padding:.375rem}.p-2\\.5{padding:.625rem}.p-3{padding:.75rem}.p-4{padding:1rem}.p-5{padding:1.25rem}.p-6{padding:1.5rem}.p-7{padding:1.75rem}
+      .px-3{padding-left:.75rem;padding-right:.75rem}.px-4{padding-left:1rem;padding-right:1rem}.px-5{padding-left:1.25rem;padding-right:1.25rem}.px-6{padding-left:1.5rem;padding-right:1.5rem}
+      .py-1\\.5{padding-top:.375rem;padding-bottom:.375rem}.py-2{padding-top:.5rem;padding-bottom:.5rem}.py-2\\.5{padding-top:.625rem;padding-bottom:.625rem}.py-6{padding-top:1.5rem;padding-bottom:1.5rem}.py-8{padding-top:2rem;padding-bottom:2rem}.py-12{padding-top:3rem;padding-bottom:3rem}.py-24{padding-top:6rem;padding-bottom:6rem}
+      .w-0{width:0}.w-2\\.5{width:.625rem}.w-9{width:2.25rem}.w-10{width:2.5rem}.w-44{width:11rem}.w-full{width:100%}.w-auto{width:auto}.min-w-0{min-width:0}
+      .h-2\\.5{height:.625rem}.h-9{height:2.25rem}.h-10{height:2.5rem}.h-16{height:4rem}
+      .max-w-\\[1320px\\]{max-width:1320px}.max-w-\\[720px\\]{max-width:720px}.max-h-\\[260px\\]{max-height:260px}
+      .overflow-auto{overflow:auto}
+      .rounded-xl{border-radius:.75rem}.rounded-2xl{border-radius:1rem}.rounded-3xl{border-radius:1.5rem}.rounded-full{border-radius:9999px}
+      .text-xs{font-size:.75rem;line-height:1rem}.text-sm{font-size:.875rem;line-height:1.25rem}.text-base{font-size:1rem;line-height:1.5rem}.text-lg{font-size:1.125rem;line-height:1.75rem}.text-xl{font-size:1.25rem;line-height:1.75rem}.text-2xl{font-size:1.5rem;line-height:2rem}.text-3xl{font-size:1.875rem;line-height:2.25rem}.text-4xl{font-size:2.25rem;line-height:2.5rem}
+      .text-\\[\\.66rem\\]{font-size:.66rem}.text-\\[\\.68rem\\]{font-size:.68rem}.text-\\[\\.7rem\\]{font-size:.7rem}.text-\\[\\.72rem\\]{font-size:.72rem}
+      .font-semibold{font-weight:600}.font-bold{font-weight:700}.font-extrabold{font-weight:800}
+      .tracking-tight{letter-spacing:-.025em}.tracking-widest{letter-spacing:.1em}.uppercase{text-transform:uppercase}.italic{font-style:italic}
+      .leading-tight{line-height:1.25}.leading-relaxed{line-height:1.625}
+      .shadow-2xl{box-shadow:0 25px 50px -12px rgba(2,8,23,.45)}.shadow-lg{box-shadow:0 10px 30px rgba(2,8,23,.4)}
+      .z-30{z-index:30}.z-40{z-index:40}.top-0{top:0}.top-20{top:5rem}.right-0{right:0}
+      .hover\\:bg-white\\/5:hover{background:rgba(255,255,255,.05)}
+      @media (min-width:640px){
+        .sm\\:inline-flex{display:inline-flex}.sm\\:grid-cols-2{grid-template-columns:repeat(2,minmax(0,1fr))}
+        .sm\\:p-5{padding:1.25rem}.sm\\:p-7{padding:1.75rem}.sm\\:px-6{padding-left:1.5rem;padding-right:1.5rem}
+        .sm\\:py-12{padding-top:3rem;padding-bottom:3rem}.sm\\:text-base{font-size:1rem}.sm\\:text-3xl{font-size:1.875rem}.sm\\:text-4xl{font-size:2.25rem}
+      }
+      @media (min-width:1024px){
+        .lg\\:flex-row{flex-direction:row}.lg\\:items-end{align-items:flex-end}
+        .lg\\:grid-cols-4{grid-template-columns:repeat(4,minmax(0,1fr))}
+        .lg\\:grid-cols-\\[1fr_360px\\]{grid-template-columns:1fr 360px}
+        .lg\\:sticky{position:sticky}.lg\\:top-20{top:5rem}
+      }`;
+      document.head.appendChild(s);
+    });
+  </script>
+  <style>
+    :root{
+      --bg:#07111f; --bg2:#0a1628; --panel:rgba(13,22,39,.82); --line:rgba(148,163,184,.14);
+      --text:#edf4ff; --muted:#93a4bf; --green:#4ade80; --blue:#60a5fa; --purple:#a78bfa;
+      --red:#f87171; --yellow:#facc15;
+    }
+    *{box-sizing:border-box}
+    html{scroll-behavior:smooth}
+    body{
+      font-family:Inter,ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
+      color:var(--text);
+      background:
+        radial-gradient(circle at 0% 0%, rgba(96,165,250,.16), transparent 26%),
+        radial-gradient(circle at 100% 0%, rgba(167,139,250,.14), transparent 22%),
+        radial-gradient(circle at 50% 120%, rgba(74,222,128,.08), transparent 34%),
+        linear-gradient(180deg,var(--bg),var(--bg2));
+      background-attachment:fixed;
+      min-height:100vh; line-height:1.55;
+    }
+    ::-webkit-scrollbar{width:10px;height:10px}
+    ::-webkit-scrollbar-thumb{background:rgba(148,163,184,.18);border-radius:999px}
+    ::-webkit-scrollbar-track{background:transparent}
+    .glass{background:var(--panel);border:1px solid var(--line);backdrop-filter:blur(14px)}
+    .gradient-text{background:linear-gradient(135deg,#fff,#a7f3d0 50%,#93c5fd 100%);-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent}
+    .btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;font-weight:700;border-radius:14px;transition:transform .16s ease,opacity .16s ease,box-shadow .16s ease,border-color .16s ease;cursor:pointer;border:none;font:inherit}
+    .btn:hover{transform:translateY(-1px)}
+    .btn:active{transform:translateY(0)}
+    .btn-primary{background:linear-gradient(135deg,var(--green),#86efac);color:#04110a;box-shadow:0 12px 30px rgba(74,222,128,.20)}
+    .btn-secondary{background:rgba(255,255,255,.04);border:1px solid var(--line);color:var(--text)}
+    .btn-secondary:hover{border-color:rgba(96,165,250,.30)}
+    .btn-ghost{background:transparent;border:1px solid var(--line);color:var(--muted)}
+    .btn-ghost:hover{color:var(--text)}
+    input,select,textarea{font:inherit;color:var(--text);background:rgba(255,255,255,.03);border:1px solid var(--line);border-radius:14px;padding:12px 14px;width:100%;outline:none;transition:border-color .15s ease}
+    input:focus,select:focus,textarea:focus{border-color:rgba(96,165,250,.4)}
+    select option{background:#0a1628;color:var(--text)}
+    /* choice chips */
+    .choice{display:flex;flex-direction:column;gap:4px;padding:16px;border-radius:16px;border:1px solid var(--line);background:rgba(255,255,255,.03);cursor:pointer;transition:all .15s ease;text-align:left}
+    .choice:hover{border-color:rgba(96,165,250,.28);transform:translateY(-2px)}
+    .choice.active{border-color:rgba(74,222,128,.55);background:rgba(74,222,128,.08);box-shadow:0 0 0 1px rgba(74,222,128,.25) inset}
+    .choice .t{font-weight:700}
+    .choice .d{font-size:.82rem;color:var(--muted)}
+    /* course cards */
+    .course{position:relative;padding:11px 12px;border-radius:13px;border:1px solid var(--line);background:rgba(255,255,255,.035);cursor:grab;transition:transform .14s ease,border-color .14s ease,box-shadow .14s ease;user-select:none}
+    .course:hover{transform:translateY(-2px);border-color:rgba(96,165,250,.35);box-shadow:0 10px 24px rgba(2,8,23,.4)}
+    .course.dragging{opacity:.45;cursor:grabbing}
+    .course.invalid{border-color:rgba(248,113,113,.55);box-shadow:0 0 0 1px rgba(248,113,113,.28) inset}
+    .course .code{font-weight:800;font-size:.82rem;letter-spacing:-.01em}
+    .course .nm{font-size:.78rem;color:var(--muted);line-height:1.3;margin-top:2px}
+    .course .meta{display:flex;align-items:center;gap:6px;margin-top:8px}
+    .cat-dot{width:8px;height:8px;border-radius:999px;flex-shrink:0}
+    .badge{font-size:.66rem;font-weight:700;padding:2px 7px;border-radius:999px;text-transform:uppercase;letter-spacing:.04em}
+    .semester{min-height:120px;border-radius:16px;border:1px dashed rgba(148,163,184,.16);padding:10px;display:flex;flex-direction:column;gap:9px;transition:background .15s ease,border-color .15s ease}
+    .semester.drop-target{background:rgba(96,165,250,.07);border-color:rgba(96,165,250,.4)}
+    .semester.over-load{border-color:rgba(250,204,21,.4)}
+    /* advisor items */
+    .advice{border-radius:14px;padding:12px 13px;border:1px solid var(--line);background:rgba(255,255,255,.03);animation:fadein .3s ease}
+    .advice .h{display:flex;align-items:center;gap:8px;font-weight:700;font-size:.86rem}
+    .advice .b{font-size:.82rem;color:var(--muted);margin-top:5px;line-height:1.5}
+    .advice.error{background:rgba(248,113,113,.08);border-color:rgba(248,113,113,.28)}
+    .advice.warn{background:rgba(250,204,21,.07);border-color:rgba(250,204,21,.25)}
+    .advice.tip{background:rgba(167,139,250,.07);border-color:rgba(167,139,250,.25)}
+    .advice.good{background:rgba(74,222,128,.07);border-color:rgba(74,222,128,.25)}
+    @keyframes fadein{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:translateY(0)}}
+    .fade-in{animation:fadein .4s ease}
+    /* modal */
+    .modal-backdrop{position:fixed;inset:0;background:rgba(3,8,20,.72);backdrop-filter:blur(6px);z-index:60;display:none;align-items:center;justify-content:center;padding:20px}
+    .modal-backdrop.show{display:flex}
+    .modal{width:min(560px,100%);max-height:88vh;overflow:auto;border-radius:22px}
+    .step-dot{height:7px;border-radius:999px;background:rgba(148,163,184,.16);overflow:hidden;flex:1}
+    .step-dot span{display:block;height:100%;width:0;background:linear-gradient(90deg,var(--green),#86efac);transition:width .3s ease}
+    .toast{position:fixed;bottom:22px;left:50%;transform:translateX(-50%) translateY(20px);background:rgba(13,22,39,.96);border:1px solid var(--line);padding:12px 18px;border-radius:14px;font-size:.9rem;font-weight:600;opacity:0;pointer-events:none;transition:all .25s ease;z-index:80;box-shadow:0 20px 50px rgba(2,8,23,.6)}
+    .toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+    .prereq-line{font-size:.8rem;color:var(--muted)}
+    [hidden]{display:none !important}
+    /* print */
+    @media print{
+      body{background:#fff;color:#000}
+      .no-print{display:none !important}
+      .glass{background:#fff !important;border:1px solid #ccc !important;backdrop-filter:none}
+      .semester{border:1px solid #ddd !important}
+      .course{border:1px solid #ccc !important;background:#fff !important;box-shadow:none !important}
+      .course .nm,.course .code{color:#000 !important}
+      #mapGrid{grid-template-columns:repeat(2,1fr) !important}
+      .gradient-text{-webkit-text-fill-color:#0a7a3a}
+    }
+  </style>
+</head>
+<body class="min-h-screen">
+
+  <!-- ===== TOP BAR ===== -->
+  <header class="sticky top-0 z-40 no-print" style="background:rgba(7,17,31,.72);backdrop-filter:blur(16px);border-bottom:1px solid rgba(148,163,184,.08)">
+    <div class="max-w-[1320px] mx-auto px-4 sm:px-6 flex items-center justify-between h-16">
+      <a href="./index.html" class="flex items-center gap-3">
+        <div class="w-10 h-10 rounded-2xl grid place-items-center glass text-xl">🎓</div>
+        <div class="font-extrabold tracking-tight text-lg">Major<span style="color:var(--green)">Map</span> AI</div>
+      </a>
+      <div class="flex items-center gap-2">
+        <span id="planPill" class="hidden sm:inline-flex px-3 py-1.5 rounded-full text-xs font-semibold glass" style="color:var(--muted)">Degree Planner</span>
+        <button id="btnRestart" class="btn btn-ghost text-sm px-3 py-2" hidden onclick="restartIntake()">↺ New Plan</button>
+      </div>
+    </div>
+  </header>
+
+  <!-- ===== INTAKE (multi-step) ===== -->
+  <section id="intake" class="max-w-[720px] mx-auto px-4 sm:px-6 py-8 sm:py-12">
+    <div class="text-center mb-8 fade-in">
+      <div class="inline-flex items-center gap-2 px-3 py-1.5 rounded-full text-xs font-semibold uppercase tracking-widest mb-4" style="color:var(--green);background:rgba(74,222,128,.08);border:1px solid rgba(74,222,128,.16)">Student Onboarding</div>
+      <h1 class="text-3xl sm:text-4xl font-extrabold tracking-tight leading-tight">Let's build your <span class="gradient-text">degree map.</span></h1>
+      <p class="mt-3 text-sm sm:text-base" style="color:var(--muted)">Answer a few quick questions. The AI drafts a personalized, prerequisite-aware 4-year plan you can reshape by hand.</p>
+    </div>
+
+    <div class="glass rounded-3xl p-5 sm:p-7 shadow-2xl">
+      <!-- progress -->
+      <div class="flex items-center gap-2 mb-6">
+        <div class="step-dot"><span id="pg1" style="width:20%"></span></div>
+        <div class="step-dot"><span id="pg2"></span></div>
+        <div class="step-dot"><span id="pg3"></span></div>
+        <div class="step-dot"><span id="pg4"></span></div>
+        <div class="step-dot"><span id="pg5"></span></div>
+      </div>
+
+      <!-- STEP 1: Major -->
+      <div class="qstep" data-step="1">
+        <div class="text-xs uppercase tracking-widest mb-1" style="color:var(--muted)">Step 1 of 5</div>
+        <h2 class="text-xl font-bold mb-1">What's your major?</h2>
+        <p class="text-sm mb-4" style="color:var(--muted)">This drives the entire course sequence and prerequisite logic.</p>
+        <div id="majorChoices" class="grid sm:grid-cols-2 gap-3"></div>
+      </div>
+
+      <!-- STEP 2: Year -->
+      <div class="qstep" data-step="2" hidden>
+        <div class="text-xs uppercase tracking-widest mb-1" style="color:var(--muted)">Step 2 of 5</div>
+        <h2 class="text-xl font-bold mb-1">Where are you now?</h2>
+        <p class="text-sm mb-4" style="color:var(--muted)">Your academic year sets the "you are here" marker on the timeline.</p>
+        <div id="yearChoices" class="grid grid-cols-2 gap-3"></div>
+      </div>
+
+      <!-- STEP 3: Career -->
+      <div class="qstep" data-step="3" hidden>
+        <div class="text-xs uppercase tracking-widest mb-1" style="color:var(--muted)">Step 3 of 5</div>
+        <h2 class="text-xl font-bold mb-1">What's the goal after graduation?</h2>
+        <p class="text-sm mb-4" style="color:var(--muted)">The AI biases electives and highlights courses toward this outcome.</p>
+        <div id="careerChoices" class="grid sm:grid-cols-2 gap-3"></div>
+      </div>
+
+      <!-- STEP 4: Workload -->
+      <div class="qstep" data-step="4" hidden>
+        <div class="text-xs uppercase tracking-widest mb-1" style="color:var(--muted)">Step 4 of 5</div>
+        <h2 class="text-xl font-bold mb-1">Weekly workload preference?</h2>
+        <p class="text-sm mb-4" style="color:var(--muted)">This tunes how many credits the AI packs into each semester.</p>
+        <div id="workloadChoices" class="grid gap-3"></div>
+      </div>
+
+      <!-- STEP 5: Prior credits -->
+      <div class="qstep" data-step="5" hidden>
+        <div class="text-xs uppercase tracking-widest mb-1" style="color:var(--muted)">Step 5 of 5</div>
+        <h2 class="text-xl font-bold mb-1">Any prior credits?</h2>
+        <p class="text-sm mb-4" style="color:var(--muted)">Tap any AP, IB, or transfer courses you've already cleared — the AI marks them done and pulls your plan forward.</p>
+        <div class="mb-3">
+          <input id="priorSearch" placeholder="Search courses..." oninput="filterPrior()" />
+        </div>
+        <div id="priorChoices" class="flex flex-wrap gap-2 max-h-[260px] overflow-auto pr-1"></div>
+        <p class="text-xs mt-3" style="color:var(--muted)">No prior credits? Just continue — this is optional.</p>
+      </div>
+
+      <!-- nav -->
+      <div class="flex items-center justify-between mt-7">
+        <button id="backBtn" class="btn btn-secondary px-4 py-2.5 text-sm" onclick="prevQ()" hidden>← Back</button>
+        <div class="ml-auto flex items-center gap-3">
+          <span id="stepHint" class="text-xs" style="color:var(--muted)"></span>
+          <button id="nextBtn" class="btn btn-primary px-5 py-2.5 text-sm" onclick="nextQ()">Continue →</button>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== LOADING ===== -->
+  <section id="loading" class="max-w-[720px] mx-auto px-6 py-24 text-center" hidden>
+    <div class="mx-auto mb-6" style="width:72px;height:72px;border-radius:50%;border:4px solid rgba(148,163,184,.14);border-top-color:var(--green);animation:spin 1s linear infinite;box-shadow:0 0 0 14px rgba(74,222,128,.03)"></div>
+    <style>@keyframes spin{to{transform:rotate(360deg)}}</style>
+    <h2 class="text-2xl font-bold tracking-tight mb-2">Drafting your degree map…</h2>
+    <p id="loadMsg" style="color:var(--muted)">Resolving prerequisites and sequencing courses.</p>
+  </section>
+
+  <!-- ===== WORKSPACE ===== -->
+  <section id="workspace" class="max-w-[1320px] mx-auto px-4 sm:px-6 py-6" hidden>
+
+    <!-- header row -->
+    <div class="flex flex-col lg:flex-row lg:items-end justify-between gap-4 mb-5 no-print">
+      <div>
+        <div id="wsTitle" class="text-2xl sm:text-3xl font-extrabold tracking-tight">Computer Science</div>
+        <div id="wsSub" class="text-sm mt-1" style="color:var(--muted)">Sophomore · Goal: Software Engineer · Balanced load</div>
+      </div>
+      <div class="flex flex-wrap gap-2">
+        <button class="btn btn-secondary px-4 py-2.5 text-sm" onclick="autoOptimize()">✨ Auto-Optimize</button>
+        <button class="btn btn-secondary px-4 py-2.5 text-sm" onclick="saveMap()">💾 Save</button>
+        <div class="relative">
+          <button class="btn btn-secondary px-4 py-2.5 text-sm" onclick="toggleExport()">⬇ Export ▾</button>
+          <div id="exportMenu" class="absolute right-0 mt-2 w-44 glass rounded-2xl p-1.5 shadow-2xl z-30" hidden>
+            <button class="w-full text-left px-3 py-2 rounded-xl text-sm hover:bg-white/5" onclick="exportPDF()">🖨 Export to PDF</button>
+            <button class="w-full text-left px-3 py-2 rounded-xl text-sm hover:bg-white/5" onclick="exportJSON()">🧾 Export JSON</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- stat row -->
+    <div class="grid grid-cols-2 lg:grid-cols-4 gap-3 mb-5">
+      <div class="glass rounded-2xl p-4">
+        <div class="text-[.68rem] uppercase tracking-widest mb-1" style="color:var(--muted)">Total Credits</div>
+        <div id="statCredits" class="text-2xl font-extrabold tracking-tight">0</div>
+      </div>
+      <div class="glass rounded-2xl p-4">
+        <div class="text-[.68rem] uppercase tracking-widest mb-1" style="color:var(--muted)">Grad Timeline</div>
+        <div id="statGrad" class="text-2xl font-extrabold tracking-tight">4 yrs</div>
+      </div>
+      <div class="glass rounded-2xl p-4">
+        <div class="text-[.68rem] uppercase tracking-widest mb-1" style="color:var(--muted)">Prior Credits</div>
+        <div id="statPrior" class="text-2xl font-extrabold tracking-tight">0</div>
+      </div>
+      <div class="glass rounded-2xl p-4">
+        <div class="text-[.68rem] uppercase tracking-widest mb-1" style="color:var(--muted)">Plan Health</div>
+        <div id="statHealth" class="text-2xl font-extrabold tracking-tight" style="color:var(--green)">Healthy</div>
+      </div>
+    </div>
+
+    <div class="grid lg:grid-cols-[1fr_360px] gap-5 items-start">
+
+      <!-- MAP -->
+      <div class="glass rounded-3xl p-4 sm:p-5">
+        <div class="flex items-center justify-between mb-3 flex-wrap gap-2">
+          <div>
+            <div class="text-xs uppercase tracking-widest" style="color:var(--muted)">Interactive Degree Map</div>
+            <div class="text-base font-bold">Drag courses between semesters</div>
+          </div>
+          <div class="flex items-center gap-3 text-[.7rem] flex-wrap" style="color:var(--muted)">
+            <span class="flex items-center gap-1.5"><span class="cat-dot" style="background:var(--blue)"></span>Core</span>
+            <span class="flex items-center gap-1.5"><span class="cat-dot" style="background:var(--green)"></span>Major</span>
+            <span class="flex items-center gap-1.5"><span class="cat-dot" style="background:var(--purple)"></span>Math/Sci</span>
+            <span class="flex items-center gap-1.5"><span class="cat-dot" style="background:#f59e0b"></span>Capstone</span>
+            <span class="flex items-center gap-1.5"><span class="cat-dot" style="background:#64748b"></span>Gen Ed</span>
+          </div>
+        </div>
+        <div id="mapGrid" class="grid sm:grid-cols-2 gap-3"></div>
+        <p class="text-xs mt-3 no-print" style="color:var(--muted)">Tip: click any course to see prerequisites, description, and why the AI placed it there.</p>
+      </div>
+
+      <!-- AI ADVISOR -->
+      <aside class="glass rounded-3xl p-4 sm:p-5 lg:sticky lg:top-20">
+        <div class="flex items-center gap-3 mb-1">
+          <div class="w-9 h-9 rounded-xl grid place-items-center" style="background:linear-gradient(135deg,rgba(167,139,250,.25),rgba(96,165,250,.25));border:1px solid var(--line)">🤖</div>
+          <div>
+            <div class="font-bold leading-tight">AI Advisor</div>
+            <div class="text-[.72rem]" style="color:var(--muted)">Live analysis of your map</div>
+          </div>
+          <span id="advisorPulse" class="ml-auto w-2.5 h-2.5 rounded-full" style="background:var(--green);box-shadow:0 0 0 4px rgba(74,222,128,.15)"></span>
+        </div>
+        <div id="advisorSummary" class="text-sm mt-3 mb-3 leading-relaxed" style="color:var(--muted)"></div>
+        <div id="advisorList" class="flex flex-col gap-2.5"></div>
+      </aside>
+    </div>
+
+    <div class="text-center mt-6 no-print">
+      <button class="btn btn-ghost px-4 py-2.5 text-sm" onclick="restartIntake()">↺ Start a new plan</button>
+    </div>
+  </section>
+
+  <!-- ===== COURSE MODAL ===== -->
+  <div class="modal-backdrop" id="courseModal" onclick="if(event.target===this)closeModal()">
+    <div class="modal glass p-6 shadow-2xl">
+      <div class="flex items-start justify-between gap-3 mb-4">
+        <div>
+          <div id="mCode" class="text-2xl font-extrabold tracking-tight"></div>
+          <div id="mName" class="text-sm mt-0.5" style="color:var(--muted)"></div>
+        </div>
+        <button class="btn btn-ghost w-9 h-9 !p-0 text-lg" onclick="closeModal()">✕</button>
+      </div>
+      <div class="flex flex-wrap gap-2 mb-4" id="mBadges"></div>
+      <div class="mb-4">
+        <div class="text-[.7rem] uppercase tracking-widest mb-1.5" style="color:var(--muted)">Description</div>
+        <p id="mDesc" class="text-sm leading-relaxed"></p>
+      </div>
+      <div class="mb-4">
+        <div class="text-[.7rem] uppercase tracking-widest mb-1.5" style="color:var(--muted)">Prerequisites</div>
+        <div id="mPrereqs" class="text-sm"></div>
+      </div>
+      <div class="mb-4">
+        <div class="text-[.7rem] uppercase tracking-widest mb-1.5" style="color:var(--muted)">Unlocks</div>
+        <div id="mUnlocks" class="text-sm"></div>
+      </div>
+      <div class="rounded-2xl p-4" style="background:rgba(167,139,250,.08);border:1px solid rgba(167,139,250,.25)">
+        <div class="flex items-center gap-2 text-sm font-bold mb-1.5">🤖 Why the AI recommended this</div>
+        <p id="mWhy" class="text-sm leading-relaxed" style="color:#dcd5ff"></p>
+      </div>
+      <div class="flex gap-2 mt-5">
+        <div class="text-xs" style="color:var(--muted)">Move to:</div>
+        <select id="mMoveTo" class="!w-auto !py-1.5 !px-3 text-sm" onchange="moveViaModal(this.value)"></select>
+      </div>
+    </div>
+  </div>
+
+  <div class="toast" id="toast"></div>
+
+  <script>
+  /* =========================================================================
+     CURRICULUM DATA  (self-contained — no backend needed)
+     Each course: code, name, cr(credits), cat, desc, pre[], careers[],
+                  heavy(reading/quant intensive), flex(safe to move around)
+     plan: 8 semesters [Y1F, Y1S, Y2F, Y2S, Y3F, Y3S, Y4F, Y4S]
+     ========================================================================= */
+  const CAT = {
+    core:   { label:'Core',      color:'var(--blue)'  },
+    major:  { label:'Major',     color:'var(--green)' },
+    math:   { label:'Math/Sci',  color:'var(--purple)'},
+    cap:    { label:'Capstone',  color:'#f59e0b'      },
+    gen:    { label:'Gen Ed',    color:'#64748b'      }
+  };
+
+  const SEMESTER_LABELS = ['Fall · Year 1','Spring · Year 1','Fall · Year 2','Spring · Year 2','Fall · Year 3','Spring · Year 3','Fall · Year 4','Spring · Year 4'];
+
+  const MAJORS = {
+    'Computer Science': {
+      careers: ['Software Engineer','ML / AI Engineer','Cybersecurity Analyst'],
+      courses: {
+        CS101:{code:'CS 101',name:'Intro to Programming',cr:4,cat:'major',desc:'Fundamentals of programming, control flow, and problem decomposition using a modern language.',pre:[],careers:['Software Engineer','ML / AI Engineer','Cybersecurity Analyst']},
+        CS102:{code:'CS 102',name:'Object-Oriented Programming',cr:4,cat:'major',desc:'Classes, inheritance, and design patterns. The bridge from scripts to real software systems.',pre:['CS101'],careers:['Software Engineer']},
+        CS201:{code:'CS 201',name:'Data Structures',cr:4,cat:'major',desc:'Lists, trees, graphs, hashing, and the complexity analysis behind them. The single biggest CS bottleneck.',pre:['CS102'],careers:['Software Engineer','ML / AI Engineer','Cybersecurity Analyst'],heavy:true},
+        CS202:{code:'CS 202',name:'Algorithms',cr:3,cat:'major',desc:'Greedy, divide-and-conquer, dynamic programming, and the analysis that powers technical interviews.',pre:['CS201','CS210'],careers:['Software Engineer','ML / AI Engineer'],heavy:true},
+        CS210:{code:'CS 210',name:'Discrete Mathematics',cr:3,cat:'math',desc:'Logic, proofs, combinatorics, and graph theory — the mathematical spine of computer science.',pre:[],careers:['ML / AI Engineer'],heavy:true},
+        CS215:{code:'CS 215',name:'Computer Organization',cr:3,cat:'major',desc:'How code becomes hardware: memory, assembly, and the machine model underneath every program.',pre:['CS102'],careers:['Cybersecurity Analyst']},
+        CS301:{code:'CS 301',name:'Operating Systems',cr:3,cat:'major',desc:'Processes, threads, scheduling, and memory management. Systems-level thinking for real engineers.',pre:['CS201','CS215'],careers:['Software Engineer','Cybersecurity Analyst'],heavy:true},
+        CS310:{code:'CS 310',name:'Databases',cr:3,cat:'major',desc:'Relational modeling, SQL, indexing, and transactions used in nearly every production backend.',pre:['CS201'],careers:['Software Engineer']},
+        CS320:{code:'CS 320',name:'Software Engineering',cr:3,cat:'major',desc:'Version control, testing, CI/CD, and working on a team codebase like you will on the job.',pre:['CS201'],careers:['Software Engineer']},
+        CS302:{code:'CS 302',name:'Computer Networks',cr:3,cat:'major',desc:'TCP/IP, HTTP, and the protocols that make distributed and web systems possible.',pre:['CS215'],careers:['Software Engineer','Cybersecurity Analyst']},
+        CS330:{code:'CS 330',name:'Web Development',cr:3,cat:'major',desc:'Full-stack web apps: front-end frameworks, APIs, and deployment.',pre:['CS102'],careers:['Software Engineer']},
+        CS340:{code:'CS 340',name:'Machine Learning',cr:3,cat:'major',desc:'Regression, classification, and neural network basics with hands-on model training.',pre:['CS202','STAT201','MATH221'],careers:['ML / AI Engineer'],heavy:true},
+        CS401:{code:'CS 401',name:'Theory of Computation',cr:3,cat:'major',desc:'Automata, computability, and NP-completeness — the limits of what algorithms can do.',pre:['CS202'],careers:['ML / AI Engineer'],heavy:true},
+        CS410:{code:'CS 410',name:'Distributed Systems',cr:3,cat:'major',desc:'Consensus, replication, and scaling services across many machines.',pre:['CS301'],careers:['Software Engineer']},
+        CS402:{code:'CS 402',name:'Cybersecurity',cr:3,cat:'major',desc:'Threat models, cryptography basics, and secure system design.',pre:['CS301'],careers:['Cybersecurity Analyst']},
+        CS420:{code:'CS 420',name:'Deep Learning & AI',cr:3,cat:'major',desc:'Modern neural architectures, training at scale, and applied AI systems.',pre:['CS340'],careers:['ML / AI Engineer'],heavy:true},
+        CSCAP1:{code:'CS 490',name:'Senior Capstone I',cr:3,cat:'cap',desc:'Scoping and designing a substantial team software project with real stakeholders.',pre:['CS320']},
+        CSCAP2:{code:'CS 491',name:'Senior Capstone II',cr:3,cat:'cap',desc:'Build, ship, and present the capstone — your portfolio centerpiece.',pre:['CSCAP1']},
+        MATH121:{code:'MATH 121',name:'Calculus I',cr:4,cat:'math',desc:'Limits, derivatives, and the foundation for later quantitative coursework.',pre:[],careers:['ML / AI Engineer'],heavy:true},
+        MATH122:{code:'MATH 122',name:'Calculus II',cr:4,cat:'math',desc:'Integration techniques and series that support statistics and ML.',pre:['MATH121'],careers:['ML / AI Engineer'],heavy:true},
+        MATH221:{code:'MATH 221',name:'Linear Algebra',cr:3,cat:'math',desc:'Vectors, matrices, and transformations — the core math behind machine learning.',pre:['MATH122'],careers:['ML / AI Engineer']},
+        STAT201:{code:'STAT 201',name:'Statistics',cr:3,cat:'math',desc:'Probability, distributions, and inference used across data-heavy CS work.',pre:['MATH122'],careers:['ML / AI Engineer']},
+        PHYS101:{code:'PHYS 101',name:'Physics I',cr:4,cat:'math',desc:'Mechanics with calculus — satisfies the science requirement and builds modeling intuition.',pre:['MATH121']},
+        ENGL101:{code:'ENGL 101',name:'Composition',cr:3,cat:'gen',desc:'College writing and argumentation.',pre:[],flex:true},
+        ENGL201:{code:'ENGL 201',name:'Technical Writing',cr:3,cat:'gen',desc:'Clear documentation and communication for engineers.',pre:[],flex:true,careers:['Software Engineer']},
+        UNIV101:{code:'UNIV 101',name:'First-Year Seminar',cr:2,cat:'gen',desc:'Orientation to university academics and success skills.',pre:[],flex:true},
+        HUM110:{code:'HUM 110',name:'Humanities Elective',cr:3,cat:'gen',desc:'Breadth requirement in the humanities.',pre:[],flex:true},
+        SOC110:{code:'SOC 110',name:'Social Science Elective',cr:3,cat:'gen',desc:'Breadth requirement in the social sciences.',pre:[],flex:true},
+        ETH210:{code:'ETH 210',name:'Ethics in Technology',cr:3,cat:'gen',desc:'Privacy, bias, and responsibility in computing.',pre:[],flex:true},
+        FREE1:{code:'ELEC 1',name:'Free Elective',cr:3,cat:'gen',desc:'Open elective — explore an interest or minor.',pre:[],flex:true},
+        FREE2:{code:'ELEC 2',name:'Free Elective',cr:3,cat:'gen',desc:'Open elective — explore an interest or minor.',pre:[],flex:true},
+        FREE3:{code:'ELEC 3',name:'Free Elective',cr:3,cat:'gen',desc:'Open elective — explore an interest or minor.',pre:[],flex:true}
+      },
+      plan: [
+        ['CS101','MATH121','ENGL101','UNIV101'],
+        ['CS102','MATH122','PHYS101','HUM110'],
+        ['CS201','CS210','MATH221','STAT201'],
+        ['CS202','CS215','ENGL201','SOC110'],
+        ['CS301','CS310','CS320','ETH210'],
+        ['CS302','CS330','CS340','FREE1'],
+        ['CS401','CS410','CSCAP1','FREE2'],
+        ['CS402','CS420','CSCAP2','FREE3']
+      ]
+    },
+
+    'Business Administration': {
+      careers: ['Product Manager','Marketing Manager','Management Consultant'],
+      courses: {
+        BUS101:{code:'BUS 101',name:'Intro to Business',cr:3,cat:'major',desc:'Survey of how firms create value across functions.',pre:[],careers:['Product Manager','Marketing Manager','Management Consultant']},
+        BUS110:{code:'BUS 110',name:'Business Communication',cr:3,cat:'core',desc:'Professional writing, presenting, and stakeholder communication.',pre:[],flex:true},
+        ACCT101:{code:'ACCT 101',name:'Financial Accounting',cr:3,cat:'core',desc:'Reading balance sheets, income statements, and cash flows.',pre:[],careers:['Management Consultant'],heavy:true},
+        ACCT102:{code:'ACCT 102',name:'Managerial Accounting',cr:3,cat:'core',desc:'Costing, budgeting, and internal decision-making.',pre:['ACCT101'],heavy:true},
+        ECON101:{code:'ECON 101',name:'Microeconomics',cr:3,cat:'core',desc:'Supply, demand, and firm behavior.',pre:[],careers:['Management Consultant'],heavy:true},
+        ECON102:{code:'ECON 102',name:'Macroeconomics',cr:3,cat:'core',desc:'Growth, inflation, and monetary/fiscal policy.',pre:[],heavy:true},
+        MATH110:{code:'MATH 110',name:'Business Math',cr:3,cat:'math',desc:'Applied quantitative methods for business decisions.',pre:[]},
+        STAT205:{code:'STAT 205',name:'Business Statistics',cr:3,cat:'math',desc:'Data analysis, regression, and inference for managers.',pre:['MATH110'],careers:['Product Manager','Management Consultant'],heavy:true},
+        MIS201:{code:'MIS 201',name:'Information Systems',cr:3,cat:'core',desc:'How data and software drive modern operations.',pre:[],careers:['Product Manager']},
+        MKT201:{code:'MKT 201',name:'Principles of Marketing',cr:3,cat:'major',desc:'Segmentation, positioning, and the marketing mix.',pre:['BUS101'],careers:['Marketing Manager']},
+        MGT201:{code:'MGT 201',name:'Principles of Management',cr:3,cat:'major',desc:'Planning, organizing, and leading teams.',pre:['BUS101'],careers:['Management Consultant','Product Manager']},
+        FIN201:{code:'FIN 201',name:'Business Finance',cr:3,cat:'major',desc:'Time value of money, capital budgeting, and valuation basics.',pre:['ACCT101'],careers:['Management Consultant'],heavy:true},
+        BLAW201:{code:'BLAW 201',name:'Business Law',cr:3,cat:'core',desc:'Contracts, liability, and the legal environment of business.',pre:[],heavy:true},
+        MKT301:{code:'MKT 301',name:'Consumer Behavior',cr:3,cat:'major',desc:'Psychology and data behind buying decisions.',pre:['MKT201'],careers:['Marketing Manager','Product Manager']},
+        MGT301:{code:'MGT 301',name:'Organizational Behavior',cr:3,cat:'major',desc:'How individuals and teams actually behave inside organizations.',pre:['MGT201'],careers:['Management Consultant']},
+        OM301:{code:'OM 301',name:'Operations Management',cr:3,cat:'major',desc:'Process design, supply chains, and quality.',pre:['STAT205'],careers:['Product Manager','Management Consultant']},
+        BUS310:{code:'BUS 310',name:'Business Analytics',cr:3,cat:'major',desc:'Turning data into decisions with dashboards and models.',pre:['STAT205'],careers:['Product Manager','Management Consultant']},
+        MKT310:{code:'MKT 310',name:'Digital Marketing',cr:3,cat:'major',desc:'SEO, paid media, funnels, and growth analytics.',pre:['MKT301'],careers:['Marketing Manager']},
+        FIN310:{code:'FIN 310',name:'Corporate Finance',cr:3,cat:'major',desc:'Capital structure, risk, and financial strategy.',pre:['FIN201'],careers:['Management Consultant']},
+        MGT310:{code:'MGT 310',name:'Strategic Management',cr:3,cat:'major',desc:'Competitive analysis and long-run firm strategy.',pre:['MGT301'],careers:['Management Consultant']},
+        MGT401:{code:'MGT 401',name:'Leadership',cr:3,cat:'major',desc:'Influence, motivation, and leading change.',pre:['MGT301'],careers:['Product Manager','Management Consultant']},
+        ENT401:{code:'ENT 401',name:'Entrepreneurship',cr:3,cat:'major',desc:'Building and validating a new venture.',pre:['BUS101'],careers:['Product Manager']},
+        BUS410:{code:'BUS 410',name:'Global Business',cr:3,cat:'major',desc:'Operating across borders, cultures, and markets.',pre:['MGT301']},
+        MGT420:{code:'MGT 420',name:'Project Management',cr:3,cat:'major',desc:'Scope, timelines, and cross-functional delivery.',pre:['MGT201'],careers:['Product Manager']},
+        BCAP1:{code:'BUS 490',name:'Capstone I: Strategy',cr:3,cat:'cap',desc:'Scoping a real consulting-style business case.',pre:['MGT310']},
+        BCAP2:{code:'BUS 491',name:'Capstone II: Pitch',cr:3,cat:'cap',desc:'Delivering strategic recommendations to a panel.',pre:['BCAP1']},
+        ENGL101:{code:'ENGL 101',name:'Composition',cr:3,cat:'gen',desc:'College writing and argumentation.',pre:[],flex:true},
+        HUM110:{code:'HUM 110',name:'Humanities Elective',cr:3,cat:'gen',desc:'Breadth requirement in the humanities.',pre:[],flex:true},
+        SOC110:{code:'SOC 110',name:'Social Science Elective',cr:3,cat:'gen',desc:'Breadth requirement in the social sciences.',pre:[],flex:true},
+        FREE1:{code:'ELEC 1',name:'Free Elective',cr:3,cat:'gen',desc:'Open elective — pair with a minor or concentration.',pre:[],flex:true},
+        FREE2:{code:'ELEC 2',name:'Free Elective',cr:3,cat:'gen',desc:'Open elective — pair with a minor or concentration.',pre:[],flex:true},
+        FREE3:{code:'ELEC 3',name:'Free Elective',cr:3,cat:'gen',desc:'Open elective — pair with a minor or concentration.',pre:[],flex:true}
+      },
+      plan: [
+        ['BUS101','ECON101','MATH110','ENGL101'],
+        ['ACCT101','ECON102','BUS110','HUM110'],
+        ['ACCT102','MKT201','STAT205','MIS201'],
+        ['FIN201','MGT201','BLAW201','SOC110'],
+        ['MKT301','MGT301','OM301','BUS310'],
+        ['MGT310','MKT310','FIN310','FREE1'],
+        ['MGT401','ENT401','BCAP1','FREE2'],
+        ['BUS410','MGT420','BCAP2','FREE3']
+      ]
+    },
+
+    'Accounting & Economics': {
+      careers: ['CPA (Accountant)','Financial Analyst','Economist'],
+      courses: {
+        ACCT101:{code:'ACCT 101',name:'Financial Accounting',cr:3,cat:'core',desc:'The language of business: statements, accruals, and reporting.',pre:[],careers:['CPA (Accountant)','Financial Analyst'],heavy:true},
+        ACCT102:{code:'ACCT 102',name:'Managerial Accounting',cr:3,cat:'core',desc:'Cost behavior, budgeting, and internal decision support.',pre:['ACCT101'],careers:['CPA (Accountant)'],heavy:true},
+        ECON101:{code:'ECON 101',name:'Microeconomics',cr:3,cat:'core',desc:'Markets, incentives, and firm behavior.',pre:[],careers:['Economist','Financial Analyst'],heavy:true},
+        ECON102:{code:'ECON 102',name:'Macroeconomics',cr:3,cat:'core',desc:'Aggregate output, inflation, and policy.',pre:[],careers:['Economist'],heavy:true},
+        MATH121:{code:'MATH 121',name:'Calculus I',cr:4,cat:'math',desc:'Derivatives and optimization used across economics.',pre:[],careers:['Economist'],heavy:true},
+        STAT201:{code:'STAT 201',name:'Statistics',cr:3,cat:'math',desc:'Probability and inference — the base for econometrics.',pre:[],careers:['Financial Analyst','Economist'],heavy:true},
+        ACCT201:{code:'ACCT 201',name:'Intermediate Accounting I',cr:3,cat:'major',desc:'Deep dive into assets, revenue recognition, and GAAP.',pre:['ACCT102'],careers:['CPA (Accountant)'],heavy:true},
+        ACCT202:{code:'ACCT 202',name:'Intermediate Accounting II',cr:3,cat:'major',desc:'Liabilities, equity, and complex reporting — heavy CPA content.',pre:['ACCT201'],careers:['CPA (Accountant)'],heavy:true},
+        ECON201:{code:'ECON 201',name:'Intermediate Microeconomics',cr:3,cat:'major',desc:'Rigorous consumer and producer theory with calculus.',pre:['ECON101','MATH121'],careers:['Economist'],heavy:true},
+        ECON202:{code:'ECON 202',name:'Intermediate Macroeconomics',cr:3,cat:'major',desc:'Growth models, business cycles, and monetary theory.',pre:['ECON102','MATH121'],careers:['Economist'],heavy:true},
+        ECON210:{code:'ECON 210',name:'Econometrics',cr:3,cat:'major',desc:'Regression modeling and causal inference with real data.',pre:['STAT201','ECON101'],careers:['Economist','Financial Analyst'],heavy:true},
+        FIN201:{code:'FIN 201',name:'Business Finance',cr:3,cat:'core',desc:'Valuation, time value of money, and capital budgeting.',pre:['ACCT101'],careers:['Financial Analyst'],heavy:true},
+        BLAW201:{code:'BLAW 201',name:'Business Law',cr:3,cat:'core',desc:'Legal environment relevant to accounting and the CPA exam.',pre:[],careers:['CPA (Accountant)'],heavy:true},
+        MIS201:{code:'MIS 201',name:'Information Systems',cr:3,cat:'core',desc:'Data systems that back modern accounting and analysis.',pre:[]},
+        ACCT301:{code:'ACCT 301',name:'Cost Accounting',cr:3,cat:'major',desc:'Activity-based costing and managerial cost analysis.',pre:['ACCT201'],careers:['CPA (Accountant)']},
+        ACCT310:{code:'ACCT 310',name:'Federal Taxation I',cr:3,cat:'major',desc:'Individual income tax — core CPA-exam and career content.',pre:['ACCT201'],careers:['CPA (Accountant)'],heavy:true},
+        ACCT302:{code:'ACCT 302',name:'Auditing',cr:3,cat:'major',desc:'Assurance, internal controls, and audit procedures.',pre:['ACCT202'],careers:['CPA (Accountant)'],heavy:true},
+        ACCT320:{code:'ACCT 320',name:'Federal Taxation II',cr:3,cat:'major',desc:'Corporate and partnership taxation.',pre:['ACCT310'],careers:['CPA (Accountant)']},
+        ECON301:{code:'ECON 301',name:'Money & Banking',cr:3,cat:'major',desc:'Financial institutions, central banking, and interest rates.',pre:['ECON202'],careers:['Financial Analyst','Economist']},
+        ECON310:{code:'ECON 310',name:'Public Finance',cr:3,cat:'major',desc:'Taxation, spending, and the economics of government.',pre:['ECON201'],careers:['Economist']},
+        FIN301:{code:'FIN 301',name:'Investments',cr:3,cat:'major',desc:'Portfolio theory, securities, and market analysis.',pre:['FIN201'],careers:['Financial Analyst']},
+        FIN310:{code:'FIN 310',name:'Financial Modeling',cr:3,cat:'major',desc:'Building valuation and forecasting models in spreadsheets.',pre:['FIN301'],careers:['Financial Analyst']},
+        ACCT401:{code:'ACCT 401',name:'Advanced Accounting',cr:3,cat:'major',desc:'Consolidations, partnerships, and advanced reporting.',pre:['ACCT202'],careers:['CPA (Accountant)']},
+        ACCT410:{code:'ACCT 410',name:'Accounting Info Systems',cr:3,cat:'major',desc:'Controls and technology in the accounting function.',pre:['MIS201','ACCT201'],careers:['CPA (Accountant)']},
+        FIN410:{code:'FIN 410',name:'Portfolio Management',cr:3,cat:'major',desc:'Risk, return, and managing investment portfolios.',pre:['FIN310'],careers:['Financial Analyst']},
+        ECON410:{code:'ECON 410',name:'International Economics',cr:3,cat:'major',desc:'Trade, exchange rates, and the global economy.',pre:['ECON202'],careers:['Economist']},
+        AECAP1:{code:'AE 490',name:'Capstone I: Analysis',cr:3,cat:'cap',desc:'Scoping a data-driven accounting or economics research project.',pre:['ECON210']},
+        AECAP2:{code:'AE 491',name:'Capstone II: Report',cr:3,cat:'cap',desc:'Delivering findings and a professional written report.',pre:['AECAP1']},
+        ENGL101:{code:'ENGL 101',name:'Composition',cr:3,cat:'gen',desc:'College writing and argumentation.',pre:[],flex:true},
+        HUM110:{code:'HUM 110',name:'Humanities Elective',cr:3,cat:'gen',desc:'Breadth requirement in the humanities.',pre:[],flex:true},
+        SOC110:{code:'SOC 110',name:'Social Science Elective',cr:3,cat:'gen',desc:'Breadth requirement in the social sciences.',pre:[],flex:true},
+        FREE1:{code:'ELEC 1',name:'Free Elective',cr:3,cat:'gen',desc:'Open elective toward the 150-credit CPA path or a minor.',pre:[],flex:true},
+        FREE2:{code:'ELEC 2',name:'Free Elective',cr:3,cat:'gen',desc:'Open elective toward the 150-credit CPA path or a minor.',pre:[],flex:true}
+      },
+      plan: [
+        ['ACCT101','ECON101','MATH121','ENGL101'],
+        ['ACCT102','ECON102','STAT201','HUM110'],
+        ['ACCT201','ECON201','FIN201','BLAW201'],
+        ['ACCT202','ECON202','ECON210','MIS201'],
+        ['ACCT301','ACCT310','ECON301','FIN301'],
+        ['ACCT302','ACCT320','ECON310','FIN310'],
+        ['ACCT401','ACCT410','ECON401_x','AECAP1'],
+        ['FIN410','ECON410','FREE1','AECAP2']
+      ]
+    }
+  };
+  // fix: Accounting plan referenced a non-existent id — replace with a real course
+  MAJORS['Accounting & Economics'].plan[6][2] = 'FREE2';
+
+  const YEARS = ['Freshman','Sophomore','Junior','Senior'];
+  const WORKLOADS = {
+    'Balanced':   { target:15, blurb:'~15 credits/semester — the standard on-time pace.' },
+    'Fast-Track': { target:18, blurb:'~18 credits/semester — heavier load to accelerate or double up.' },
+    'Low-Stress': { target:12, blurb:'~12 credits/semester — lighter load, more breathing room.' }
+  };
+
+  /* =========================================================================
+     STATE
+     ========================================================================= */
+  let state = {
+    step: 1,
+    major: null,
+    year: null,
+    career: null,
+    workload: null,
+    prior: new Set(),      // course ids marked complete
+    plan: []               // array(8) of arrays of course ids
+  };
+
+  const el = (id) => document.getElementById(id);
+  const courseData = () => MAJORS[state.major].courses;
+
+  /* =========================================================================
+     INTAKE FLOW
+     ========================================================================= */
+  function renderMajorChoices(){
+    el('majorChoices').innerHTML = Object.keys(MAJORS).map(m => `
+      <button type="button" class="choice ${state.major===m?'active':''}" onclick="pickMajor('${m}')">
+        <span class="t">${m}</span>
+        <span class="d">${MAJORS[m].careers.length} career tracks · prerequisite-mapped</span>
+      </button>`).join('');
+  }
+  function pickMajor(m){
+    state.major = m;
+    // reset downstream selections that depend on major
+    state.career = null; state.prior = new Set();
+    renderMajorChoices();
+  }
+
+  function renderYearChoices(){
+    el('yearChoices').innerHTML = YEARS.map(y => `
+      <button type="button" class="choice ${state.year===y?'active':''}" onclick="pickYear('${y}')">
+        <span class="t">${y}</span>
+        <span class="d">Year ${YEARS.indexOf(y)+1}</span>
+      </button>`).join('');
+  }
+  function pickYear(y){ state.year = y; renderYearChoices(); }
+
+  function renderCareerChoices(){
+    const list = MAJORS[state.major].careers;
+    el('careerChoices').innerHTML = list.map(c => `
+      <button type="button" class="choice ${state.career===c?'active':''}" onclick="pickCareer('${c.replace(/'/g,"\\'")}')">
+        <span class="t">${c}</span>
+        <span class="d">Bias electives toward this path</span>
+      </button>`).join('');
+  }
+  function pickCareer(c){ state.career = c; renderCareerChoices(); }
+
+  function renderWorkloadChoices(){
+    el('workloadChoices').innerHTML = Object.keys(WORKLOADS).map(w => `
+      <button type="button" class="choice ${state.workload===w?'active':''}" onclick="pickWorkload('${w}')">
+        <span class="t">${w}</span>
+        <span class="d">${WORKLOADS[w].blurb}</span>
+      </button>`).join('');
+  }
+  function pickWorkload(w){ state.workload = w; renderWorkloadChoices(); }
+
+  function renderPriorChoices(){
+    const c = courseData();
+    // offer real (non gen-ed filler) courses so "prior credit" feels meaningful
+    const ids = Object.keys(c).filter(id => !c[id].flex);
+    el('priorChoices').innerHTML = ids.map(id => `
+      <button type="button" data-id="${id}" data-label="${(c[id].code+' '+c[id].name).toLowerCase()}"
+        class="choice !flex-row !items-center !p-2.5 !gap-2 ${state.prior.has(id)?'active':''}" style="width:auto" onclick="togglePrior('${id}')">
+        <span style="font-weight:800;font-size:.8rem">${c[id].code}</span>
+        <span class="d">${c[id].name}</span>
+      </button>`).join('');
+  }
+  function togglePrior(id){
+    if(state.prior.has(id)) state.prior.delete(id); else state.prior.add(id);
+    renderPriorChoices();
+  }
+  function filterPrior(){
+    const q = el('priorSearch').value.toLowerCase();
+    el('priorChoices').querySelectorAll('[data-id]').forEach(b=>{
+      b.style.display = (!q || b.dataset.label.includes(q)) ? '' : 'none';
+    });
+  }
+
+  function showStep(n){
+    state.step = n;
+    document.querySelectorAll('.qstep').forEach(s => s.hidden = (+s.dataset.step !== n));
+    for(let i=1;i<=5;i++){ el('pg'+i).style.width = (i <= n ? '100%' : '0%'); }
+    el('backBtn').hidden = (n===1);
+    el('nextBtn').textContent = (n===5 ? 'Generate My Map ✨' : 'Continue →');
+    if(n===1) renderMajorChoices();
+    if(n===2) renderYearChoices();
+    if(n===3) renderCareerChoices();
+    if(n===4) renderWorkloadChoices();
+    if(n===5) renderPriorChoices();
+    updateStepHint();
+  }
+  function updateStepHint(){
+    const need = { 1:!state.major, 2:!state.year, 3:!state.career, 4:!state.workload, 5:false };
+    el('stepHint').textContent = need[state.step] ? 'Pick one to continue' : '';
+    el('nextBtn').style.opacity = need[state.step] ? .5 : 1;
+  }
+  function nextQ(){
+    const need = { 1:!state.major, 2:!state.year, 3:!state.career, 4:!state.workload, 5:false };
+    if(need[state.step]){ toast('Please make a selection'); return; }
+    if(state.step < 5){ showStep(state.step+1); return; }
+    generateMap();
+  }
+  function prevQ(){ if(state.step>1) showStep(state.step-1); }
+
+  /* =========================================================================
+     PLAN GENERATION
+     ========================================================================= */
+  function buildBasePlan(){
+    // deep copy the major's default plan, dropping any prior-credit courses
+    let plan = MAJORS[state.major].plan.map(sem => sem.filter(id => !state.prior.has(id)));
+    plan = rebalanceForWorkload(plan);
+    return plan;
+  }
+
+  // move only FLEX (elective) courses to respect prereqs while hitting a credit target
+  function rebalanceForWorkload(plan){
+    const c = courseData();
+    const target = WORKLOADS[state.workload].target;
+    const credits = (sem)=> sem.reduce((s,id)=> s + (c[id]?.cr||0), 0);
+
+    if(state.workload === 'Low-Stress'){
+      // pull flex courses OUT of over-target semesters into later under-target ones
+      for(let i=0;i<plan.length;i++){
+        while(credits(plan[i]) > target){
+          const fIdx = plan[i].findIndex(id => c[id]?.flex);
+          if(fIdx === -1) break;
+          const moved = plan[i][fIdx];
+          const dest = findLaterRoom(plan, i, target, c, moved);
+          if(dest === -1) break;
+          plan[i].splice(fIdx,1);
+          plan[dest].push(moved);
+        }
+      }
+    } else if(state.workload === 'Fast-Track'){
+      // pull flex courses FORWARD from later semesters to fill early ones toward target
+      for(let i=0;i<plan.length-1;i++){
+        for(let j=plan.length-1;j>i;j--){
+          while(credits(plan[i]) < target && plan[j].some(id=>c[id]?.flex) && credits(plan[i])+3 <= target+1){
+            const fIdx = plan[j].findIndex(id => c[id]?.flex);
+            if(fIdx === -1) break;
+            const moved = plan[j].splice(fIdx,1)[0];
+            plan[i].push(moved);
+          }
+        }
+      }
+    }
+    return plan;
+  }
+  function findLaterRoom(plan, from, target, c, movedId){
+    const credits = (sem)=> sem.reduce((s,id)=> s + (c[id]?.cr||0), 0);
+    const need = c[movedId]?.cr || 3;
+    for(let j=from+1;j<plan.length;j++){
+      if(credits(plan[j]) + need <= target) return j;
+    }
+    // fallback: last semester if nothing fits cleanly
+    return plan.length-1 > from ? plan.length-1 : -1;
+  }
+
+  function generateMap(){
+    el('intake').hidden = true;
+    el('loading').hidden = false;
+    const msgs = ['Resolving prerequisites…','Sequencing '+state.major+' core…','Tuning for a '+state.workload.toLowerCase()+' load…','Aligning electives with '+state.career+'…'];
+    let mi=0; el('loadMsg').textContent = msgs[0];
+    const iv = setInterval(()=>{ mi++; if(msgs[mi]) el('loadMsg').textContent = msgs[mi]; }, 480);
+
+    state.plan = buildBasePlan();
+
+    setTimeout(()=>{
+      clearInterval(iv);
+      el('loading').hidden = true;
+      el('workspace').hidden = false;
+      el('btnRestart').hidden = false;
+      el('planPill').textContent = state.major;
+      renderWorkspaceHeader();
+      renderMap();
+      runAdvisor();
+      window.scrollTo({top:0,behavior:'smooth'});
+    }, 2100);
+  }
+
+  function renderWorkspaceHeader(){
+    el('wsTitle').textContent = state.major;
+    el('wsSub').textContent = `${state.year} · Goal: ${state.career} · ${state.workload} load`;
+  }
+
+  /* =========================================================================
+     MAP RENDERING + DRAG & DROP
+     ========================================================================= */
+  const currentYearIndex = () => YEARS.indexOf(state.year); // 0..3
+
+  function courseCardHTML(id){
+    const c = courseData()[id];
+    if(!c) return '';
+    const cat = CAT[c.cat];
+    return `<div class="course" draggable="true" data-id="${id}"
+        ondragstart="onDragStart(event,'${id}')" ondragend="onDragEnd(event)" onclick="openModal('${id}')">
+        <div class="flex items-start justify-between gap-2">
+          <div class="min-w-0">
+            <div class="code">${c.code}</div>
+            <div class="nm">${c.name}</div>
+          </div>
+          <span class="badge" style="background:rgba(148,163,184,.12);color:var(--muted)">${c.cr} cr</span>
+        </div>
+        <div class="meta">
+          <span class="cat-dot" style="background:${cat.color}"></span>
+          <span class="text-[.66rem]" style="color:var(--muted)">${cat.label}</span>
+          ${c.careers && c.careers.includes(state.career) ? '<span class="badge ml-auto" style="background:rgba(74,222,128,.14);color:var(--green)">★ Goal</span>':''}
+        </div>
+      </div>`;
+  }
+
+  function renderMap(){
+    const c = courseData();
+    const yi = currentYearIndex();
+    el('mapGrid').innerHTML = state.plan.map((sem, i)=>{
+      const cr = sem.reduce((s,id)=> s+(c[id]?.cr||0),0);
+      const isPast = Math.floor(i/2) < yi;
+      const isCurrent = Math.floor(i/2) === yi;
+      const target = WORKLOADS[state.workload].target;
+      const over = cr > target + 1;
+      return `<div class="rounded-2xl p-3" style="background:rgba(255,255,255,.02);border:1px solid var(--line)">
+        <div class="flex items-center justify-between mb-2">
+          <div class="flex items-center gap-2">
+            <span class="text-sm font-bold">${SEMESTER_LABELS[i]}</span>
+            ${isCurrent?'<span class="badge" style="background:rgba(96,165,250,.16);color:var(--blue)">You are here</span>':''}
+            ${isPast?'<span class="badge" style="background:rgba(148,163,184,.14);color:var(--muted)">Completed</span>':''}
+          </div>
+          <span class="text-xs font-semibold" style="color:${over?'var(--yellow)':'var(--muted)'}">${cr} cr</span>
+        </div>
+        <div class="semester ${over?'over-load':''}" data-sem="${i}"
+          ondragover="onDragOver(event,${i})" ondragleave="onDragLeave(event)" ondrop="onDrop(event,${i})">
+          ${sem.map(courseCardHTML).join('') || `<div class="text-xs italic grid place-items-center flex-1" style="color:var(--muted)">Drop courses here</div>`}
+        </div>
+      </div>`;
+    }).join('');
+    // flag prereq violations visually
+    markViolations();
+    updateStats();
+  }
+
+  let dragId = null;
+  function onDragStart(e,id){ dragId=id; e.currentTarget.classList.add('dragging'); e.dataTransfer.effectAllowed='move'; }
+  function onDragEnd(e){ e.currentTarget.classList.remove('dragging'); document.querySelectorAll('.semester').forEach(s=>s.classList.remove('drop-target')); }
+  function onDragOver(e,i){ e.preventDefault(); e.currentTarget.classList.add('drop-target'); }
+  function onDragLeave(e){ e.currentTarget.classList.remove('drop-target'); }
+  function onDrop(e, semIdx){
+    e.preventDefault();
+    e.currentTarget.classList.remove('drop-target');
+    if(dragId==null) return;
+    moveCourse(dragId, semIdx);
+    dragId=null;
+  }
+
+  function moveCourse(id, destSem){
+    // remove from wherever it is
+    for(const sem of state.plan){ const k = sem.indexOf(id); if(k>-1){ sem.splice(k,1); break; } }
+    state.plan[destSem].push(id);
+    renderMap();
+    runAdvisor();
+  }
+
+  // find which semester a course sits in (-1 if not placed)
+  function semesterOf(id){
+    for(let i=0;i<state.plan.length;i++){ if(state.plan[i].includes(id)) return i; }
+    return -1;
+  }
+
+  function markViolations(){
+    const bad = computeViolations();
+    document.querySelectorAll('.course').forEach(elx=>{
+      elx.classList.toggle('invalid', bad.has(elx.dataset.id));
+    });
+  }
+  // a course is violating if a prereq is missing (not prior, not in an earlier semester)
+  function computeViolations(){
+    const c = courseData();
+    const bad = new Set();
+    for(let i=0;i<state.plan.length;i++){
+      for(const id of state.plan[i]){
+        const pre = c[id]?.pre || [];
+        for(const p of pre){
+          if(state.prior.has(p)) continue;
+          const ps = semesterOf(p);
+          if(ps === -1 || ps >= i){ bad.add(id); }
+        }
+      }
+    }
+    return bad;
+  }
+
+  function updateStats(){
+    const c = courseData();
+    let total=0; state.plan.forEach(sem=> sem.forEach(id=> total += c[id]?.cr||0));
+    let prior=0; state.prior.forEach(id=> prior += c[id]?.cr||0);
+    el('statCredits').textContent = total + prior;
+    el('statPrior').textContent = prior;
+    // grad timeline: last non-empty semester
+    let last=0; state.plan.forEach((s,i)=>{ if(s.length) last=i; });
+    const yrs = (Math.floor(last/2)+1);
+    el('statGrad').textContent = yrs + (yrs===1?' yr':' yrs');
+    const v = computeViolations();
+    const overloaded = state.plan.some(sem=> sem.reduce((s,id)=>s+(c[id]?.cr||0),0) > WORKLOADS[state.workload].target+1);
+    const health = el('statHealth');
+    if(v.size){ health.textContent='Needs fixes'; health.style.color='var(--red)'; }
+    else if(overloaded){ health.textContent='Heavy'; health.style.color='var(--yellow)'; }
+    else { health.textContent='Healthy'; health.style.color='var(--green)'; }
+  }
+
+  /* =========================================================================
+     AI ADVISOR — live analysis
+     ========================================================================= */
+  function runAdvisor(){
+    const c = courseData();
+    const items = [];
+    const target = WORKLOADS[state.workload].target;
+
+    // 1) prereq violations (errors)
+    const v = computeViolations();
+    if(v.size){
+      for(const id of v){
+        const missing = (c[id].pre||[]).filter(p=> !state.prior.has(p) && (semesterOf(p)===-1 || semesterOf(p)>=semesterOf(id)));
+        items.push({sev:'error', icon:'⛔', h:`${c[id].code} is out of sequence`,
+          b:`It needs ${missing.map(p=>c[p].code).join(', ')} beforehand. Move ${c[id].code} later, or pull its prerequisite earlier.`});
+      }
+    }
+
+    // 2) per-semester load + reading-heavy combos
+    state.plan.forEach((sem,i)=>{
+      const cr = sem.reduce((s,id)=> s+(c[id]?.cr||0),0);
+      if(cr > target + 2){
+        items.push({sev:'warn', icon:'⚠️', h:`${SEMESTER_LABELS[i]} is overloaded`,
+          b:`${cr} credits is above your ${state.workload.toLowerCase()} target of ${target}. Consider shifting an elective to a lighter term.`});
+      }
+      const heavy = sem.filter(id=> c[id]?.heavy);
+      if(heavy.length >= 3){
+        items.push({sev:'warn', icon:'📚', h:`Heavy reading/quant load in ${SEMESTER_LABELS[i].split(' · ')[0]} ${SEMESTER_LABELS[i].split(' · ')[1]}`,
+          b:`You've stacked ${heavy.map(id=>c[id].code).join(', ')} together — all reading/quant-intensive. Spreading one out protects your GPA.`});
+      }
+    });
+
+    // 3) career-boosting tips
+    careerTips(c).forEach(t=> items.push(t));
+
+    // 4) underloaded early semesters (accelerate)
+    const firstLight = state.plan.findIndex((sem,i)=> Math.floor(i/2) >= currentYearIndex() && sem.reduce((s,id)=>s+(c[id]?.cr||0),0) < target-4 && sem.length);
+    if(firstLight>-1 && state.workload!=='Low-Stress'){
+      items.push({sev:'tip', icon:'⚡', h:`${SEMESTER_LABELS[firstLight]} has room`,
+        b:`This term is light. If you want to graduate sooner, you could pull a future elective forward here.`});
+    }
+
+    // 5) all-clear
+    if(!items.some(x=>x.sev==='error') && !items.some(x=>x.sev==='warn')){
+      items.unshift({sev:'good', icon:'✅', h:'Your map is on track',
+        b:'No prerequisite conflicts and no overloaded semesters. Every course is sequenced correctly for on-time graduation.'});
+    }
+
+    // summary line
+    const errCount = items.filter(x=>x.sev==='error').length;
+    const warnCount = items.filter(x=>x.sev==='warn').length;
+    let sum;
+    if(errCount) sum = `I found <b style="color:var(--red)">${errCount} sequencing ${errCount===1?'issue':'issues'}</b> that could delay graduation. Fix these first.`;
+    else if(warnCount) sum = `Sequencing looks valid, but <b style="color:var(--yellow)">${warnCount} ${warnCount===1?'semester needs':'semesters need'} balancing</b>. Suggestions below.`;
+    else sum = `Nice work — this plan is <b style="color:var(--green)">clean and graduation-ready</b>. Here are ways to make it even stronger.`;
+    el('advisorSummary').innerHTML = sum;
+
+    el('advisorList').innerHTML = items.map(it=>`
+      <div class="advice ${it.sev==='error'?'error':it.sev==='warn'?'warn':it.sev==='tip'?'tip':'good'}">
+        <div class="h">${it.icon} ${it.h}</div>
+        <div class="b">${it.b}</div>
+      </div>`).join('');
+
+    // pulse color
+    el('advisorPulse').style.background = errCount?'var(--red)':warnCount?'var(--yellow)':'var(--green)';
+    el('advisorPulse').style.boxShadow = `0 0 0 4px ${errCount?'rgba(248,113,113,.15)':warnCount?'rgba(250,204,21,.15)':'rgba(74,222,128,.15)'}`;
+  }
+
+  function careerTips(c){
+    const tips = [];
+    const placed = new Set(); state.plan.forEach(s=> s.forEach(id=> placed.add(id)));
+    const goalCourses = Object.keys(c).filter(id=> c[id].careers && c[id].careers.includes(state.career));
+
+    // find goal courses and where they sit
+    const highlight = goalCourses.filter(id=> placed.has(id));
+    if(highlight.length){
+      const sample = highlight.slice(0,3).map(id=> c[id].code).join(', ');
+      tips.push({sev:'tip', icon:'🎯', h:`Aligned with ${state.career}`,
+        b:`Your map already includes ${sample}${highlight.length>3?` and ${highlight.length-3} more`:''} — the courses that matter most for this path. Prioritize these over free electives.`});
+    }
+
+    // specific, hand-authored career nudges
+    if(state.career === 'CPA (Accountant)'){
+      const tax = semesterOf('ACCT310'); const aud = semesterOf('ACCT302');
+      if(tax>-1) tips.push({sev:'tip', icon:'🧾', h:'CPA path: tax + audit are locked in',
+        b:`Because you want the CPA, we placed Federal Taxation I in ${SEMESTER_LABELS[tax]} and Auditing in ${SEMESTER_LABELS[aud]}. Keep those before senior year so you're exam-ready.`});
+      tips.push({sev:'tip', icon:'📈', h:'Mind the 150-credit rule',
+        b:`Most states require 150 credits to sit for the CPA. Your free electives are the natural place to close that gap — consider a minor.`});
+    }
+    if(state.career === 'Software Engineer'){
+      if(placed.has('CS320')) tips.push({sev:'tip', icon:'💻', h:'Ship a portfolio early',
+        b:`Software Engineering (CS 320) and your capstone give you real teamwork artifacts. Start a public GitHub project by end of Year 2 — recruiters weigh it heavily.`});
+    }
+    if(state.career === 'ML / AI Engineer'){
+      const ml = semesterOf('CS340');
+      if(ml>-1) tips.push({sev:'tip', icon:'🧠', h:'Front-load the math for ML',
+        b:`Machine Learning (CS 340) leans on Linear Algebra and Statistics. Keep those before ${SEMESTER_LABELS[ml]} so you're not learning the math and the models at once.`});
+    }
+    if(state.career === 'Financial Analyst'){
+      if(placed.has('FIN310')) tips.push({sev:'tip', icon:'📊', h:'Modeling is your edge',
+        b:`Financial Modeling and Investments are the interview-relevant courses for analysts. Pair them with a valuation project to stand out.`});
+    }
+    if(state.career === 'Product Manager'){
+      if(placed.has('BUS310')) tips.push({sev:'tip', icon:'🚀', h:'Blend analytics + communication',
+        b:`PMs live at the data/communication intersection. Business Analytics plus a technical free elective (SQL or intro CS) makes your profile much stronger.`});
+    }
+    return tips;
+  }
+
+  /* =========================================================================
+     AUTO-OPTIMIZE — one-click fix of sequencing + load
+     ========================================================================= */
+  function autoOptimize(){
+    const c = courseData();
+    const target = WORKLOADS[state.workload].target;
+
+    // 1) topological-ish fix: ensure each course sits after its prereqs
+    let changed = true, guard = 0;
+    while(changed && guard++ < 50){
+      changed = false;
+      for(let i=0;i<state.plan.length;i++){
+        for(const id of [...state.plan[i]]){
+          const pre = (c[id]?.pre||[]).filter(p=> !state.prior.has(p));
+          const maxPre = Math.max(-1, ...pre.map(p=> semesterOf(p)));
+          if(maxPre >= i){
+            // move id to the semester right after its latest prereq
+            const dest = Math.min(maxPre+1, state.plan.length-1);
+            const k = state.plan[i].indexOf(id); state.plan[i].splice(k,1);
+            state.plan[dest].push(id);
+            changed = true;
+          }
+        }
+      }
+    }
+    // 2) balance flex courses off overloaded semesters
+    for(let i=0;i<state.plan.length;i++){
+      const cr = ()=> state.plan[i].reduce((s,id)=>s+(c[id]?.cr||0),0);
+      while(cr() > target+1){
+        const fIdx = state.plan[i].findIndex(id=> c[id]?.flex);
+        if(fIdx===-1) break;
+        const moved = state.plan[i][fIdx];
+        const dest = findLaterRoom(state.plan, i, target+1, c, moved);
+        if(dest===-1 || dest===i) break;
+        state.plan[i].splice(fIdx,1);
+        state.plan[dest].push(moved);
+      }
+    }
+    renderMap();
+    runAdvisor();
+    toast('✨ Optimized — sequencing and load rebalanced');
+  }
+
+  /* =========================================================================
+     COURSE MODAL
+     ========================================================================= */
+  function openModal(id){
+    const c = courseData(); const course = c[id];
+    if(!course) return;
+    el('mCode').textContent = course.code;
+    el('mName').textContent = course.name;
+    const cat = CAT[course.cat];
+    const badges = [`<span class="badge" style="background:${hexA(cat.color)};color:${cat.color}">${cat.label}</span>`,
+      `<span class="badge" style="background:rgba(148,163,184,.14);color:var(--muted)">${course.cr} credits</span>`];
+    if(course.heavy) badges.push(`<span class="badge" style="background:rgba(250,204,21,.14);color:var(--yellow)">Reading/Quant heavy</span>`);
+    if(course.careers && course.careers.includes(state.career)) badges.push(`<span class="badge" style="background:rgba(74,222,128,.14);color:var(--green)">★ ${state.career}</span>`);
+    el('mBadges').innerHTML = badges.join('');
+    el('mDesc').textContent = course.desc;
+
+    // prereqs
+    const pre = course.pre||[];
+    el('mPrereqs').innerHTML = pre.length
+      ? pre.map(p=>{
+          const done = state.prior.has(p) || (semesterOf(p)>-1 && semesterOf(p)<semesterOf(id));
+          return `<span class="prereq-line inline-flex items-center gap-1 mr-3">${done?'✅':'⚠️'} ${c[p]?c[p].code:p}${state.prior.has(p)?' (prior)':''}</span>`;
+        }).join('')
+      : '<span class="prereq-line">None — you can take this any time.</span>';
+
+    // unlocks (dependents)
+    const deps = Object.keys(c).filter(k=> (c[k].pre||[]).includes(id));
+    el('mUnlocks').innerHTML = deps.length
+      ? deps.map(d=> `<span class="prereq-line inline-flex items-center gap-1 mr-3">🔓 ${c[d].code}</span>`).join('')
+      : '<span class="prereq-line">Nothing depends on this course.</span>';
+
+    el('mWhy').textContent = whyRecommended(id);
+
+    // move-to dropdown
+    el('mMoveTo').innerHTML = '<option value="">—</option>' + SEMESTER_LABELS.map((l,i)=>`<option value="${i}" ${semesterOf(id)===i?'selected':''}>${l}</option>`).join('');
+    el('mMoveTo').dataset.course = id;
+
+    el('courseModal').classList.add('show');
+  }
+  function moveViaModal(v){
+    if(v==='') return;
+    const id = el('mMoveTo').dataset.course;
+    moveCourse(id, +v);
+    closeModal();
+    toast('Moved '+courseData()[id].code+' → '+SEMESTER_LABELS[+v]);
+  }
+  function closeModal(){ el('courseModal').classList.remove('show'); }
+
+  function whyRecommended(id){
+    const c = courseData(); const course = c[id];
+    const isGoal = course.careers && course.careers.includes(state.career);
+    const deps = Object.keys(c).filter(k=> (c[k].pre||[]).includes(id));
+    let s = '';
+    if(isGoal){
+      s = `You told us your goal is ${state.career}, and ${course.code} is one of the highest-signal courses for that path — it's why the AI placed it in your core sequence rather than treating it as optional.`;
+    } else if(course.cat==='cap'){
+      s = `Capstone courses are where everything comes together into a portfolio piece. The AI scheduled ${course.code} in senior year, after its prerequisites, so you build on a full foundation.`;
+    } else if(course.cat==='math'){
+      s = `${course.code} is a quantitative foundation. The AI placed it early because ${deps.length? c[deps[0]].code+' and other upper-level courses depend on it':'it supports later analytical work'}.`;
+    } else if(course.cat==='gen'){
+      s = `${course.code} satisfies a breadth/general-education requirement. The AI slotted it into a lighter semester so it balances your heavier ${state.major} courses instead of competing with them.`;
+    } else {
+      s = `${course.code} is part of the required ${state.major} core.`;
+    }
+    if(deps.length){
+      s += ` It also unlocks ${deps.slice(0,3).map(d=>c[d].code).join(', ')}${deps.length>3?' and more':''}, so taking it on time keeps your whole track moving.`;
+    }
+    if(course.heavy){
+      s += ` Heads up: it's reading/quant-intensive, so the AI tried not to stack it with other heavy courses.`;
+    }
+    return s;
+  }
+
+  function hexA(color){
+    // rough translucent bg for badge based on the css var color
+    if(color.startsWith('var')) return 'rgba(148,163,184,.14)';
+    return color+'22';
+  }
+
+  /* =========================================================================
+     SAVE / EXPORT
+     ========================================================================= */
+  const STORAGE_KEY = 'majormap_ai_plan_v1';
+  function serialize(){
+    return {
+      version:1, savedAt:new Date().toISOString(),
+      major:state.major, year:state.year, career:state.career, workload:state.workload,
+      priorCredits:[...state.prior],
+      plan: state.plan.map((sem,i)=>({
+        semester:SEMESTER_LABELS[i],
+        courses: sem.map(id=>{ const c=courseData()[id]; return {code:c.code,name:c.name,credits:c.cr}; })
+      }))
+    };
+  }
+  function saveMap(){
+    try{ localStorage.setItem(STORAGE_KEY, JSON.stringify({state:{...state, prior:[...state.prior]}})); toast('💾 Map saved to this browser'); }
+    catch(e){ toast('Could not save (storage blocked)'); }
+  }
+  function loadSaved(){
+    try{
+      const raw = localStorage.getItem(STORAGE_KEY);
+      if(!raw) return false;
+      const d = JSON.parse(raw).state;
+      if(!d || !MAJORS[d.major]) return false;
+      state = {...d, prior:new Set(d.prior||[]), step:5};
+      return true;
+    }catch(e){ return false; }
+  }
+  function exportJSON(){
+    toggleExport();
+    const blob = new Blob([JSON.stringify(serialize(),null,2)], {type:'application/json'});
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(blob);
+    a.download = `majormap-${state.major.toLowerCase().replace(/[^a-z]+/g,'-')}.json`;
+    a.click(); URL.revokeObjectURL(a.href);
+    toast('🧾 JSON exported');
+  }
+  function exportPDF(){
+    toggleExport();
+    toast('🖨 Opening print dialog — choose “Save as PDF”');
+    setTimeout(()=> window.print(), 300);
+  }
+  function toggleExport(){ el('exportMenu').hidden = !el('exportMenu').hidden; }
+  document.addEventListener('click', (e)=>{
+    if(!e.target.closest('#exportMenu') && !e.target.closest('[onclick="toggleExport()"]')) el('exportMenu').hidden = true;
+  });
+
+  /* =========================================================================
+     MISC
+     ========================================================================= */
+  function restartIntake(){
+    state = { step:1, major:null, year:null, career:null, workload:null, prior:new Set(), plan:[] };
+    el('workspace').hidden = true;
+    el('loading').hidden = true;
+    el('intake').hidden = false;
+    el('btnRestart').hidden = true;
+    el('planPill').textContent = 'Degree Planner';
+    showStep(1);
+    window.scrollTo({top:0,behavior:'smooth'});
+  }
+  let toastTimer;
+  function toast(msg){
+    const t = el('toast'); t.textContent = msg; t.classList.add('show');
+    clearTimeout(toastTimer); toastTimer = setTimeout(()=> t.classList.remove('show'), 2400);
+  }
+  document.addEventListener('keydown', e=>{ if(e.key==='Escape'){ closeModal(); el('exportMenu').hidden=true; } });
+
+  // deep-link: ?major=Computer%20Science to preselect
+  (function init(){
+    const params = new URLSearchParams(location.search);
+    const m = params.get('major');
+    if(m && MAJORS[m]) state.major = m;
+    showStep(1);
+  })();
+  </script>
+</body>
+</html>
