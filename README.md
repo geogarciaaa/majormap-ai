@@ -26,12 +26,23 @@ python3 -m http.server 8000
 Or just double-click `app.html` — it's fully self-contained (no CDN, no network
 needed) and works straight from disk.
 
-## The planner (`app.html`)
+## The app (`app.html`)
 
+**Database-first.** The app opens straight into the **Course Database** — a
+premium, searchable table of every section (ratings, seats, times) with an
+always-visible filter bar. No onboarding required.
+
+- **Course Database home** — instant load, sticky filter bar (search + term +
+  subject + course number + "on my map") and an Advanced Filters drawer. Every
+  row has a **＋ Add to schedule** button.
+- **Slide-out schedule** — clicking ＋ slots the course into your timeline and
+  slides out a right-hand **My Schedule** drawer; tap any highlighted term (or
+  drag) to move it. The course table stays interactive behind it.
+- **Guided planner (opt-in)** — "✨ Auto-build" runs a 5-step wizard (school,
+  major, year, career goal, workload, prior credits) to generate a full,
+  prerequisite-aware plan; "⤢ Full planner" opens the advisor/auto-optimize view.
 - **Light & dark mode** — follows your system preference, with a sun/moon toggle
   in the header that overrides it and remembers your choice (`localStorage`).
-- **5-step intake** — school, major, academic year, career goal, weekly workload,
-  prior credits.
 - **Philadelphia universities** — Drexel, Penn, Temple, Saint Joseph's, Thomas
   Jefferson, and La Salle. The timeline adapts to each school's calendar.
 - **Dynamic timeline** — semester schools render a 4-year Fall/Spring grid;
