@@ -220,11 +220,30 @@
     .add-btn{width:30px;height:30px;border-radius:9px;display:grid;place-items:center;border:1px solid var(--line);background:var(--panel);color:var(--accent);font-size:1.1rem;font-weight:700;line-height:1;cursor:pointer;transition:all .14s ease}
     .add-btn:hover{background:var(--accent);color:#fff;border-color:var(--accent);transform:translateY(-1px)}
     .add-btn.added{background:color-mix(in srgb,var(--green) 18%,transparent);border-color:var(--green);color:var(--green)}
+    .add-btn.added:hover{background:color-mix(in srgb,var(--red) 16%,transparent);border-color:var(--red);color:var(--red)}
+    .add-btn.added:hover::after{content:"✕"} .add-btn.added:hover .chk{display:none}
+    /* sortable headers */
+    .saas-table thead th.sortable{cursor:pointer;user-select:none;transition:color .12s ease}
+    .saas-table thead th.sortable:hover{color:var(--text)}
+    .sort-caret{opacity:.35;font-size:.85em;margin-left:3px}
+    .sort-caret.active{opacity:1;color:var(--accent)}
+    /* time-conflict styling */
+    .pd-term.conflict{border-color:color-mix(in srgb,var(--red) 50%,var(--line))}
+    .pd-chip.conflict{border-color:color-mix(in srgb,var(--red) 60%,var(--line));background:color-mix(in srgb,var(--red) 8%,var(--panel))}
+    .conflict-note{font-size:.72rem;color:var(--red);margin-top:7px;display:flex;align-items:flex-start;gap:5px;line-height:1.4}
+    /* placeholder-data disclaimer flag */
+    .demo-flag{display:inline-flex;align-items:center;gap:5px;font-size:.7rem;font-weight:700;color:var(--yellow);background:color-mix(in srgb,var(--yellow) 14%,transparent);border:1px solid color-mix(in srgb,var(--yellow) 35%,var(--line));border-radius:999px;padding:3px 9px;cursor:help}
+    /* drawer width + push-content-aside behavior */
+    :root{--drawer-w:min(440px,94vw)}
+    @media (min-width:980px){
+      .main-push{transition:margin-right .34s cubic-bezier(.4,0,.2,1)}
+      :root.drawer-pushed .main-push{margin-right:456px}
+    }
     /* right slide-out schedule drawer */
     /* subtle, non-blocking scrim so the course table stays clickable while the drawer is open */
     #planScrim{position:fixed;inset:0;background:linear-gradient(90deg,transparent 40%,rgba(3,8,20,.10));z-index:55;opacity:0;pointer-events:none;transition:opacity .3s ease}
     #planScrim.open{opacity:1}
-    #planDrawer{position:fixed;top:0;right:0;height:100dvh;width:min(440px,100%);z-index:56;transform:translateX(102%);transition:transform .34s cubic-bezier(.4,0,.2,1);display:flex;flex-direction:column}
+    #planDrawer{position:fixed;top:0;right:0;height:100dvh;width:var(--drawer-w);z-index:56;transform:translateX(102%);transition:transform .34s cubic-bezier(.4,0,.2,1);display:flex;flex-direction:column}
     #planDrawer.open{transform:translateX(0)}
     .pd-inner{height:100%;display:flex;flex-direction:column;border-radius:0;border-left:1px solid var(--line);background:var(--panel);box-shadow:-24px 0 60px rgba(2,8,23,.28)}
     .pd-head{position:sticky;top:0;padding:16px;border-bottom:1px solid var(--line);background:var(--glass);backdrop-filter:blur(12px);z-index:2}
@@ -257,7 +276,7 @@
 
   <!-- ===== TOP BAR ===== -->
   <header class="sticky top-0 z-40 no-print" style="background:var(--glass);backdrop-filter:blur(16px);border-bottom:1px solid rgba(148,163,184,.08)">
-    <div class="max-w-[1320px] mx-auto px-4 sm:px-6 flex items-center justify-between h-16">
+    <div class="main-push max-w-[1320px] mx-auto px-4 sm:px-6 flex items-center justify-between h-16">
       <a href="./index.html" class="flex items-center gap-3">
         <div class="w-10 h-10 rounded-2xl grid place-items-center glass text-xl">🎓</div>
         <div class="font-extrabold tracking-tight text-lg">Major<span style="color:var(--green)">Map</span> AI</div>
@@ -278,7 +297,7 @@
   </header>
 
   <!-- ===== INTAKE (multi-step, opt-in guided planner) ===== -->
-  <section id="intake" class="max-w-[720px] mx-auto px-4 sm:px-6 py-8 sm:py-12" hidden>
+  <section id="intake" class="main-push max-w-[720px] mx-auto px-4 sm:px-6 py-8 sm:py-12" hidden>
     <div class="text-center mb-8 fade-in">
       <div class="inline-flex items-center gap-2 px-3 py-1.5 rounded-full text-xs font-semibold uppercase tracking-widest mb-4" style="color:var(--green);background:rgba(74,222,128,.08);border:1px solid rgba(74,222,128,.16)">Student Onboarding</div>
       <h1 class="text-3xl sm:text-4xl font-extrabold tracking-tight leading-tight">Let's build your <span class="gradient-text">degree map.</span></h1>
@@ -358,7 +377,7 @@
   </section>
 
   <!-- ===== LOADING ===== -->
-  <section id="loading" class="max-w-[720px] mx-auto px-6 py-24 text-center" hidden>
+  <section id="loading" class="main-push max-w-[720px] mx-auto px-6 py-24 text-center" hidden>
     <div class="mx-auto mb-6" style="width:72px;height:72px;border-radius:50%;border:4px solid rgba(148,163,184,.14);border-top-color:var(--green);animation:spin 1s linear infinite;box-shadow:0 0 0 14px rgba(74,222,128,.03)"></div>
     <style>@keyframes spin{to{transform:rotate(360deg)}}</style>
     <h2 class="text-2xl font-bold tracking-tight mb-2">Drafting your degree map…</h2>
@@ -366,7 +385,7 @@
   </section>
 
   <!-- ===== WORKSPACE ===== -->
-  <section id="workspace" class="max-w-[1320px] mx-auto px-4 sm:px-6 py-6" hidden>
+  <section id="workspace" class="main-push max-w-[1320px] mx-auto px-4 sm:px-6 py-6" hidden>
 
     <!-- header row -->
     <div class="flex flex-col lg:flex-row lg:items-end justify-between gap-4 mb-5 no-print">
@@ -492,13 +511,14 @@
   </div>
 
   <!-- ===== COURSE DATABASE (default home) ===== -->
-  <section id="dbview" class="max-w-[1320px] mx-auto px-4 sm:px-6 py-5">
+  <section id="dbview" class="main-push max-w-[1320px] mx-auto px-4 sm:px-6 py-5">
     <div class="flex flex-col lg:flex-row lg:items-end justify-between gap-3 mb-4">
       <div>
         <div class="text-2xl sm:text-3xl font-extrabold tracking-tight">Course Database</div>
         <div id="liveSub" class="text-sm mt-1" style="color:var(--muted)">Search every section — ratings, seats, and times. Add any class straight to your schedule.</div>
       </div>
       <div class="flex flex-wrap items-center gap-2">
+        <span class="demo-flag" data-tip="Prototype notice: instructor ★ ratings and seat counts are placeholder/sample data — not real RateMyProfessors or live registrar values.">⚠ demo ratings &amp; seats</span>
         <span id="liveStatus" class="text-xs mr-1" style="color:var(--muted)"></span>
         <label class="btn btn-secondary px-3.5 py-2 text-sm" style="cursor:pointer" data-tip="Import a data.json from the Drexel scraper">
           📂 Import
@@ -588,7 +608,14 @@
         <table class="saas-table">
           <thead><tr>
             <th style="width:46px"></th>
-            <th>Course</th><th>Title</th><th>Section</th><th>CRN</th><th>Days &amp; Time</th><th>Instructor</th><th>Seats</th><th style="text-align:right">Cr</th>
+            <th class="sortable" onclick="setSort('course')">Course <span class="sort-caret" data-k="course"></span></th>
+            <th class="sortable" onclick="setSort('title')">Title <span class="sort-caret" data-k="title"></span></th>
+            <th class="sortable" onclick="setSort('section')">Sec <span class="sort-caret" data-k="section"></span></th>
+            <th class="sortable" onclick="setSort('crn')">CRN <span class="sort-caret" data-k="crn"></span></th>
+            <th>Days &amp; Time</th>
+            <th class="sortable" data-tip="⚠ Ratings are placeholder demo data — not real RateMyProfessors values" onclick="setSort('rating')">Instructor ★ <span class="sort-caret" data-k="rating"></span></th>
+            <th class="sortable" onclick="setSort('seats')">Seats <span class="sort-caret" data-k="seats"></span></th>
+            <th class="sortable" style="text-align:right" onclick="setSort('cr')">Cr <span class="sort-caret" data-k="cr"></span></th>
           </tr></thead>
           <tbody id="liveTableBody"></tbody>
         </table>
@@ -1075,10 +1102,12 @@
     renderPlanDrawer();
     el('planScrim').classList.add('open');
     el('planDrawer').classList.add('open');
+    document.documentElement.classList.add('drawer-pushed');   // push content aside
   }
   function closePlan(){
     el('planScrim').classList.remove('open');
     el('planDrawer').classList.remove('open');
+    document.documentElement.classList.remove('drawer-pushed');
     if(pendingAdd){ pendingAdd = null; renderLiveTable(); }
   }
   function clearPlan(){
@@ -1109,9 +1138,14 @@
   }
 
   /* =========================================================================
-     ADD-TO-SCHEDULE (database → timeline)
+     ADD-TO-SCHEDULE (database → timeline) — locks the specific section/CRN
      ========================================================================= */
+  const lockedSection = {};   // course id -> chosen section meeting {crn, days, start, end, ...}
   function sectionByCrn(crn){ return liveData ? liveData.sections.find(s=> String(s.crn)===String(crn)) : null; }
+  function sectionMeeting(s){
+    return { crn:String(s.crn), days:(s.days&&s.days.length)?s.days:null, start:s.start_time||null, end:s.end_time||null,
+             method:s.instruction_method||'', instr:(s.instructors&&s.instructors[0]&&s.instructors[0].name)||'STAFF' };
+  }
   function ensureCourseFromSection(s){
     const id = normKey(s.subject_code, s.course_number);
     const existing = (state.major && MAJORS[state.major] && MAJORS[state.major].courses[id]);
@@ -1133,36 +1167,91 @@
     return (withRoom || cts[0]).i;
   }
   function courseIsPlaced(id){ return semesterOf(id) > -1; }
+  const idFromSection = (s)=> normKey(s.subject_code, s.course_number);
+
   function addFromRow(crn){
     const s = sectionByCrn(crn); if(!s) return;
     if(!state.terms.length) initBlankPlan();
     const id = ensureCourseFromSection(s);
-    if(courseIsPlaced(id)){ openPlan(); toast(`${courseData()[id].code} is already in your schedule`); return; }
+    const already = courseIsPlaced(id);
+    lockedSection[id] = sectionMeeting(s);      // lock in this exact CRN
+    if(already){
+      // swap the locked section without moving the course
+      openPlan();
+      if(!el('workspace').hidden) renderTimeline(false);
+      renderPlanDrawer(); renderLiveTable();
+      toast(`Locked ${courseData()[id].code} → section ${s.section} · CRN ${crn}`);
+      return;
+    }
     const dest = firstOpenClassTerm();
     state.terms[dest].courses.push(id);
-    pendingAdd = id;                       // highlight it as the just-added course
+    pendingAdd = id;
     updatePlanCount();
     if(!el('workspace').hidden){ renderTimeline(false); runAdvisor(); }
     renderLiveTable();
     openPlan();
-    toast(`Added ${courseData()[id].code} → ${SEMESTER_LABELS[dest]} · drag to move`);
+    const clash = conflictIdsInTerm(dest).has(id);
+    toast(clash
+      ? `⚠ ${courseData()[id].code} added to ${SEMESTER_LABELS[dest]} — time conflict, drag to move`
+      : `Added ${courseData()[id].code} (CRN ${crn}) → ${SEMESTER_LABELS[dest]}`);
     setTimeout(()=>{ if(pendingAdd===id){ pendingAdd=null; renderPlanDrawer(); } }, 2600);
+  }
+  // + / ✓ toggle straight from a table row
+  function toggleRow(crn){
+    const s = sectionByCrn(crn); if(!s) return;
+    const id = idFromSection(s);
+    if(courseIsPlaced(id)) removeFromPlan(id);
+    else addFromRow(crn);
   }
   function removeFromPlan(id){
     for(const t of state.terms){ const k=t.courses.indexOf(id); if(k>-1){ t.courses.splice(k,1); break; } }
+    delete lockedSection[id];
     if(customCourses[id] && !courseIsPlaced(id)) delete customCourses[id];
     renderPlanDrawer(); updatePlanCount();
     if(!el('workspace').hidden){ renderTimeline(false); runAdvisor(); }
     renderLiveTable();
+    toast('Removed from schedule');
   }
   function placePending(termIdx){
     if(pendingAdd==null) return;
     if(state.terms[termIdx]?.type!=='class'){ toast('Co-op & break terms can’t hold courses'); return; }
-    moveCourse(pendingAdd, termIdx);
-    toast(`Moved ${courseData()[pendingAdd].code} → ${SEMESTER_LABELS[termIdx]}`);
+    const id = pendingAdd;
+    moveCourse(id, termIdx);
+    const clash = conflictIdsInTerm(termIdx).has(id);
+    toast(clash ? `⚠ Moved ${courseData()[id].code} — still a time conflict here` : `Moved ${courseData()[id].code} → ${SEMESTER_LABELS[termIdx]}`);
     pendingAdd = null;
     renderPlanDrawer(); renderLiveTable();
   }
+
+  /* ===== time-conflict detection (ignores TBD / async sections) ===== */
+  const toMin = (hhmm)=>{ const [h,m]=hhmm.split(':').map(Number); return h*60+m; };
+  function sectionsClash(a,b){
+    if(!a||!b) return false;
+    if(!a.days || !b.days || !a.start || !a.end || !b.start || !b.end) return false; // async/TBD never clash
+    if(!a.days.some(d=> b.days.includes(d))) return false;                            // no shared day
+    return toMin(a.start) < toMin(b.end) && toMin(b.start) < toMin(a.end);            // overlapping window
+  }
+  // ids in a term that clash with another course there
+  function conflictIdsInTerm(termIdx){
+    const t = state.terms[termIdx]; const bad = new Set();
+    if(!t || t.type!=='class') return bad;
+    const ids = t.courses.filter(id=> lockedSection[id]);
+    for(let a=0;a<ids.length;a++) for(let b=a+1;b<ids.length;b++){
+      if(sectionsClash(lockedSection[ids[a]], lockedSection[ids[b]])){ bad.add(ids[a]); bad.add(ids[b]); }
+    }
+    return bad;
+  }
+  function conflictPairsInTerm(termIdx){
+    const t = state.terms[termIdx]; const pairs = [];
+    if(!t || t.type!=='class') return pairs;
+    const c = courseData();
+    const ids = t.courses.filter(id=> lockedSection[id]);
+    for(let a=0;a<ids.length;a++) for(let b=a+1;b<ids.length;b++){
+      if(sectionsClash(lockedSection[ids[a]], lockedSection[ids[b]])) pairs.push([c[ids[a]]?.code, c[ids[b]]?.code]);
+    }
+    return pairs;
+  }
+  function totalConflicts(){ let n=0; state.terms.forEach((t,i)=>{ n += conflictPairsInTerm(i).length; }); return n; }
 
   /* =========================================================================
      SCHEDULE DRAWER RENDERING
@@ -1174,8 +1263,10 @@
     el('pdCredits').textContent = total;
     el('pdCourses').textContent = count;
     const v = computeViolations();
+    const clashes = totalConflicts();
     const hEl = el('pdHealth');
     if(v.size){ hEl.textContent='Fix'; hEl.style.color='var(--red)'; }
+    else if(clashes){ hEl.textContent='Clash'; hEl.style.color='var(--red)'; }
     else { hEl.textContent='OK'; hEl.style.color='var(--green)'; }
     el('pdSub').textContent = `${uni().short} · ${uni().system==='quarter'?'5-yr co-op quarters':'4-yr semesters'}`;
 
@@ -1192,7 +1283,9 @@
       if(t.type==='break') return `<div class="pd-coop" style="color:var(--muted);border-color:var(--line)">☀️ ${t.term} Y${t.year} · break</div>`;
       const cr = t.courses.reduce((s,id)=>s+(c[id]?.cr||0),0);
       const eligible = pendingAdd!=null;
-      return `<div class="pd-term ${eligible?'eligible':''}" data-sem="${i}"
+      const clashIds = conflictIdsInTerm(i);
+      const pairs = conflictPairsInTerm(i);
+      return `<div class="pd-term ${eligible?'eligible':''} ${pairs.length?'conflict':''}" data-sem="${i}"
           ${eligible?`onclick="placePending(${i})"`:''}
           ondragover="onDragOver(event,${i})" ondragleave="onDragLeave(event)" ondrop="onDrop(event,${i})">
         <div class="flex items-center justify-between mb-2">
@@ -1200,14 +1293,16 @@
           <span class="text-[.68rem]" style="color:var(--muted)">${cr} cr</span>
         </div>
         <div class="flex flex-col gap-1.5">
-          ${t.courses.map(id=>{ const co=c[id]; if(!co) return ''; const inv=bad.has(id);
-            return `<div class="pd-chip" draggable="true" data-id="${id}" style="${inv?'border-color:color-mix(in srgb,var(--red) 55%,var(--line))':''}"
+          ${t.courses.map(id=>{ const co=c[id]; if(!co) return ''; const inv=bad.has(id); const clash=clashIds.has(id); const sec=lockedSection[id];
+            const meta = sec ? `CRN ${sec.crn}${sec.days? ' · '+sec.days.map(d=>DAY_ABBR[d]||'').join('')+' '+t12(sec.start) : ' · async'}` : '';
+            return `<div class="pd-chip ${clash?'conflict':''}" draggable="true" data-id="${id}" style="${inv&&!clash?'border-color:color-mix(in srgb,var(--red) 55%,var(--line))':''}"
               ondragstart="onDragStart(event,'${id}')" ondragend="onDragEnd(event)">
-              <span class="cat-dot" style="background:${CAT[co.cat]?.color||'var(--muted)'}"></span>
-              <span onclick="openModal('${id}')" style="cursor:pointer"><b>${co.code}</b> <span style="color:var(--muted)">${co.cr}cr</span></span>
+              <span class="cat-dot" style="background:${clash?'var(--red)':CAT[co.cat]?.color||'var(--muted)'}"></span>
+              <span onclick="openModal('${id}')" style="cursor:pointer;min-width:0"><b>${co.code}</b> <span style="color:var(--muted)">${co.cr}cr</span>${meta?`<div style="color:var(--muted);font-size:.68rem">${meta}</div>`:''}</span>
               <span class="x" data-tip="Remove" onclick="removeFromPlan('${id}')">✕</span>
             </div>`; }).join('') || `<div class="text-xs italic" style="color:var(--muted)">${eligible?'Tap to add here':'Empty'}</div>`}
         </div>
+        ${pairs.length? `<div class="conflict-note">⚠ Time conflict: ${pairs.map(p=>p.join(' ↔ ')).join(', ')}</div>` : ''}
       </div>`;
     }).join('');
     updatePlanCount();
@@ -1361,8 +1456,9 @@
 
   function markViolations(){
     const bad = computeViolations();
+    const clash = new Set(); state.terms.forEach((t,i)=> conflictIdsInTerm(i).forEach(id=> clash.add(id)));
     document.querySelectorAll('.course').forEach(elx=>{
-      elx.classList.toggle('invalid', bad.has(elx.dataset.id));
+      elx.classList.toggle('invalid', bad.has(elx.dataset.id) || clash.has(elx.dataset.id));
     });
   }
   // a course is violating if a prereq is missing (not prior, not in an earlier semester)
@@ -1392,10 +1488,12 @@
     let gradYear = uni().years; state.terms.forEach(t=>{ if(t.courses.length) gradYear = t.year; });
     el('statGrad').textContent = gradYear + (gradYear===1?' yr':' yrs');
     const v = computeViolations();
+    const clashes = totalConflicts();
     const target = loadTarget();
     const overloaded = classTerms().some(({t})=> t.courses.reduce((s,id)=>s+(c[id]?.cr||0),0) > target+1);
     const health = el('statHealth');
     if(v.size){ health.textContent='Needs fixes'; health.style.color='var(--red)'; }
+    else if(clashes){ health.textContent='Time clash'; health.style.color='var(--red)'; }
     else if(overloaded){ health.textContent='Heavy'; health.style.color='var(--yellow)'; }
     else { health.textContent='Healthy'; health.style.color='var(--green)'; }
   }
@@ -1430,6 +1528,13 @@
         items.push({sev:'warn', icon:'📚', h:`Heavy reading/quant load in ${SEMESTER_LABELS[i]}`,
           b:`You've stacked ${heavy.map(id=>c[id].code).join(', ')} together — all reading/quant-intensive. Spreading one out protects your GPA.`});
       }
+    });
+
+    // 2a) time conflicts between locked sections (ignores TBD/async)
+    classTerms().forEach(({t,i})=>{
+      const pairs = conflictPairsInTerm(i);
+      pairs.forEach(([a,b])=> items.push({sev:'error', icon:'⏰', h:`Time conflict in ${SEMESTER_LABELS[i]}`,
+        b:`${a} and ${b} meet at overlapping times. Pick a different section (CRN) for one, or move it to another term.`}));
     });
 
     // 2b) Drexel co-op guidance — suggest a real role per block
@@ -1893,6 +1998,34 @@
     if(prereq==='has' && (/^\s*(none)?\s*$/i.test(s.prereqs||''))) return false;
     return true;
   }
+  // ===== sorting =====
+  let sortState = { key:null, dir:1 };
+  function setSort(key){
+    if(sortState.key===key) sortState.dir *= -1;
+    else sortState = { key, dir: (key==='rating'||key==='seats') ? -1 : 1 }; // ratings/seats default high→low
+    renderLiveTable();
+  }
+  const bestRating = (s)=>{ const rs=(s.instructors||[]).map(i=>i.rating&&i.rating.quality).filter(x=>x!=null); return rs.length?Math.max(...rs):-1; };
+  const openSeats  = (s)=>{ if(s.enroll==='FULL'||s.max_enroll==='FULL') return -1; return Math.max(0, Number(s.max_enroll)-Number(s.enroll)); };
+  function sortValue(s, key){
+    switch(key){
+      case 'course':  return s.subject_code+' '+String(s.course_number).padStart(4,'0');
+      case 'title':   return (s.course_title||'').toLowerCase();
+      case 'section': return s.section||'';
+      case 'crn':     return Number(s.crn)||0;
+      case 'rating':  return bestRating(s);
+      case 'seats':   return openSeats(s);
+      case 'cr':      return Number(s.credits)||0;
+      default: return 0;
+    }
+  }
+  function updateSortCarets(){
+    document.querySelectorAll('.sort-caret').forEach(el=>{
+      const active = el.dataset.k===sortState.key;
+      el.classList.toggle('active', active);
+      el.textContent = active ? (sortState.dir>0?'▲':'▼') : '↕';
+    });
+  }
   function renderLiveTable(){
     if(!liveData) return;
     const q = (el('liveSearch').value||'').toLowerCase();
@@ -1902,7 +2035,7 @@
     const mineOnly = el('liveMineOnly').checked;
     const mineKeys = new Set();
     if(mineOnly){ state.terms.forEach(t=> t.courses.forEach(id=>{ const k=courseKey(id); if(k) mineKeys.add(k); })); }
-    const rows = liveData.sections.filter(s=>{
+    let rows = liveData.sections.filter(s=>{
       if(subj && s.subject_code!==subj) return false;
       if(num && s.course_number!==num) return false;
       if(openOnly && !isSectionOpen(s)) return false;
@@ -1914,12 +2047,19 @@
       }
       return true;
     });
+    if(sortState.key){
+      rows = rows.slice().sort((a,b)=>{
+        const va=sortValue(a,sortState.key), vb=sortValue(b,sortState.key);
+        if(va<vb) return -1*sortState.dir; if(va>vb) return 1*sortState.dir; return 0;
+      });
+    }
     el('liveCount').textContent = `Showing ${rows.length} of ${liveData.sections.length} sections`;
     el('liveTableBody').innerHTML = rows.length ? rows.map(s=>{
       const id = normKey(s.subject_code, s.course_number);
       const placed = courseIsPlaced(id);
+      const lockedHere = placed && lockedSection[id] && String(lockedSection[id].crn)===String(s.crn);
       return `<tr>
-        <td><button class="add-btn ${placed?'added':''}" data-tip="${placed?'In your schedule':'Add to schedule'}" onclick="addFromRow('${s.crn}')">${placed?'✓':'＋'}</button></td>
+        <td><button class="add-btn ${placed?'added':''}" data-tip="${placed?(lockedHere?'This CRN is in your schedule — click to remove':'Course added (different CRN) — click to remove'):'Add this section to your schedule'}" onclick="toggleRow('${s.crn}')"><span class="chk">${placed?'✓':'＋'}</span></button></td>
         <td><span style="font-weight:800">${s.subject_code} ${s.course_number}</span></td>
         <td style="color:var(--muted)">${s.course_title}</td>
         <td>${s.section}</td>
@@ -1929,6 +2069,7 @@
         <td style="white-space:nowrap">${seatCellHTML(s)}</td>
         <td style="text-align:right;font-weight:700">${s.credits||''}</td>
       </tr>`; }).join('') : `<tr><td colspan="9" style="text-align:center;color:var(--muted);padding:28px">No sections match your filters.</td></tr>`;
+    updateSortCarets();
   }
 
   // advisor tip that references live availability of this year's planned courses

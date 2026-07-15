@@ -35,9 +35,15 @@ always-visible filter bar. No onboarding required.
 - **Course Database home** — instant load, sticky filter bar (search + term +
   subject + course number + "on my map") and an Advanced Filters drawer. Every
   row has a **＋ Add to schedule** button.
-- **Slide-out schedule** — clicking ＋ slots the course into your timeline and
-  slides out a right-hand **My Schedule** drawer; tap any highlighted term (or
-  drag) to move it. The course table stays interactive behind it.
+- **Slide-out schedule** — clicking ＋ locks in that exact **section/CRN** and
+  slots it into your timeline, sliding out a right-hand **My Schedule** drawer
+  (which *pushes* the table aside so no columns get covered); tap any highlighted
+  term or drag to move it. Click a row's ✓ again to remove it.
+- **Time-conflict detection** — the drawer flags overlapping sections in the same
+  term (e.g. "ENGL 101 ↔ BLAW 201") and marks health "Clash". `TBD / async`
+  sections are ignored.
+- **Sortable table** — click any header (Course, Title, CRN, **Instructor ★**,
+  **Seats**, Cr) to sort; click again to reverse.
 - **Guided planner (opt-in)** — "✨ Auto-build" runs a 5-step wizard (school,
   major, year, career goal, workload, prior credits) to generate a full,
   prerequisite-aware plan; "⤢ Full planner" opens the advisor/auto-optimize view.
@@ -69,13 +75,15 @@ The planner can overlay **real Drexel Term Master Schedule** data — actual
 sections, meeting times, instructors (with RateMyProfessor ratings), and open
 seats — on top of your map.
 
-1. In the planner, click **📡 Live Sections → ⚡ Load sample term** to try it
-   immediately with the bundled `data/sample-drexel-data.json`.
+> ⚠️ **Prototype data:** the bundled sample's instructor ★ ratings and seat
+> counts are **placeholder/demo values** — not real RateMyProfessors or live
+> registrar data. The app shows this notice next to the term badge.
+
+1. The app loads the bundled `data/sample-drexel-data.json` automatically.
 2. To use *real* current data, run the
    [drexel-scraper](https://github.com/Zohair-coder/drexel-scraper) yourself
-   (it needs your own Drexel login + MFA — that stays on your machine), then in
-   the planner click **📡 Live Sections → 📂 Import data.json** and pick the
-   `data.json` it produced.
+   (it needs your own Drexel login + MFA — that stays on your machine), then click
+   **📂 Import** in the Course Database and pick the `data.json` it produced.
 
 The **Live Sections** view is a premium data dashboard: a primary filter bar
 (term, subject, course number, "on my map") plus an **Advanced filters** drawer
