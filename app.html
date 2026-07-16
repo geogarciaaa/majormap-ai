@@ -258,6 +258,23 @@
     .pd-chip .x:hover{color:var(--red)}
     .pd-coop{border-radius:12px;padding:10px;text-align:center;font-size:.75rem;color:var(--purple);border:1px dashed color-mix(in srgb,var(--purple) 40%,var(--line));background:color-mix(in srgb,var(--purple) 8%,transparent);margin-bottom:10px}
     .pending-banner{border-radius:12px;padding:10px 12px;background:color-mix(in srgb,var(--accent) 14%,transparent);border:1px solid var(--accent);font-size:.82rem;margin-bottom:12px}
+    /* weekly calendar grid (drawer) — locked sections as positioned blocks */
+    .week-wrap{border:1px solid var(--line);border-radius:14px;background:var(--surface-2);padding:10px;margin-bottom:12px}
+    .week-grid{position:relative;display:grid;grid-template-columns:34px repeat(5,1fr);gap:0;border-radius:10px;overflow:hidden;border:1px solid var(--line)}
+    .week-col{position:relative;border-left:1px solid var(--line);background:var(--panel)}
+    .week-col .wl{position:sticky;top:0;text-align:center;font-size:.62rem;font-weight:800;text-transform:uppercase;letter-spacing:.06em;color:var(--muted);padding:4px 0;border-bottom:1px solid var(--line);background:var(--surface-2)}
+    .week-axis{background:var(--surface-2)}
+    .week-axis div{font-size:.58rem;color:var(--muted);text-align:right;padding-right:4px;font-variant-numeric:tabular-nums}
+    .week-block{position:absolute;left:2px;right:2px;border-radius:6px;padding:2px 4px;font-size:.6rem;font-weight:700;line-height:1.15;overflow:hidden;color:#fff;background:color-mix(in srgb,var(--accent) 78%,#000 8%);border:1px solid color-mix(in srgb,var(--accent) 90%,#fff 10%);box-shadow:0 2px 6px rgba(2,8,23,.25)}
+    .week-block.clash{background:color-mix(in srgb,var(--red) 80%,#000 6%);border-color:var(--red);animation:pulseClash 1.4s ease infinite}
+    @keyframes pulseClash{0%,100%{box-shadow:0 0 0 0 color-mix(in srgb,var(--red) 45%,transparent)}50%{box-shadow:0 0 0 4px color-mix(in srgb,var(--red) 18%,transparent)}}
+    .week-async{display:flex;flex-wrap:wrap;gap:5px;margin-top:8px;font-size:.66rem;color:var(--muted)}
+    .week-async span{border:1px dashed var(--line-strong);border-radius:999px;padding:2px 8px}
+    /* data-source pill */
+    .src-pill{display:inline-flex;align-items:center;gap:6px;font-size:.7rem;font-weight:700;border-radius:999px;padding:3px 10px;border:1px solid var(--line)}
+    .src-pill .dot{width:7px;height:7px;border-radius:999px}
+    .src-pill.live{color:var(--green);border-color:color-mix(in srgb,var(--green) 40%,var(--line));background:color-mix(in srgb,var(--green) 10%,transparent)}
+    .src-pill.sample{color:var(--muted)}
     [hidden]{display:none !important}
     /* print */
     @media print{
@@ -518,7 +535,8 @@
         <div id="liveSub" class="text-sm mt-1" style="color:var(--muted)">Search every section — ratings, seats, and times. Add any class straight to your schedule.</div>
       </div>
       <div class="flex flex-wrap items-center gap-2">
-        <span class="demo-flag" data-tip="Prototype notice: instructor ★ ratings and seat counts are placeholder/sample data — not real RateMyProfessors or live registrar values.">⚠ demo ratings &amp; seats</span>
+        <span id="srcPill" class="src-pill sample" data-tip="Checking for a local API…"><span class="dot" style="background:var(--muted)"></span><span id="srcPillText">sample data</span></span>
+        <span id="demoFlag" class="demo-flag" data-tip="Prototype notice: instructor ★ ratings and seat counts are placeholder/sample data — not real RateMyProfessors or live registrar values.">⚠ demo ratings &amp; seats</span>
         <span id="liveStatus" class="text-xs mr-1" style="color:var(--muted)"></span>
         <label class="btn btn-secondary px-3.5 py-2 text-sm" style="cursor:pointer" data-tip="Import a data.json from the Drexel scraper">
           📂 Import
@@ -537,10 +555,10 @@
         </div>
         <div class="flex flex-wrap items-center gap-2 mb-1">
           <div class="flex flex-col">
-            <select id="liveTerm" class="pill-select" data-tip="Academic term" onchange="renderLiveTable()"></select>
+            <select id="liveTerm" class="pill-select" data-tip="Academic term" onchange="onTermChange()"></select>
           </div>
           <select id="liveSubject" class="pill-select" data-tip="Subject code" onchange="onSubjectChange()"></select>
-          <select id="liveNumber" class="pill-select" data-tip="Course number" onchange="renderLiveTable()"></select>
+          <select id="liveNumber" class="pill-select" data-tip="Course number" onchange="onNumberChange()"></select>
           <button id="liveMineChip" class="pill-select" data-tip="Show only courses on your map" onclick="toggleChip('liveMineOnly')" style="padding-right:14px">On my map</button>
           <input id="liveMineOnly" type="checkbox" hidden onchange="renderLiveTable()" />
           <button id="advToggle" class="btn btn-secondary text-sm" style="border-radius:999px;padding:9px 16px;margin-left:auto" data-tip="More precise filters" onclick="toggleAdvanced()">
@@ -613,7 +631,7 @@
             <th class="sortable" onclick="setSort('section')">Sec <span class="sort-caret" data-k="section"></span></th>
             <th class="sortable" onclick="setSort('crn')">CRN <span class="sort-caret" data-k="crn"></span></th>
             <th>Days &amp; Time</th>
-            <th class="sortable" data-tip="⚠ Ratings are placeholder demo data — not real RateMyProfessors values" onclick="setSort('rating')">Instructor ★ <span class="sort-caret" data-k="rating"></span></th>
+            <th id="thInstr" class="sortable" data-tip="⚠ Ratings are placeholder demo data — not real RateMyProfessors values" onclick="setSort('rating')">Instructor ★ <span class="sort-caret" data-k="rating"></span></th>
             <th class="sortable" onclick="setSort('seats')">Seats <span class="sort-caret" data-k="seats"></span></th>
             <th class="sortable" style="text-align:right" onclick="setSort('cr')">Cr <span class="sort-caret" data-k="cr"></span></th>
           </tr></thead>
@@ -651,6 +669,14 @@
             <div class="text-[.6rem] uppercase tracking-widest" style="color:var(--muted)">Health</div>
             <div id="pdHealth" class="text-lg font-extrabold" style="color:var(--green)">OK</div>
           </div>
+        </div>
+        <div id="pdWeekWrap" class="week-wrap" hidden>
+          <div class="flex items-center justify-between mb-2">
+            <span class="text-xs font-bold">🗓 Week view</span>
+            <select id="pdWeekTerm" class="pill-select text-xs" style="max-width:170px" onchange="renderWeekGrid()"></select>
+          </div>
+          <div id="pdWeekGrid"></div>
+          <div id="pdWeekAsync" class="week-async"></div>
         </div>
         <div id="pdTimeline"></div>
       </div>
@@ -1305,6 +1331,7 @@
         ${pairs.length? `<div class="conflict-note">⚠ Time conflict: ${pairs.map(p=>p.join(' ↔ ')).join(', ')}</div>` : ''}
       </div>`;
     }).join('');
+    renderWeekGrid();
     updatePlanCount();
   }
 
@@ -1955,7 +1982,8 @@
     renderLiveTable();
   }
   function onSubjectChange(){
-    // repopulate course-number options for the chosen subject
+    if(apiMode){ apiRefetch(true); return; }   // server-side filter via URL params
+    // sample mode: repopulate course-number options client-side
     const subj = el('liveSubject').value;
     const nums = [...new Set(liveData.sections.filter(s=>!subj||s.subject_code===subj).map(s=>s.course_number))]
       .sort((a,b)=>Number(a)-Number(b));
@@ -2090,6 +2118,173 @@
   }
 
   /* =========================================================================
+     LIVE BACKEND API — FastAPI + PostgreSQL (backend/main.py)
+     Primary data source. The embedded sample stays ONLY as an automatic
+     fallback when no API is reachable (hosted artifact / offline / file://),
+     so the shareable prototype keeps working.
+     ========================================================================= */
+  const API_BASE = 'http://localhost:8000';
+  let apiMode = false;          // true once the local API answers the health probe
+  let apiTerm = null;           // raw term string reported by the API (opaque — survives the 2027 semester-code change)
+
+  // Flat API rows (one per section+instructor) -> scraper-shaped sections,
+  // grouped by CRN with an instructors[] array. Times/days pass through
+  // unchanged ("HH:MM" + day-name arrays), so the conflict detection and
+  // week-grid logic work identically on live data.
+  function adaptApiRows(rows){
+    const byCrn = new Map();
+    for(const r of rows){
+      const key = String(r.crn);
+      let s = byCrn.get(key);
+      if(!s){
+        s = {
+          subject_code:r.subject_code, course_number:String(r.course_number),
+          instruction_type:r.instruction_type||'', instruction_method:r.instruction_method||'',
+          section:r.section||'', crn:r.crn,
+          enroll:r.enroll, max_enroll:r.max_enroll,
+          course_title:r.title || r.course_title || '',
+          days:r.days||null, start_time:r.start_time||null, end_time:r.end_time||null,
+          building:r.building||null, room:r.room||null,
+          prereqs:r.prereqs||'', credits:r.credits!=null?String(r.credits):'',
+          instructors:null
+        };
+        byCrn.set(key, s);
+      }
+      if(r.instructor_name){
+        if(!s.instructors) s.instructors = [];
+        if(!s.instructors.some(i=>i.name===r.instructor_name)){
+          s.instructors.push(r.rating!=null
+            ? { name:r.instructor_name, rating:{ quality:Number(r.rating), difficulty:r.difficulty!=null?Number(r.difficulty):null } }
+            : { name:r.instructor_name });
+        }
+      }
+    }
+    return [...byCrn.values()];
+  }
+
+  async function fetchLiveCourseData(term, subject, courseNumber){
+    const params = new URLSearchParams();
+    if(term) params.append('term', term);
+    if(subject) params.append('subject', subject);
+    if(courseNumber) params.append('course_number', courseNumber);
+    const res = await fetch(`${API_BASE}/api/sections?${params.toString()}`);
+    if(!res.ok) throw new Error('API '+res.status);
+    const result = await res.json();
+    if(result.status!=='success') throw new Error(result.detail||'API error');
+    return { sections: adaptApiRows(result.data), term: result.term };
+  }
+
+  function setSourceUI(live){
+    const pill = el('srcPill'), txt = el('srcPillText'), flag = el('demoFlag'), th = el('thInstr');
+    if(live){
+      pill.classList.add('live'); pill.classList.remove('sample');
+      pill.querySelector('.dot').style.background = 'var(--green)';
+      txt.textContent = 'live API';
+      pill.setAttribute('data-tip', `Connected to ${API_BASE} — data from the scraper's PostgreSQL (${apiTerm||'current term'})`);
+      flag.textContent = 'ℹ cached RMP ratings';
+      flag.setAttribute('data-tip', "Instructor ★ ratings come from the scraper's cached RateMyProfessors database — they can lag behind live RMP values. Seats reflect the last scrape, not this second.");
+      if(th) th.setAttribute('data-tip', "★ ratings are served from the cached RateMyProfessors DB (scraper's ratings_cache) — may lag live RMP");
+    } else {
+      pill.classList.remove('live'); pill.classList.add('sample');
+      pill.querySelector('.dot').style.background = 'var(--muted)';
+      txt.textContent = 'sample data';
+      pill.setAttribute('data-tip', `No local API found at ${API_BASE} — showing the bundled sample term. Run: uvicorn main:app --reload (see backend/)`);
+      flag.textContent = '⚠ demo ratings & seats';
+      flag.setAttribute('data-tip', 'Prototype notice: instructor ★ ratings and seat counts are placeholder/sample data — not real RateMyProfessors or live registrar values.');
+      if(th) th.setAttribute('data-tip', '⚠ Ratings are placeholder demo data — not real RateMyProfessors values');
+    }
+  }
+
+  // Probe the local API; if it answers, swap the table onto live data.
+  async function tryLiveApi(){
+    try{
+      const ctl = new AbortController();
+      const timer = setTimeout(()=>ctl.abort(), 1800);
+      const res = await fetch(`${API_BASE}/api/health`, { signal:ctl.signal });
+      clearTimeout(timer);
+      if(!res.ok) return false;
+      const h = await res.json();
+      if(h.status!=='ok') return false;
+      const { sections, term } = await fetchLiveCourseData();
+      if(!sections.length) return false;
+      apiMode = true; apiTerm = term || h.term || 'Live term';
+      ingestLiveData(sections, `${apiTerm} · live`);
+      setSourceUI(true);
+      toast(`🟢 Live API connected — ${sections.length} sections (${apiTerm})`);
+      return true;
+    }catch(e){ return false; }
+  }
+
+  // Server-side filtering: pass the select states as URL params and re-ingest.
+  let apiFetchSeq = 0, apiDebounce = null;
+  function apiRefetch(resetNumber){
+    if(!apiMode) return;
+    clearTimeout(apiDebounce);
+    apiDebounce = setTimeout(async ()=>{
+      const seq = ++apiFetchSeq;
+      const subj = el('liveSubject').value || null;
+      if(resetNumber) el('liveNumber').value = '';
+      const num = el('liveNumber').value || null;
+      try{
+        const { sections } = await fetchLiveCourseData(apiTerm, subj, num);
+        if(seq !== apiFetchSeq) return;                     // stale response
+        const byKey = new Map();
+        for(const s of sections){ const k = normKey(s.subject_code, s.course_number); if(!byKey.has(k)) byKey.set(k,[]); byKey.get(k).push(s); }
+        liveData.sections = sections; liveData.byKey = byKey;
+        if(resetNumber || subj){                            // rebuild number options from the server-filtered rows
+          const nums = [...new Set(sections.map(s=>s.course_number))].sort((a,b)=>Number(a)-Number(b));
+          const cur = el('liveNumber').value;
+          el('liveNumber').innerHTML = '<option value="">All numbers</option>' + nums.map(n=>`<option ${n===cur?'selected':''}>${n}</option>`).join('');
+        }
+        el('liveStatus').textContent = `${sections.length} sections · ${liveData.term}`;
+        renderLiveTable();
+      }catch(e){
+        toast('⚠ Live API request failed — check the backend'); console.error('Error fetching live Drexel data:', e);
+      }
+    }, 220);
+  }
+  function onTermChange(){ if(apiMode){ apiRefetch(false); } else renderLiveTable(); }
+  function onNumberChange(){ if(apiMode){ apiRefetch(false); } else renderLiveTable(); }
+
+  /* =========================================================================
+     WEEKLY CALENDAR GRID (drawer) — locked sections as overlapping blocks
+     ========================================================================= */
+  const WEEK_DAYS = ['Monday','Tuesday','Wednesday','Thursday','Friday'];
+  function renderWeekGrid(){
+    const wrap = el('pdWeekWrap'); if(!wrap) return;
+    const withLocked = state.terms.map((t,i)=>({t,i})).filter(x=> x.t.type==='class' && x.t.courses.some(id=>lockedSection[id]));
+    if(!withLocked.length){ wrap.hidden = true; return; }
+    wrap.hidden = false;
+    const sel = el('pdWeekTerm');
+    const opts = withLocked.map(({t,i})=>`<option value="${i}">${t.term} · Y${t.year}</option>`).join('');
+    if(sel.dataset.opts !== opts){ const keep = sel.value; sel.innerHTML = opts; sel.dataset.opts = opts; if([...sel.options].some(o=>o.value===keep)) sel.value = keep; }
+    let idx = Number(sel.value);
+    if(!withLocked.some(x=>x.i===idx)){ idx = withLocked[0].i; sel.value = String(idx); }
+
+    const c = courseData();
+    const clashIds = conflictIdsInTerm(idx);
+    const startH = 8, endH = 21, pxm = 0.42, H = (endH-startH)*60*pxm;
+    const ids = state.terms[idx].courses.filter(id=> lockedSection[id]);
+    const timed = ids.filter(id=> lockedSection[id].days && lockedSection[id].start);
+    const asyncs = ids.filter(id=> !(lockedSection[id].days && lockedSection[id].start));
+
+    const hourLabels = [];
+    for(let h=startH; h<=endH; h+=2) hourLabels.push(`<div style="position:absolute;top:${(h-startH)*60*pxm - 5}px;right:0;left:0">${h%12||12}${h<12?'a':'p'}</div>`);
+    const blocksFor = (day)=> timed.filter(id=> lockedSection[id].days.includes(day)).map(id=>{
+      const s = lockedSection[id];
+      const top = Math.max(0, (toMin(s.start)-startH*60)*pxm);
+      const h  = Math.max(15, Math.min(H-top, (toMin(s.end)-toMin(s.start))*pxm));
+      return `<div class="week-block ${clashIds.has(id)?'clash':''}" style="top:${top}px;height:${h}px">${c[id]?.code||id}<br>${t12(s.start)}</div>`;
+    }).join('');
+
+    el('pdWeekGrid').innerHTML = `<div class="week-grid">
+      <div class="week-col week-axis" style="border-left:none"><div class="wl">&nbsp;</div><div style="position:relative;height:${H}px">${hourLabels.join('')}</div></div>
+      ${WEEK_DAYS.map(d=>`<div class="week-col"><div class="wl">${d.slice(0,3)}</div><div style="position:relative;height:${H}px">${blocksFor(d)}</div></div>`).join('')}
+    </div>`;
+    el('pdWeekAsync').innerHTML = asyncs.length ? 'Async / TBD: ' + asyncs.map(id=>`<span>${c[id]?.code||id}</span>`).join('') : '';
+  }
+
+  /* =========================================================================
      THEME — system preference + manual override, persisted to localStorage
      ========================================================================= */
   const THEME_KEY = 'majormap_theme';
@@ -2116,17 +2311,20 @@
     applyTheme(next);
   }
 
-  // Database-first: open straight into the Course Database with data loaded.
-  (function init(){
+  // Database-first: paint instantly, then upgrade to the live API when present.
+  (async function init(){
     initTheme();
-    ingestLiveData(SAMPLE_LIVE, 'Fall 2026 · sample data');  // instant data, no wizard
+    ingestLiveData(SAMPLE_LIVE, 'Fall 2026 · sample data');  // instant first paint (fallback dataset)
     showDb();
+    setSourceUI(false);
     updatePlanCount();
     // optional deep-link: ?guided=1 opens the guided planner wizard
     const params = new URLSearchParams(location.search);
     const m = params.get('major');
     if(m && MAJORS[m]) state.major = m;
     if(params.get('guided')==='1'){ openGuided(); }
+    // probe the local FastAPI backend; if it answers, swap onto live PostgreSQL data
+    await tryLiveApi();
   })();
   </script>
 </body>
