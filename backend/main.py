@@ -39,12 +39,22 @@ from psycopg2.extras import RealDictCursor
 
 app = FastAPI(title="MajorMap AI Live Data API")
 
-# CORS: the SPA is a static file (file:// or any static host), so allow all
-# origins in dev. For production, replace "*" with the real frontend origin.
+# CORS: locked to the production site plus local development origins.
+# Override/extend with a comma-separated ALLOWED_ORIGINS env var.
+# ("null" is the Origin browsers send when app.html is opened from file://.)
+DEFAULT_ORIGINS = (
+    "https://majormapai.com,https://www.majormapai.com,"
+    "https://geogarciaaa.github.io,"
+    "http://localhost:3000,http://127.0.0.1:3000,"
+    "http://localhost:8000,http://127.0.0.1:8000,null"
+)
+ALLOWED_ORIGINS = [
+    o.strip() for o in os.getenv("ALLOWED_ORIGINS", DEFAULT_ORIGINS).split(",") if o.strip()
+]
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],
-    allow_methods=["*"],
+    allow_origins=ALLOWED_ORIGINS,
+    allow_methods=["GET"],
     allow_headers=["*"],
 )
 
@@ -52,10 +62,16 @@ app.add_middleware(
 def get_db_connection():
     """Connect to the scraper's PostgreSQL database.
 
-    Defaults mirror the scraper's db_config.py; override via environment
-    variables (DB_HOST, DB_NAME, DB_USER, DB_PASSWORD, DB_PORT).
+    Two configuration styles are supported:
+      * DATABASE_URL — the single connection string that managed hosts
+        (Render, Railway, Fly, Heroku) inject automatically; takes precedence.
+      * discrete DB_HOST / DB_NAME / DB_USER / DB_PASSWORD / DB_PORT vars,
+        with defaults mirroring the scraper's local Docker setup.
     """
     try:
+        dsn = os.getenv("DATABASE_URL")
+        if dsn:
+            return psycopg2.connect(dsn)
         return psycopg2.connect(
             host=os.getenv("DB_HOST", "localhost"),
             database=os.getenv("DB_NAME", "schedulerdb"),

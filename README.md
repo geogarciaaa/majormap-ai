@@ -199,9 +199,46 @@ Returns `{"status": "degraded", "database": "unreachable"}` if PostgreSQL is dow
 
 ## Deployment (GitHub Pages + custom domain)
 
-The frontend is fully static, so the repo deploys directly to **GitHub Pages**
-(the backend is a separate, localhost/self-hosted service — the public site
-runs in sample-data mode unless you point it at a hosted API).
+The frontend is fully static, so the repo deploys directly to **GitHub Pages**;
+the backend deploys separately to a cloud host (below). The live site probes
+the deployed API on load and only falls back to sample data if it's unreachable.
+
+### Deploying the backend (Render — one click)
+
+A [`render.yaml`](./render.yaml) Blueprint provisions both the API and a
+managed PostgreSQL:
+
+1. Render dashboard → **New → Blueprint** → select this repo → Apply. This
+   creates the `majormap-api` web service (with `ALLOWED_ORIGINS` preset to
+   `https://majormapai.com` / `https://www.majormapai.com`) and the
+   `majormap-db` PostgreSQL, wired together via `DATABASE_URL`.
+2. Check the service URL Render assigned. The frontend expects
+   `https://majormap-api.onrender.com` — if Render appended a suffix (name
+   collision), update the single `API_BASE_PROD` constant near the top of
+   `app.html`'s script and push.
+3. **Load data** — the new database starts empty. From your own machine, run
+   the [drexel-scraper](https://github.com/Zohair-coder/drexel-scraper) in
+   `--db` mode pointed at Render's *External Database URL* (dashboard →
+   majormap-db → Connect): set the scraper's DB env vars to that host, user,
+   password, and database (`schedulerdb`). Re-run it whenever you want fresh
+   seat counts — the API serves whatever is in the DB.
+4. Verify: `https://<your-service>.onrender.com/api/health` should return
+   `{"status":"ok", "term": …}` — then majormapai.com will show the green
+   **live API** pill on next load.
+
+> Free-tier note: Render free services sleep when idle and cold-start in
+> ~30–60 s. The frontend paints the sample table instantly and keeps probing
+> for up to 45 s, swapping to live data when the API wakes.
+
+**Alternative hosts** (same code, pick one):
+- **Railway** — the root [`Procfile`](./Procfile) is picked up automatically;
+  add a Railway PostgreSQL plugin (it injects `DATABASE_URL`) and set
+  `ALLOWED_ORIGINS`.
+- **Fly.io** — `cd backend && fly launch` (uses [`backend/Dockerfile`](./backend/Dockerfile));
+  attach Fly Postgres and set the same env vars.
+
+CORS is env-driven: `ALLOWED_ORIGINS` (comma-separated) defaults to the
+production domains + local dev origins; only `GET` is allowed.
 
 ### One-time repo setup
 
