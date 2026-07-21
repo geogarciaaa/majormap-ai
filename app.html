@@ -1,0 +1,2331 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>MajorMap AI — Degree Planner</title>
+  <meta name="description" content="Build your interactive 4-year degree map with a live AI advisor that catches sequencing mistakes before they cost you a semester." />
+  <!-- Set theme before first paint to avoid a flash of the wrong mode -->
+  <script>
+    (function(){ try{
+      var s = localStorage.getItem('majormap_theme');
+      var dark = s ? s === 'dark' : (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches);
+      if(dark) document.documentElement.classList.add('dark');
+    }catch(e){ document.documentElement.classList.add('dark'); } })();
+  </script>
+  <!-- Self-contained utility layer (Tailwind-compatible class names, no external CDN needed) -->
+  <style>
+    .min-h-screen{min-height:100vh}.relative{position:relative}.absolute{position:absolute}.sticky{position:sticky}
+    .flex{display:flex}.inline-flex{display:inline-flex}.grid{display:grid}.hidden{display:none}
+    .flex-col{flex-direction:column}.flex-row{flex-direction:row}.flex-wrap{flex-wrap:wrap}.flex-1{flex:1 1 0%}
+    .items-center{align-items:center}.items-start{align-items:flex-start}.items-end{align-items:flex-end}
+    .justify-between{justify-content:space-between}.justify-center{justify-content:center}
+    .place-items-center{place-items:center}.text-center{text-align:center}.text-left{text-align:left}
+    .grid-cols-2{grid-template-columns:repeat(2,minmax(0,1fr))}
+    .gap-1{gap:.25rem}.gap-1\.5{gap:.375rem}.gap-2{gap:.5rem}.gap-2\.5{gap:.625rem}.gap-3{gap:.75rem}.gap-4{gap:1rem}.gap-5{gap:1.25rem}
+    .mx-auto{margin-left:auto;margin-right:auto}.ml-auto{margin-left:auto}.pr-1{padding-right:.25rem}.mr-3{margin-right:.75rem}
+    .mb-1{margin-bottom:.25rem}.mb-1\.5{margin-bottom:.375rem}.mb-2{margin-bottom:.5rem}.mb-3{margin-bottom:.75rem}.mb-4{margin-bottom:1rem}.mb-5{margin-bottom:1.25rem}.mb-6{margin-bottom:1.5rem}.mb-8{margin-bottom:2rem}
+    .mt-0\.5{margin-top:.125rem}.mt-1{margin-top:.25rem}.mt-2{margin-top:.5rem}.mt-3{margin-top:.75rem}.mt-5{margin-top:1.25rem}.mt-6{margin-top:1.5rem}.mt-7{margin-top:1.75rem}
+    .p-0{padding:0}.p-1\.5{padding:.375rem}.p-2\.5{padding:.625rem}.p-3{padding:.75rem}.p-4{padding:1rem}.p-5{padding:1.25rem}.p-6{padding:1.5rem}.p-7{padding:1.75rem}
+    .px-3{padding-left:.75rem;padding-right:.75rem}.px-4{padding-left:1rem;padding-right:1rem}.px-5{padding-left:1.25rem;padding-right:1.25rem}.px-6{padding-left:1.5rem;padding-right:1.5rem}
+    .py-1\.5{padding-top:.375rem;padding-bottom:.375rem}.py-2{padding-top:.5rem;padding-bottom:.5rem}.py-2\.5{padding-top:.625rem;padding-bottom:.625rem}.py-6{padding-top:1.5rem;padding-bottom:1.5rem}.py-8{padding-top:2rem;padding-bottom:2rem}.py-12{padding-top:3rem;padding-bottom:3rem}.py-24{padding-top:6rem;padding-bottom:6rem}
+    .w-0{width:0}.w-2\.5{width:.625rem}.w-9{width:2.25rem}.w-10{width:2.5rem}.w-44{width:11rem}.w-full{width:100%}.w-auto{width:auto}.min-w-0{min-width:0}
+    .h-2\.5{height:.625rem}.h-9{height:2.25rem}.h-10{height:2.5rem}.h-16{height:4rem}
+    .max-w-\[1320px\]{max-width:1320px}.max-w-\[720px\]{max-width:720px}.max-h-\[260px\]{max-height:260px}
+    .overflow-auto{overflow:auto}
+    .rounded-xl{border-radius:.75rem}.rounded-2xl{border-radius:1rem}.rounded-3xl{border-radius:1.5rem}.rounded-full{border-radius:9999px}
+    .text-xs{font-size:.75rem;line-height:1rem}.text-sm{font-size:.875rem;line-height:1.25rem}.text-base{font-size:1rem;line-height:1.5rem}.text-lg{font-size:1.125rem;line-height:1.75rem}.text-xl{font-size:1.25rem;line-height:1.75rem}.text-2xl{font-size:1.5rem;line-height:2rem}.text-3xl{font-size:1.875rem;line-height:2.25rem}.text-4xl{font-size:2.25rem;line-height:2.5rem}
+    .text-\[\.66rem\]{font-size:.66rem}.text-\[\.68rem\]{font-size:.68rem}.text-\[\.7rem\]{font-size:.7rem}.text-\[\.72rem\]{font-size:.72rem}
+    .font-semibold{font-weight:600}.font-bold{font-weight:700}.font-extrabold{font-weight:800}
+    .tracking-tight{letter-spacing:-.025em}.tracking-widest{letter-spacing:.1em}.uppercase{text-transform:uppercase}.italic{font-style:italic}
+    .leading-tight{line-height:1.25}.leading-relaxed{line-height:1.625}
+    .shadow-2xl{box-shadow:0 25px 50px -12px rgba(2,8,23,.45)}.shadow-lg{box-shadow:0 10px 30px rgba(2,8,23,.4)}
+    .z-30{z-index:30}.z-40{z-index:40}.top-0{top:0}.top-20{top:5rem}.right-0{right:0}
+    .hover\:bg-white\/5:hover{background:var(--hover)}
+    @media (min-width:640px){
+      .sm\:inline-flex{display:inline-flex}.sm\:grid-cols-2{grid-template-columns:repeat(2,minmax(0,1fr))}
+      .sm\:p-5{padding:1.25rem}.sm\:p-7{padding:1.75rem}.sm\:px-6{padding-left:1.5rem;padding-right:1.5rem}
+      .sm\:py-12{padding-top:3rem;padding-bottom:3rem}.sm\:text-base{font-size:1rem}.sm\:text-3xl{font-size:1.875rem}.sm\:text-4xl{font-size:2.25rem}
+    }
+    @media (min-width:1024px){
+      .lg\:flex-row{flex-direction:row}.lg\:items-end{align-items:flex-end}
+      .lg\:grid-cols-4{grid-template-columns:repeat(4,minmax(0,1fr))}
+      .lg\:grid-cols-\[1fr_360px\]{grid-template-columns:1fr 360px}
+      .lg\:sticky{position:sticky}.lg\:top-20{top:5rem}
+    }
+  </style>
+  <style>
+    /* ===== THEME TOKENS — light is the default; .dark overrides (Tailwind class strategy) ===== */
+    :root{
+      --bg:#f8fafc; --bg2:#eef2f7;                 /* slate-50 ground */
+      --panel:#ffffff; --panel-solid:#ffffff;       /* pure white cards */
+      --surface:#f8fafc; --surface-2:#f1f5f9; --hover:#f1f5f9;  /* slate-50/100 */
+      --line:#e2e8f0; --line-strong:#cbd5e1;        /* slate-200/300 */
+      --text:#0f172a; --muted:#64748b;              /* slate-900 / slate-500 */
+      --green:#16a34a; --blue:#2563eb; --purple:#7c3aed; --red:#dc2626; --yellow:#ca8a04;
+      --accent:#6366f1; --accent-hover:#4f46e5;     /* indigo-500 */
+      --glass:rgba(255,255,255,.72); --option-bg:#ffffff;
+      --shadow:0 1px 2px rgba(15,23,42,.04),0 12px 34px rgba(15,23,42,.08);
+      --grad-text:linear-gradient(135deg,#0f172a,#4338ca 55%,#0ea5e9);
+      --ambient:.05;
+    }
+    :root.dark{
+      --bg:#0B0F19; --bg2:#0d1322;                  /* requested deep gray */
+      --panel:#111726; --panel-solid:#0f1524;
+      --surface:rgba(255,255,255,.03); --surface-2:rgba(255,255,255,.02); --hover:rgba(255,255,255,.05);
+      --line:#1e293b; --line-strong:#334155;        /* slate-800/700 */
+      --text:#e6edf7; --muted:#94a3b8;              /* slate-400 */
+      --green:#4ade80; --blue:#60a5fa; --purple:#a78bfa; --red:#f87171; --yellow:#facc15;
+      --accent:#818cf8; --accent-hover:#a5b4fc;     /* indigo-400 */
+      --glass:rgba(11,15,25,.72); --option-bg:#0f1524;
+      --shadow:0 30px 80px rgba(2,8,23,.45);
+      --grad-text:linear-gradient(135deg,#fff,#a7f3d0 50%,#93c5fd 100%);
+      --ambient:.16;
+    }
+    :root{color-scheme:light} :root.dark{color-scheme:dark}
+    *{box-sizing:border-box}
+    html{scroll-behavior:smooth}
+    body{
+      font-family:Inter,ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
+      color:var(--text);
+      background:var(--app-bg);
+      background-attachment:fixed;
+      min-height:100vh; line-height:1.55;
+      transition:background-color .4s ease, color .3s ease;
+    }
+    :root{
+      --app-bg:
+        radial-gradient(circle at 0% 0%, rgba(99,102,241,.06), transparent 26%),
+        radial-gradient(circle at 100% 0%, rgba(20,184,166,.05), transparent 22%),
+        linear-gradient(180deg,var(--bg),var(--bg2));
+    }
+    :root.dark{
+      --app-bg:
+        radial-gradient(circle at 0% 0%, rgba(96,165,250,.16), transparent 26%),
+        radial-gradient(circle at 100% 0%, rgba(167,139,250,.14), transparent 22%),
+        radial-gradient(circle at 50% 120%, rgba(74,222,128,.08), transparent 34%),
+        linear-gradient(180deg,var(--bg),var(--bg2));
+    }
+    ::-webkit-scrollbar{width:10px;height:10px}
+    ::-webkit-scrollbar-thumb{background:rgba(148,163,184,.18);border-radius:999px}
+    ::-webkit-scrollbar-track{background:transparent}
+    .glass{background:var(--panel);border:1px solid var(--line);backdrop-filter:blur(14px);box-shadow:var(--shadow)}
+    .gradient-text{background:var(--grad-text);-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent}
+    /* theme toggle */
+    .theme-toggle{width:38px;height:38px;border-radius:12px;display:grid;place-items:center;border:1px solid var(--line);background:var(--panel);color:var(--text);cursor:pointer;transition:border-color .15s ease,transform .15s ease,background .3s ease}
+    .theme-toggle:hover{border-color:var(--accent);transform:translateY(-1px)}
+    .theme-toggle .sun{display:none} .theme-toggle .moon{display:block}
+    :root.dark .theme-toggle .sun{display:block} :root.dark .theme-toggle .moon{display:none}
+    .btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;font-weight:700;border-radius:14px;transition:transform .16s ease,opacity .16s ease,box-shadow .16s ease,border-color .16s ease;cursor:pointer;border:none;font:inherit}
+    .btn:hover{transform:translateY(-1px)}
+    .btn:active{transform:translateY(0)}
+    .btn-primary{background:linear-gradient(135deg,var(--green),#86efac);color:#04110a;box-shadow:0 12px 30px rgba(74,222,128,.20)}
+    .btn-secondary{background:var(--panel);border:1px solid var(--line);color:var(--text)}
+    .btn-secondary:hover{border-color:var(--accent)}
+    .btn-ghost{background:transparent;border:1px solid var(--line);color:var(--muted)}
+    .btn-ghost:hover{color:var(--text);border-color:var(--line-strong)}
+    input,select,textarea{font:inherit;color:var(--text);background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:12px 14px;width:100%;outline:none;transition:border-color .15s ease,box-shadow .15s ease}
+    input:focus,select:focus,textarea:focus{border-color:var(--accent);box-shadow:0 0 0 3px color-mix(in srgb,var(--accent) 22%,transparent)}
+    select option{background:var(--option-bg);color:var(--text)}
+    /* ===== SaaS primitives ===== */
+    .pill-select{appearance:none;-webkit-appearance:none;border-radius:999px;padding:9px 34px 9px 14px;font-size:.85rem;font-weight:600;background:var(--panel);border:1px solid var(--line);cursor:pointer;width:auto;
+      background-image:linear-gradient(45deg,transparent 50%,var(--muted) 50%),linear-gradient(135deg,var(--muted) 50%,transparent 50%);
+      background-position:calc(100% - 18px) center,calc(100% - 13px) center;background-size:5px 5px,5px 5px;background-repeat:no-repeat}
+    .pill-select:hover{border-color:var(--line-strong)}
+    .field-label{font-size:.66rem;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);margin-bottom:6px}
+    .accent-link{color:var(--accent);font-weight:600;text-decoration:none;text-underline-offset:4px;transition:color .15s ease}
+    .accent-link:hover{color:var(--accent-hover);text-decoration:underline}
+    /* custom tooltip: replaces native title="" */
+    [data-tip]{position:relative}
+    [data-tip]:hover::after{content:attr(data-tip);position:absolute;bottom:calc(100% + 8px);left:50%;transform:translateX(-50%);
+      background:#0f172a;color:#f8fafc;font-size:.72rem;font-weight:600;line-height:1.3;letter-spacing:.01em;white-space:nowrap;
+      padding:6px 9px;border-radius:8px;box-shadow:0 8px 24px rgba(2,8,23,.4);border:1px solid #334155;z-index:90;pointer-events:none;opacity:1;animation:tipIn .06s ease}
+    [data-tip]:hover::before{content:"";position:absolute;bottom:calc(100% + 3px);left:50%;transform:translateX(-50%);border:5px solid transparent;border-top-color:#0f172a;z-index:90;pointer-events:none}
+    @keyframes tipIn{from{opacity:0;transform:translateX(-50%) translateY(3px)}to{opacity:1;transform:translateX(-50%) translateY(0)}}
+    /* advanced-filters drawer (collapsible) */
+    .drawer{display:grid;grid-template-rows:0fr;transition:grid-template-rows .32s cubic-bezier(.4,0,.2,1),opacity .3s ease,margin .3s ease;opacity:0;overflow:hidden}
+    .drawer.open{grid-template-rows:1fr;opacity:1}
+    .drawer > .drawer-inner{min-height:0;overflow:hidden}
+    .chev{transition:transform .3s ease} .chev.open{transform:rotate(180deg)}
+    /* premium table */
+    .saas-table{width:100%;border-collapse:separate;border-spacing:0;font-size:.84rem}
+    .saas-table thead th{position:sticky;top:0;z-index:2;text-align:left;font-size:.66rem;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--muted);
+      padding:11px 12px;background:var(--glass);backdrop-filter:blur(10px);border-bottom:1px solid var(--line);white-space:nowrap}
+    .saas-table tbody td{padding:11px 12px;border-bottom:1px solid var(--line);vertical-align:middle;font-variant-numeric:tabular-nums}
+    .saas-table tbody tr{transition:background .12s ease}
+    .saas-table tbody tr:hover{background:var(--hover)}
+    .saas-table tbody tr:last-child td{border-bottom:none}
+    /* choice chips */
+    .choice{display:flex;flex-direction:column;gap:4px;padding:16px;border-radius:16px;border:1px solid var(--line);background:var(--surface);cursor:pointer;transition:all .15s ease;text-align:left}
+    .choice:hover{border-color:rgba(96,165,250,.28);transform:translateY(-2px)}
+    .choice.active{border-color:rgba(74,222,128,.55);background:rgba(74,222,128,.08);box-shadow:0 0 0 1px rgba(74,222,128,.25) inset}
+    .choice .t{font-weight:700}
+    .choice .d{font-size:.82rem;color:var(--muted)}
+    /* course cards */
+    .course{position:relative;padding:11px 12px;border-radius:13px;border:1px solid var(--line);background:var(--surface);cursor:grab;transition:transform .14s ease,border-color .14s ease,box-shadow .14s ease;user-select:none}
+    .course:hover{transform:translateY(-2px);border-color:rgba(96,165,250,.35);box-shadow:0 10px 24px rgba(2,8,23,.4)}
+    .course.dragging{opacity:.45;cursor:grabbing}
+    .course.invalid{border-color:rgba(248,113,113,.55);box-shadow:0 0 0 1px rgba(248,113,113,.28) inset}
+    .course .code{font-weight:800;font-size:.82rem;letter-spacing:-.01em}
+    .course .nm{font-size:.78rem;color:var(--muted);line-height:1.3;margin-top:2px}
+    .course .meta{display:flex;align-items:center;gap:6px;margin-top:8px}
+    .cat-dot{width:8px;height:8px;border-radius:999px;flex-shrink:0}
+    .badge{font-size:.66rem;font-weight:700;padding:2px 7px;border-radius:999px;text-transform:uppercase;letter-spacing:.04em}
+    .semester{min-height:120px;border-radius:16px;border:1px dashed var(--line-strong);padding:10px;display:flex;flex-direction:column;gap:9px;transition:background .15s ease,border-color .15s ease}
+    .semester.drop-target{background:color-mix(in srgb,var(--accent) 12%,transparent);border-color:var(--accent)}
+    .semester.over-load{border-color:rgba(250,204,21,.5)}
+    /* timeline term cell + entrance animation */
+    #mapGrid{transition:grid-template-columns .5s cubic-bezier(.4,0,.2,1)}
+    .term-cell{border-radius:18px;padding:12px;background:var(--surface-2);border:1px solid var(--line);animation:termIn .45s cubic-bezier(.2,.7,.3,1) both}
+    @keyframes termIn{from{opacity:0;transform:translateY(14px) scale(.97)}to{opacity:1;transform:none}}
+    .term-cell.current{border-color:color-mix(in srgb,var(--accent) 45%,var(--line));box-shadow:0 0 0 1px color-mix(in srgb,var(--accent) 30%,transparent) inset}
+    /* Drexel co-op block */
+    .coop-block{min-height:150px;border-radius:16px;padding:14px;display:flex;flex-direction:column;gap:6px;justify-content:center;text-align:center;
+      background:linear-gradient(150deg,color-mix(in srgb,var(--purple) 16%,transparent),color-mix(in srgb,var(--blue) 12%,transparent));
+      border:1px solid color-mix(in srgb,var(--purple) 40%,var(--line))}
+    .coop-badge{font-size:.7rem;font-weight:800;letter-spacing:.04em;text-transform:uppercase;color:var(--purple)}
+    .coop-title{font-weight:800;font-size:.95rem;letter-spacing:-.02em}
+    .coop-role{font-size:.8rem;font-weight:600;color:var(--text);background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:7px 9px;margin-top:2px}
+    .coop-hint{font-size:.72rem;color:var(--muted)}
+    .break-block{min-height:150px;border-radius:16px;padding:14px;display:grid;place-items:center;text-align:center;border:1px dashed var(--line-strong);background:var(--surface-2);color:var(--muted);font-size:.82rem}
+    /* advisor items */
+    .advice{border-radius:14px;padding:12px 13px;border:1px solid var(--line);background:var(--surface);animation:fadein .3s ease}
+    .advice .h{display:flex;align-items:center;gap:8px;font-weight:700;font-size:.86rem}
+    .advice .b{font-size:.82rem;color:var(--muted);margin-top:5px;line-height:1.5}
+    .advice.error{background:rgba(248,113,113,.08);border-color:rgba(248,113,113,.28)}
+    .advice.warn{background:rgba(250,204,21,.07);border-color:rgba(250,204,21,.25)}
+    .advice.tip{background:rgba(167,139,250,.07);border-color:rgba(167,139,250,.25)}
+    .advice.good{background:rgba(74,222,128,.07);border-color:rgba(74,222,128,.25)}
+    @keyframes fadein{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:translateY(0)}}
+    .fade-in{animation:fadein .4s ease}
+    /* modal */
+    .modal-backdrop{position:fixed;inset:0;background:rgba(3,8,20,.72);backdrop-filter:blur(6px);z-index:60;display:none;align-items:center;justify-content:center;padding:20px}
+    .modal-backdrop.show{display:flex}
+    .modal{width:min(560px,100%);max-height:88vh;overflow:auto;border-radius:22px}
+    .modal.wide{width:min(920px,100%)}
+    .live-table{width:100%;border-collapse:collapse;font-size:.82rem}
+    .live-table th{text-align:left;font-size:.68rem;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);padding:8px 10px;position:sticky;top:0;background:var(--panel-solid);border-bottom:1px solid var(--line)}
+    .live-table td{padding:9px 10px;border-bottom:1px solid rgba(148,163,184,.08);vertical-align:top}
+    .live-table tr:hover td{background:var(--surface-2)}
+    .seat-bar{height:5px;border-radius:999px;background:rgba(148,163,184,.16);overflow:hidden;margin-top:4px;width:70px}
+    .seat-bar span{display:block;height:100%;border-radius:999px}
+    .rmp{font-weight:700}
+    .live-sec{padding:10px 11px;border-radius:12px;border:1px solid var(--line);background:var(--surface);font-size:.8rem}
+    .step-dot{height:7px;border-radius:999px;background:rgba(148,163,184,.16);overflow:hidden;flex:1}
+    .step-dot span{display:block;height:100%;width:0;background:linear-gradient(90deg,var(--green),#86efac);transition:width .3s ease}
+    .toast{position:fixed;bottom:22px;left:50%;transform:translateX(-50%) translateY(20px);background:var(--panel-solid);border:1px solid var(--line);padding:12px 18px;border-radius:14px;font-size:.9rem;font-weight:600;opacity:0;pointer-events:none;transition:all .25s ease;z-index:80;box-shadow:0 20px 50px rgba(2,8,23,.6)}
+    .toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+    .prereq-line{font-size:.8rem;color:var(--muted)}
+    /* add-to-schedule row button */
+    .add-btn{width:30px;height:30px;border-radius:9px;display:grid;place-items:center;border:1px solid var(--line);background:var(--panel);color:var(--accent);font-size:1.1rem;font-weight:700;line-height:1;cursor:pointer;transition:all .14s ease}
+    .add-btn:hover{background:var(--accent);color:#fff;border-color:var(--accent);transform:translateY(-1px)}
+    .add-btn.added{background:color-mix(in srgb,var(--green) 18%,transparent);border-color:var(--green);color:var(--green)}
+    .add-btn.added:hover{background:color-mix(in srgb,var(--red) 16%,transparent);border-color:var(--red);color:var(--red)}
+    .add-btn.added:hover::after{content:"✕"} .add-btn.added:hover .chk{display:none}
+    /* sortable headers */
+    .saas-table thead th.sortable{cursor:pointer;user-select:none;transition:color .12s ease}
+    .saas-table thead th.sortable:hover{color:var(--text)}
+    .sort-caret{opacity:.35;font-size:.85em;margin-left:3px}
+    .sort-caret.active{opacity:1;color:var(--accent)}
+    /* time-conflict styling */
+    .pd-term.conflict{border-color:color-mix(in srgb,var(--red) 50%,var(--line))}
+    .pd-chip.conflict{border-color:color-mix(in srgb,var(--red) 60%,var(--line));background:color-mix(in srgb,var(--red) 8%,var(--panel))}
+    .conflict-note{font-size:.72rem;color:var(--red);margin-top:7px;display:flex;align-items:flex-start;gap:5px;line-height:1.4}
+    /* placeholder-data disclaimer flag */
+    .demo-flag{display:inline-flex;align-items:center;gap:5px;font-size:.7rem;font-weight:700;color:var(--yellow);background:color-mix(in srgb,var(--yellow) 14%,transparent);border:1px solid color-mix(in srgb,var(--yellow) 35%,var(--line));border-radius:999px;padding:3px 9px;cursor:help}
+    /* drawer width + push-content-aside behavior */
+    :root{--drawer-w:min(440px,94vw)}
+    @media (min-width:980px){
+      .main-push{transition:margin-right .34s cubic-bezier(.4,0,.2,1)}
+      :root.drawer-pushed .main-push{margin-right:456px}
+    }
+    /* right slide-out schedule drawer */
+    /* subtle, non-blocking scrim so the course table stays clickable while the drawer is open */
+    #planScrim{position:fixed;inset:0;background:linear-gradient(90deg,transparent 40%,rgba(3,8,20,.10));z-index:55;opacity:0;pointer-events:none;transition:opacity .3s ease}
+    #planScrim.open{opacity:1}
+    #planDrawer{position:fixed;top:0;right:0;height:100dvh;width:var(--drawer-w);z-index:56;transform:translateX(102%);transition:transform .34s cubic-bezier(.4,0,.2,1);display:flex;flex-direction:column}
+    #planDrawer.open{transform:translateX(0)}
+    .pd-inner{height:100%;display:flex;flex-direction:column;border-radius:0;border-left:1px solid var(--line);background:var(--panel);box-shadow:-24px 0 60px rgba(2,8,23,.28)}
+    .pd-head{position:sticky;top:0;padding:16px;border-bottom:1px solid var(--line);background:var(--glass);backdrop-filter:blur(12px);z-index:2}
+    .pd-body{flex:1;overflow:auto;padding:14px}
+    .pd-foot{padding:12px 14px;border-top:1px solid var(--line);background:var(--glass);backdrop-filter:blur(12px);display:flex;gap:8px;flex-wrap:wrap}
+    .pd-term{border-radius:14px;border:1px solid var(--line);background:var(--surface-2);padding:10px;margin-bottom:10px;transition:border-color .15s ease,background .15s ease}
+    .pd-term.eligible{border-color:color-mix(in srgb,var(--accent) 45%,var(--line));background:color-mix(in srgb,var(--accent) 8%,var(--surface-2));cursor:pointer}
+    .pd-term.eligible:hover{border-color:var(--accent);background:color-mix(in srgb,var(--accent) 14%,var(--surface-2))}
+    .pd-term.drop-target{border-color:var(--accent);background:color-mix(in srgb,var(--accent) 14%,transparent)}
+    .pd-chip{display:flex;align-items:center;gap:8px;padding:8px 9px;border-radius:10px;border:1px solid var(--line);background:var(--panel);font-size:.8rem;cursor:grab}
+    .pd-chip .x{margin-left:auto;color:var(--muted);cursor:pointer;font-weight:700;padding:0 3px}
+    .pd-chip .x:hover{color:var(--red)}
+    .pd-coop{border-radius:12px;padding:10px;text-align:center;font-size:.75rem;color:var(--purple);border:1px dashed color-mix(in srgb,var(--purple) 40%,var(--line));background:color-mix(in srgb,var(--purple) 8%,transparent);margin-bottom:10px}
+    .pending-banner{border-radius:12px;padding:10px 12px;background:color-mix(in srgb,var(--accent) 14%,transparent);border:1px solid var(--accent);font-size:.82rem;margin-bottom:12px}
+    /* weekly calendar grid (drawer) — locked sections as positioned blocks */
+    .week-wrap{border:1px solid var(--line);border-radius:14px;background:var(--surface-2);padding:10px;margin-bottom:12px}
+    .week-grid{position:relative;display:grid;grid-template-columns:34px repeat(5,1fr);gap:0;border-radius:10px;overflow:hidden;border:1px solid var(--line)}
+    .week-col{position:relative;border-left:1px solid var(--line);background:var(--panel)}
+    .week-col .wl{position:sticky;top:0;text-align:center;font-size:.62rem;font-weight:800;text-transform:uppercase;letter-spacing:.06em;color:var(--muted);padding:4px 0;border-bottom:1px solid var(--line);background:var(--surface-2)}
+    .week-axis{background:var(--surface-2)}
+    .week-axis div{font-size:.58rem;color:var(--muted);text-align:right;padding-right:4px;font-variant-numeric:tabular-nums}
+    .week-block{position:absolute;left:2px;right:2px;border-radius:6px;padding:2px 4px;font-size:.6rem;font-weight:700;line-height:1.15;overflow:hidden;color:#fff;background:color-mix(in srgb,var(--accent) 78%,#000 8%);border:1px solid color-mix(in srgb,var(--accent) 90%,#fff 10%);box-shadow:0 2px 6px rgba(2,8,23,.25)}
+    .week-block.clash{background:color-mix(in srgb,var(--red) 80%,#000 6%);border-color:var(--red);animation:pulseClash 1.4s ease infinite}
+    @keyframes pulseClash{0%,100%{box-shadow:0 0 0 0 color-mix(in srgb,var(--red) 45%,transparent)}50%{box-shadow:0 0 0 4px color-mix(in srgb,var(--red) 18%,transparent)}}
+    .week-async{display:flex;flex-wrap:wrap;gap:5px;margin-top:8px;font-size:.66rem;color:var(--muted)}
+    .week-async span{border:1px dashed var(--line-strong);border-radius:999px;padding:2px 8px}
+    /* data-source pill */
+    .src-pill{display:inline-flex;align-items:center;gap:6px;font-size:.7rem;font-weight:700;border-radius:999px;padding:3px 10px;border:1px solid var(--line)}
+    .src-pill .dot{width:7px;height:7px;border-radius:999px}
+    .src-pill.live{color:var(--green);border-color:color-mix(in srgb,var(--green) 40%,var(--line));background:color-mix(in srgb,var(--green) 10%,transparent)}
+    .src-pill.sample{color:var(--muted)}
+    [hidden]{display:none !important}
+    /* print */
+    @media print{
+      body{background:#fff;color:#000}
+      .no-print{display:none !important}
+      .glass{background:#fff !important;border:1px solid #ccc !important;backdrop-filter:none}
+      .semester{border:1px solid #ddd !important}
+      .course{border:1px solid #ccc !important;background:#fff !important;box-shadow:none !important}
+      .course .nm,.course .code{color:#000 !important}
+      #mapGrid{grid-template-columns:repeat(2,1fr) !important}
+      .gradient-text{-webkit-text-fill-color:#0a7a3a}
+    }
+  </style>
+</head>
+<body class="min-h-screen">
+
+  <!-- ===== TOP BAR ===== -->
+  <header class="sticky top-0 z-40 no-print" style="background:var(--glass);backdrop-filter:blur(16px);border-bottom:1px solid rgba(148,163,184,.08)">
+    <div class="main-push max-w-[1320px] mx-auto px-4 sm:px-6 flex items-center justify-between h-16">
+      <a href="./index.html" class="flex items-center gap-3">
+        <div class="w-10 h-10 rounded-2xl grid place-items-center glass text-xl">🎓</div>
+        <div class="font-extrabold tracking-tight text-lg">Major<span style="color:var(--green)">Map</span> AI</div>
+      </a>
+      <div class="flex items-center gap-2">
+        <button id="navDb" class="btn btn-ghost text-sm px-3 py-2" hidden onclick="showDb()">🔍 Courses</button>
+        <button id="navSchedule" class="btn btn-secondary text-sm px-3 py-2" onclick="openPlan()" data-tip="Open your schedule">
+          📅 My Schedule <span id="planCount" class="badge" style="background:color-mix(in srgb,var(--accent) 18%,transparent);color:var(--accent)">0</span>
+        </button>
+        <span id="planPill" class="hidden sm:inline-flex px-3 py-1.5 rounded-full text-xs font-semibold glass" style="color:var(--muted)" hidden>Degree Planner</span>
+        <button id="btnRestart" class="btn btn-ghost text-sm px-3 py-2" hidden onclick="restartIntake()">↺ New Plan</button>
+        <button class="theme-toggle" data-tip="Toggle theme" aria-label="Toggle light and dark mode" onclick="toggleTheme()">
+          <svg class="sun" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/></svg>
+          <svg class="moon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8z"/></svg>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <!-- ===== INTAKE (multi-step, opt-in guided planner) ===== -->
+  <section id="intake" class="main-push max-w-[720px] mx-auto px-4 sm:px-6 py-8 sm:py-12" hidden>
+    <div class="text-center mb-8 fade-in">
+      <div class="inline-flex items-center gap-2 px-3 py-1.5 rounded-full text-xs font-semibold uppercase tracking-widest mb-4" style="color:var(--green);background:rgba(74,222,128,.08);border:1px solid rgba(74,222,128,.16)">Student Onboarding</div>
+      <h1 class="text-3xl sm:text-4xl font-extrabold tracking-tight leading-tight">Let's build your <span class="gradient-text">degree map.</span></h1>
+      <p class="mt-3 text-sm sm:text-base" style="color:var(--muted)">Answer a few quick questions. The AI drafts a personalized, prerequisite-aware 4-year plan you can reshape by hand.</p>
+    </div>
+
+    <div class="glass rounded-3xl p-5 sm:p-7 shadow-2xl">
+      <!-- progress -->
+      <div class="flex items-center gap-2 mb-6">
+        <div class="step-dot"><span id="pg1" style="width:20%"></span></div>
+        <div class="step-dot"><span id="pg2"></span></div>
+        <div class="step-dot"><span id="pg3"></span></div>
+        <div class="step-dot"><span id="pg4"></span></div>
+        <div class="step-dot"><span id="pg5"></span></div>
+      </div>
+
+      <!-- STEP 1: School + Major -->
+      <div class="qstep" data-step="1">
+        <div class="text-xs uppercase tracking-widest mb-1" style="color:var(--muted)">Step 1 of 5</div>
+        <h2 class="text-xl font-bold mb-1">Your school & major</h2>
+        <p class="text-sm mb-4" style="color:var(--muted)">We tailor the timeline to your university's calendar — including Drexel's 5-year co-op quarters.</p>
+        <div class="mb-4">
+          <div class="field-label">Select university</div>
+          <input id="uniInput" list="uniList" placeholder="Start typing a Philadelphia school…" autocomplete="off" oninput="pickUniversity(this.value)" />
+          <datalist id="uniList"></datalist>
+          <div id="uniNote" class="text-xs mt-1.5" style="color:var(--accent);font-weight:600"></div>
+        </div>
+        <div class="field-label">Choose your major</div>
+        <div id="majorChoices" class="grid sm:grid-cols-2 gap-3"></div>
+      </div>
+
+      <!-- STEP 2: Year -->
+      <div class="qstep" data-step="2" hidden>
+        <div class="text-xs uppercase tracking-widest mb-1" style="color:var(--muted)">Step 2 of 5</div>
+        <h2 class="text-xl font-bold mb-1">Where are you now?</h2>
+        <p class="text-sm mb-4" style="color:var(--muted)">Your academic year sets the "you are here" marker on the timeline.</p>
+        <div id="yearChoices" class="grid grid-cols-2 gap-3"></div>
+      </div>
+
+      <!-- STEP 3: Career -->
+      <div class="qstep" data-step="3" hidden>
+        <div class="text-xs uppercase tracking-widest mb-1" style="color:var(--muted)">Step 3 of 5</div>
+        <h2 class="text-xl font-bold mb-1">What's the goal after graduation?</h2>
+        <p class="text-sm mb-4" style="color:var(--muted)">The AI biases electives and highlights courses toward this outcome.</p>
+        <div id="careerChoices" class="grid sm:grid-cols-2 gap-3"></div>
+      </div>
+
+      <!-- STEP 4: Workload -->
+      <div class="qstep" data-step="4" hidden>
+        <div class="text-xs uppercase tracking-widest mb-1" style="color:var(--muted)">Step 4 of 5</div>
+        <h2 class="text-xl font-bold mb-1">Weekly workload preference?</h2>
+        <p class="text-sm mb-4" style="color:var(--muted)">This tunes how many credits the AI packs into each semester.</p>
+        <div id="workloadChoices" class="grid gap-3"></div>
+      </div>
+
+      <!-- STEP 5: Prior credits -->
+      <div class="qstep" data-step="5" hidden>
+        <div class="text-xs uppercase tracking-widest mb-1" style="color:var(--muted)">Step 5 of 5</div>
+        <h2 class="text-xl font-bold mb-1">Any prior credits?</h2>
+        <p class="text-sm mb-4" style="color:var(--muted)">Tap any AP, IB, or transfer courses you've already cleared — the AI marks them done and pulls your plan forward.</p>
+        <div class="mb-3">
+          <input id="priorSearch" placeholder="Search courses..." oninput="filterPrior()" />
+        </div>
+        <div id="priorChoices" class="flex flex-wrap gap-2 max-h-[260px] overflow-auto pr-1"></div>
+        <p class="text-xs mt-3" style="color:var(--muted)">No prior credits? Just continue — this is optional.</p>
+      </div>
+
+      <!-- nav -->
+      <div class="flex items-center justify-between mt-7">
+        <button id="backBtn" class="btn btn-secondary px-4 py-2.5 text-sm" onclick="prevQ()" hidden>← Back</button>
+        <div class="ml-auto flex items-center gap-3">
+          <span id="stepHint" class="text-xs" style="color:var(--muted)"></span>
+          <button id="nextBtn" class="btn btn-primary px-5 py-2.5 text-sm" onclick="nextQ()">Continue →</button>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== LOADING ===== -->
+  <section id="loading" class="main-push max-w-[720px] mx-auto px-6 py-24 text-center" hidden>
+    <div class="mx-auto mb-6" style="width:72px;height:72px;border-radius:50%;border:4px solid rgba(148,163,184,.14);border-top-color:var(--green);animation:spin 1s linear infinite;box-shadow:0 0 0 14px rgba(74,222,128,.03)"></div>
+    <style>@keyframes spin{to{transform:rotate(360deg)}}</style>
+    <h2 class="text-2xl font-bold tracking-tight mb-2">Drafting your degree map…</h2>
+    <p id="loadMsg" style="color:var(--muted)">Resolving prerequisites and sequencing courses.</p>
+  </section>
+
+  <!-- ===== WORKSPACE ===== -->
+  <section id="workspace" class="main-push max-w-[1320px] mx-auto px-4 sm:px-6 py-6" hidden>
+
+    <!-- header row -->
+    <div class="flex flex-col lg:flex-row lg:items-end justify-between gap-4 mb-5 no-print">
+      <div>
+        <div id="wsTitle" class="text-2xl sm:text-3xl font-extrabold tracking-tight">Computer Science</div>
+        <div id="wsSub" class="text-sm mt-1 mb-2" style="color:var(--muted)">Sophomore · Goal: Software Engineer · Balanced load</div>
+        <div class="flex items-center gap-2">
+          <span class="field-label" style="margin:0">School</span>
+          <select id="schoolSelect" class="pill-select" data-tip="Switch university — the timeline adapts" onchange="switchUniversity(this.value)"></select>
+        </div>
+      </div>
+      <div class="flex flex-wrap gap-2">
+        <button class="btn btn-secondary px-4 py-2.5 text-sm" onclick="showDb()">🔍 Course Database</button>
+        <button class="btn btn-secondary px-4 py-2.5 text-sm" onclick="autoOptimize()">✨ Auto-Optimize</button>
+        <button class="btn btn-secondary px-4 py-2.5 text-sm" onclick="saveMap()">💾 Save</button>
+        <div class="relative">
+          <button class="btn btn-secondary px-4 py-2.5 text-sm" onclick="toggleExport()">⬇ Export ▾</button>
+          <div id="exportMenu" class="absolute right-0 mt-2 w-44 glass rounded-2xl p-1.5 shadow-2xl z-30" hidden>
+            <button class="w-full text-left px-3 py-2 rounded-xl text-sm hover:bg-white/5" onclick="exportPDF()">🖨 Export to PDF</button>
+            <button class="w-full text-left px-3 py-2 rounded-xl text-sm hover:bg-white/5" onclick="exportJSON()">🧾 Export JSON</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- stat row -->
+    <div class="grid grid-cols-2 lg:grid-cols-4 gap-3 mb-5">
+      <div class="glass rounded-2xl p-4">
+        <div class="text-[.68rem] uppercase tracking-widest mb-1" style="color:var(--muted)">Total Credits</div>
+        <div id="statCredits" class="text-2xl font-extrabold tracking-tight">0</div>
+      </div>
+      <div class="glass rounded-2xl p-4">
+        <div class="text-[.68rem] uppercase tracking-widest mb-1" style="color:var(--muted)">Grad Timeline</div>
+        <div id="statGrad" class="text-2xl font-extrabold tracking-tight">4 yrs</div>
+      </div>
+      <div class="glass rounded-2xl p-4">
+        <div class="text-[.68rem] uppercase tracking-widest mb-1" style="color:var(--muted)">Prior Credits</div>
+        <div id="statPrior" class="text-2xl font-extrabold tracking-tight">0</div>
+      </div>
+      <div class="glass rounded-2xl p-4">
+        <div class="text-[.68rem] uppercase tracking-widest mb-1" style="color:var(--muted)">Plan Health</div>
+        <div id="statHealth" class="text-2xl font-extrabold tracking-tight" style="color:var(--green)">Healthy</div>
+      </div>
+    </div>
+
+    <div class="grid lg:grid-cols-[1fr_360px] gap-5 items-start">
+
+      <!-- MAP -->
+      <div class="glass rounded-3xl p-4 sm:p-5">
+        <div class="flex items-center justify-between mb-3 flex-wrap gap-2">
+          <div>
+            <div class="text-xs uppercase tracking-widest" style="color:var(--muted)">Interactive Degree Map</div>
+            <div id="mapSubhead" class="text-base font-bold">Drag courses between semesters</div>
+          </div>
+          <div class="flex items-center gap-3 text-[.7rem] flex-wrap" style="color:var(--muted)">
+            <span class="flex items-center gap-1.5"><span class="cat-dot" style="background:var(--blue)"></span>Core</span>
+            <span class="flex items-center gap-1.5"><span class="cat-dot" style="background:var(--green)"></span>Major</span>
+            <span class="flex items-center gap-1.5"><span class="cat-dot" style="background:var(--purple)"></span>Math/Sci</span>
+            <span class="flex items-center gap-1.5"><span class="cat-dot" style="background:#f59e0b"></span>Capstone</span>
+            <span class="flex items-center gap-1.5"><span class="cat-dot" style="background:#64748b"></span>Gen Ed</span>
+          </div>
+        </div>
+        <div id="mapGrid" class="grid sm:grid-cols-2 gap-3"></div>
+        <p class="text-xs mt-3 no-print" style="color:var(--muted)">Tip: click any course to see prerequisites, description, and why the AI placed it there.</p>
+      </div>
+
+      <!-- AI ADVISOR -->
+      <aside class="glass rounded-3xl p-4 sm:p-5 lg:sticky lg:top-20">
+        <div class="flex items-center gap-3 mb-1">
+          <div class="w-9 h-9 rounded-xl grid place-items-center" style="background:linear-gradient(135deg,rgba(167,139,250,.25),rgba(96,165,250,.25));border:1px solid var(--line)">🤖</div>
+          <div>
+            <div class="font-bold leading-tight">AI Advisor</div>
+            <div class="text-[.72rem]" style="color:var(--muted)">Live analysis of your map</div>
+          </div>
+          <span id="advisorPulse" class="ml-auto w-2.5 h-2.5 rounded-full" style="background:var(--green);box-shadow:0 0 0 4px rgba(74,222,128,.15)"></span>
+        </div>
+        <div id="advisorSummary" class="text-sm mt-3 mb-3 leading-relaxed" style="color:var(--muted)"></div>
+        <div id="advisorList" class="flex flex-col gap-2.5"></div>
+      </aside>
+    </div>
+
+    <div class="text-center mt-6 no-print">
+      <button class="btn btn-ghost px-4 py-2.5 text-sm" onclick="restartIntake()">↺ Start a new plan</button>
+    </div>
+  </section>
+
+  <!-- ===== COURSE MODAL ===== -->
+  <div class="modal-backdrop" id="courseModal" onclick="if(event.target===this)closeModal()">
+    <div class="modal glass p-6 shadow-2xl">
+      <div class="flex items-start justify-between gap-3 mb-4">
+        <div>
+          <div id="mCode" class="text-2xl font-extrabold tracking-tight"></div>
+          <div id="mName" class="text-sm mt-0.5" style="color:var(--muted)"></div>
+        </div>
+        <button class="btn btn-ghost w-9 h-9 !p-0 text-lg" onclick="closeModal()">✕</button>
+      </div>
+      <div class="flex flex-wrap gap-2 mb-4" id="mBadges"></div>
+      <div class="mb-4">
+        <div class="text-[.7rem] uppercase tracking-widest mb-1.5" style="color:var(--muted)">Description</div>
+        <p id="mDesc" class="text-sm leading-relaxed"></p>
+      </div>
+      <div class="mb-4">
+        <div class="text-[.7rem] uppercase tracking-widest mb-1.5" style="color:var(--muted)">Prerequisites</div>
+        <div id="mPrereqs" class="text-sm"></div>
+      </div>
+      <div class="mb-4">
+        <div class="text-[.7rem] uppercase tracking-widest mb-1.5" style="color:var(--muted)">Unlocks</div>
+        <div id="mUnlocks" class="text-sm"></div>
+      </div>
+      <div id="mLiveWrap" class="mb-4" hidden>
+        <div class="text-[.7rem] uppercase tracking-widest mb-1.5" style="color:var(--muted)">📡 Live sections this term</div>
+        <div id="mLive" class="flex flex-col gap-2"></div>
+      </div>
+      <div class="rounded-2xl p-4" style="background:rgba(167,139,250,.08);border:1px solid rgba(167,139,250,.25)">
+        <div class="flex items-center gap-2 text-sm font-bold mb-1.5">🤖 Why the AI recommended this</div>
+        <p id="mWhy" class="text-sm leading-relaxed" style="color:var(--text)"></p>
+      </div>
+      <div class="flex gap-2 mt-5">
+        <div class="text-xs" style="color:var(--muted)">Move to:</div>
+        <select id="mMoveTo" class="!w-auto !py-1.5 !px-3 text-sm" onchange="moveViaModal(this.value)"></select>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== COURSE DATABASE (default home) ===== -->
+  <section id="dbview" class="main-push max-w-[1320px] mx-auto px-4 sm:px-6 py-5">
+    <div class="flex flex-col lg:flex-row lg:items-end justify-between gap-3 mb-4">
+      <div>
+        <div class="text-2xl sm:text-3xl font-extrabold tracking-tight">Course Database</div>
+        <div id="liveSub" class="text-sm mt-1" style="color:var(--muted)">Search every section — ratings, seats, and times. Add any class straight to your schedule.</div>
+      </div>
+      <div class="flex flex-wrap items-center gap-2">
+        <span id="srcPill" class="src-pill sample" data-tip="Checking for a local API…"><span class="dot" style="background:var(--muted)"></span><span id="srcPillText">sample data</span></span>
+        <span id="demoFlag" class="demo-flag" data-tip="Prototype notice: instructor ★ ratings and seat counts are placeholder/sample data — not real RateMyProfessors or live registrar values.">⚠ demo ratings &amp; seats</span>
+        <span id="liveStatus" class="text-xs mr-1" style="color:var(--muted)"></span>
+        <label class="btn btn-secondary px-3.5 py-2 text-sm" style="cursor:pointer" data-tip="Import a data.json from the Drexel scraper">
+          📂 Import
+          <input type="file" accept="application/json,.json" onchange="onLiveFile(this)" style="display:none" />
+        </label>
+        <button class="btn btn-secondary px-3.5 py-2 text-sm" onclick="loadSampleLive()" data-tip="Reload the bundled sample term">⚡ Sample term</button>
+      </div>
+    </div>
+
+    <!-- sticky primary filter bar -->
+    <div class="glass rounded-3xl p-4 sm:p-5 mb-4" style="position:sticky;top:72px;z-index:20">
+      <!-- ===== PRIMARY FILTER BAR ===== -->
+      <div id="liveControls">
+        <div class="mb-3">
+          <input id="liveSearch" placeholder="🔍  Search course, title, CRN, or instructor…" oninput="renderLiveTable()" />
+        </div>
+        <div class="flex flex-wrap items-center gap-2 mb-1">
+          <div class="flex flex-col">
+            <select id="liveTerm" class="pill-select" data-tip="Academic term" onchange="onTermChange()"></select>
+          </div>
+          <select id="liveSubject" class="pill-select" data-tip="Subject code" onchange="onSubjectChange()"></select>
+          <select id="liveNumber" class="pill-select" data-tip="Course number" onchange="onNumberChange()"></select>
+          <button id="liveMineChip" class="pill-select" data-tip="Show only courses on your map" onclick="toggleChip('liveMineOnly')" style="padding-right:14px">On my map</button>
+          <input id="liveMineOnly" type="checkbox" hidden onchange="renderLiveTable()" />
+          <button id="advToggle" class="btn btn-secondary text-sm" style="border-radius:999px;padding:9px 16px;margin-left:auto" data-tip="More precise filters" onclick="toggleAdvanced()">
+            Advanced filters
+            <svg class="chev" id="advChev" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l6 6 6-6"/></svg>
+          </button>
+        </div>
+
+        <!-- ===== ADVANCED FILTERS DRAWER ===== -->
+        <div id="advDrawer" class="drawer">
+          <div class="drawer-inner">
+            <div class="rounded-2xl p-4 mt-2 mb-1" style="background:var(--surface);border:1px solid var(--line)">
+              <div class="grid sm:grid-cols-2 lg:grid-cols-4 gap-3">
+                <div>
+                  <div class="field-label" data-tip="Minimum RateMyProfessors quality">Min instructor rating</div>
+                  <select id="advRating" class="pill-select" style="width:100%" onchange="renderLiveTable()">
+                    <option value="0">Any rating</option><option value="3">3.0+</option><option value="4">4.0+</option><option value="4.5">4.5+</option>
+                  </select>
+                </div>
+                <div>
+                  <div class="field-label" data-tip="Maximum RateMyProfessors difficulty">Max difficulty</div>
+                  <select id="advDiff" class="pill-select" style="width:100%" onchange="renderLiveTable()">
+                    <option value="5">Any difficulty</option><option value="4">≤ 4.0</option><option value="3.5">≤ 3.5</option><option value="3">≤ 3.0</option>
+                  </select>
+                </div>
+                <div>
+                  <div class="field-label" data-tip="Only sections starting at or after this time">Starts after</div>
+                  <input id="advStart" type="time" onchange="renderLiveTable()" />
+                </div>
+                <div>
+                  <div class="field-label" data-tip="Only sections ending at or before this time">Ends before</div>
+                  <input id="advEnd" type="time" onchange="renderLiveTable()" />
+                </div>
+                <div>
+                  <div class="field-label" data-tip="Filter by whether a course has prerequisites">Prerequisites</div>
+                  <select id="advPrereq" class="pill-select" style="width:100%" onchange="renderLiveTable()">
+                    <option value="any">Any</option><option value="none">No prerequisites</option><option value="has">Has prerequisites</option>
+                  </select>
+                </div>
+                <div class="flex items-end">
+                  <button id="advOpenChip" class="pill-select" style="width:100%" data-tip="Hide sections with no seats" onclick="toggleChip('advOpen')">Open seats only</button>
+                  <input id="advOpen" type="checkbox" hidden onchange="renderLiveTable()" />
+                </div>
+                <div class="flex items-end">
+                  <button id="advBlankChip" class="pill-select" style="width:100%" data-tip="Include sections whose instructor has no rating yet" onclick="toggleChip('advBlank')">Show blank ratings</button>
+                  <input id="advBlank" type="checkbox" checked hidden onchange="renderLiveTable()" />
+                </div>
+                <div class="flex items-end">
+                  <button class="btn btn-ghost text-sm" style="width:100%;border-radius:999px;padding:9px 14px" onclick="resetAdvanced()">Reset</button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+      </div><!-- /liveControls -->
+    </div><!-- /sticky filter bar -->
+
+    <!-- results table -->
+    <div class="glass rounded-3xl p-2 sm:p-3">
+      <div class="flex items-center justify-between px-2 pt-1 pb-2">
+        <div id="liveCount" class="text-xs" style="color:var(--muted)"></div>
+      </div>
+      <div id="liveTableWrap" style="max-height:calc(100dvh - 300px);overflow:auto;border-radius:16px;border:1px solid var(--line)">
+        <table class="saas-table">
+          <thead><tr>
+            <th style="width:46px"></th>
+            <th class="sortable" onclick="setSort('course')">Course <span class="sort-caret" data-k="course"></span></th>
+            <th class="sortable" onclick="setSort('title')">Title <span class="sort-caret" data-k="title"></span></th>
+            <th class="sortable" onclick="setSort('section')">Sec <span class="sort-caret" data-k="section"></span></th>
+            <th class="sortable" onclick="setSort('crn')">CRN <span class="sort-caret" data-k="crn"></span></th>
+            <th>Days &amp; Time</th>
+            <th id="thInstr" class="sortable" data-tip="⚠ Ratings are placeholder demo data — not real RateMyProfessors values" onclick="setSort('rating')">Instructor ★ <span class="sort-caret" data-k="rating"></span></th>
+            <th class="sortable" onclick="setSort('seats')">Seats <span class="sort-caret" data-k="seats"></span></th>
+            <th class="sortable" style="text-align:right" onclick="setSort('cr')">Cr <span class="sort-caret" data-k="cr"></span></th>
+          </tr></thead>
+          <tbody id="liveTableBody"></tbody>
+        </table>
+      </div>
+      <div id="liveEmpty" class="text-center text-sm py-10" style="color:var(--muted)" hidden>No data loaded. Click “Sample term” to browse sections.</div>
+    </div>
+  </section>
+
+  <!-- ===== SLIDE-OUT SCHEDULE DRAWER ===== -->
+  <div id="planScrim" onclick="closePlan()"></div>
+  <aside id="planDrawer" class="no-print" aria-label="Your schedule">
+    <div class="pd-inner">
+      <div class="pd-head flex items-center gap-3">
+        <div class="flex-1">
+          <div class="font-extrabold tracking-tight text-lg">📅 My Schedule</div>
+          <div id="pdSub" class="text-xs" style="color:var(--muted)">Slot courses into your timeline</div>
+        </div>
+        <select id="pdSchool" class="pill-select text-xs" data-tip="Switch calendar" onchange="switchUniversity(this.value)" style="max-width:150px"></select>
+        <button class="btn btn-ghost w-9 h-9 !p-0 text-lg" onclick="closePlan()" data-tip="Close">✕</button>
+      </div>
+      <div class="pd-body">
+        <div id="pdPending" class="pending-banner" hidden></div>
+        <div class="grid grid-cols-3 gap-2 mb-3">
+          <div class="rounded-xl p-2.5 text-center" style="background:var(--surface-2);border:1px solid var(--line)">
+            <div class="text-[.6rem] uppercase tracking-widest" style="color:var(--muted)">Credits</div>
+            <div id="pdCredits" class="text-lg font-extrabold">0</div>
+          </div>
+          <div class="rounded-xl p-2.5 text-center" style="background:var(--surface-2);border:1px solid var(--line)">
+            <div class="text-[.6rem] uppercase tracking-widest" style="color:var(--muted)">Courses</div>
+            <div id="pdCourses" class="text-lg font-extrabold">0</div>
+          </div>
+          <div class="rounded-xl p-2.5 text-center" style="background:var(--surface-2);border:1px solid var(--line)">
+            <div class="text-[.6rem] uppercase tracking-widest" style="color:var(--muted)">Health</div>
+            <div id="pdHealth" class="text-lg font-extrabold" style="color:var(--green)">OK</div>
+          </div>
+        </div>
+        <div id="pdWeekWrap" class="week-wrap" hidden>
+          <div class="flex items-center justify-between mb-2">
+            <span class="text-xs font-bold">🗓 Week view</span>
+            <select id="pdWeekTerm" class="pill-select text-xs" style="max-width:170px" onchange="renderWeekGrid()"></select>
+          </div>
+          <div id="pdWeekGrid"></div>
+          <div id="pdWeekAsync" class="week-async"></div>
+        </div>
+        <div id="pdTimeline"></div>
+      </div>
+      <div class="pd-foot">
+        <button class="btn btn-secondary text-sm flex-1" style="min-width:130px" onclick="showWorkspace()" data-tip="Open the full planner with the AI advisor">⤢ Full planner</button>
+        <button class="btn btn-secondary text-sm" onclick="openGuided()" data-tip="Auto-generate a full major plan">✨ Auto-build</button>
+        <button class="btn btn-ghost text-sm" onclick="exportJSON()">⬇ JSON</button>
+        <button class="btn btn-ghost text-sm" onclick="clearPlan()">Clear</button>
+      </div>
+    </div>
+  </aside>
+
+  <div class="toast" id="toast"></div>
+
+  <script>
+  /* =========================================================================
+     CURRICULUM DATA  (self-contained — no backend needed)
+     Each course: code, name, cr(credits), cat, desc, pre[], careers[],
+                  heavy(reading/quant intensive), flex(safe to move around)
+     plan: 8 semesters [Y1F, Y1S, Y2F, Y2S, Y3F, Y3S, Y4F, Y4S]
+     ========================================================================= */
+  const CAT = {
+    core:   { label:'Core',      color:'var(--blue)'  },
+    major:  { label:'Major',     color:'var(--green)' },
+    math:   { label:'Math/Sci',  color:'var(--purple)'},
+    cap:    { label:'Capstone',  color:'#f59e0b'      },
+    gen:    { label:'Gen Ed',    color:'#64748b'      }
+  };
+
+  // dynamic term labels — rebuilt by buildTimeline() to match the selected university's calendar
+  let SEMESTER_LABELS = ['Fall · Year 1','Spring · Year 1','Fall · Year 2','Spring · Year 2','Fall · Year 3','Spring · Year 3','Fall · Year 4','Spring · Year 4'];
+
+  const MAJORS = {
+    'Computer Science': {
+      careers: ['Software Engineer','ML / AI Engineer','Cybersecurity Analyst'],
+      courses: {
+        CS101:{code:'CS 101',name:'Intro to Programming',cr:4,cat:'major',desc:'Fundamentals of programming, control flow, and problem decomposition using a modern language.',pre:[],careers:['Software Engineer','ML / AI Engineer','Cybersecurity Analyst']},
+        CS102:{code:'CS 102',name:'Object-Oriented Programming',cr:4,cat:'major',desc:'Classes, inheritance, and design patterns. The bridge from scripts to real software systems.',pre:['CS101'],careers:['Software Engineer']},
+        CS201:{code:'CS 201',name:'Data Structures',cr:4,cat:'major',desc:'Lists, trees, graphs, hashing, and the complexity analysis behind them. The single biggest CS bottleneck.',pre:['CS102'],careers:['Software Engineer','ML / AI Engineer','Cybersecurity Analyst'],heavy:true},
+        CS202:{code:'CS 202',name:'Algorithms',cr:3,cat:'major',desc:'Greedy, divide-and-conquer, dynamic programming, and the analysis that powers technical interviews.',pre:['CS201','CS210'],careers:['Software Engineer','ML / AI Engineer'],heavy:true},
+        CS210:{code:'CS 210',name:'Discrete Mathematics',cr:3,cat:'math',desc:'Logic, proofs, combinatorics, and graph theory — the mathematical spine of computer science.',pre:[],careers:['ML / AI Engineer'],heavy:true},
+        CS215:{code:'CS 215',name:'Computer Organization',cr:3,cat:'major',desc:'How code becomes hardware: memory, assembly, and the machine model underneath every program.',pre:['CS102'],careers:['Cybersecurity Analyst']},
+        CS301:{code:'CS 301',name:'Operating Systems',cr:3,cat:'major',desc:'Processes, threads, scheduling, and memory management. Systems-level thinking for real engineers.',pre:['CS201','CS215'],careers:['Software Engineer','Cybersecurity Analyst'],heavy:true},
+        CS310:{code:'CS 310',name:'Databases',cr:3,cat:'major',desc:'Relational modeling, SQL, indexing, and transactions used in nearly every production backend.',pre:['CS201'],careers:['Software Engineer']},
+        CS320:{code:'CS 320',name:'Software Engineering',cr:3,cat:'major',desc:'Version control, testing, CI/CD, and working on a team codebase like you will on the job.',pre:['CS201'],careers:['Software Engineer']},
+        CS302:{code:'CS 302',name:'Computer Networks',cr:3,cat:'major',desc:'TCP/IP, HTTP, and the protocols that make distributed and web systems possible.',pre:['CS215'],careers:['Software Engineer','Cybersecurity Analyst']},
+        CS330:{code:'CS 330',name:'Web Development',cr:3,cat:'major',desc:'Full-stack web apps: front-end frameworks, APIs, and deployment.',pre:['CS102'],careers:['Software Engineer']},
+        CS340:{code:'CS 340',name:'Machine Learning',cr:3,cat:'major',desc:'Regression, classification, and neural network basics with hands-on model training.',pre:['CS202','STAT201','MATH221'],careers:['ML / AI Engineer'],heavy:true},
+        CS401:{code:'CS 401',name:'Theory of Computation',cr:3,cat:'major',desc:'Automata, computability, and NP-completeness — the limits of what algorithms can do.',pre:['CS202'],careers:['ML / AI Engineer'],heavy:true},
+        CS410:{code:'CS 410',name:'Distributed Systems',cr:3,cat:'major',desc:'Consensus, replication, and scaling services across many machines.',pre:['CS301'],careers:['Software Engineer']},
+        CS402:{code:'CS 402',name:'Cybersecurity',cr:3,cat:'major',desc:'Threat models, cryptography basics, and secure system design.',pre:['CS301'],careers:['Cybersecurity Analyst']},
+        CS420:{code:'CS 420',name:'Deep Learning & AI',cr:3,cat:'major',desc:'Modern neural architectures, training at scale, and applied AI systems.',pre:['CS340'],careers:['ML / AI Engineer'],heavy:true},
+        CSCAP1:{code:'CS 490',name:'Senior Capstone I',cr:3,cat:'cap',desc:'Scoping and designing a substantial team software project with real stakeholders.',pre:['CS320']},
+        CSCAP2:{code:'CS 491',name:'Senior Capstone II',cr:3,cat:'cap',desc:'Build, ship, and present the capstone — your portfolio centerpiece.',pre:['CSCAP1']},
+        MATH121:{code:'MATH 121',name:'Calculus I',cr:4,cat:'math',desc:'Limits, derivatives, and the foundation for later quantitative coursework.',pre:[],careers:['ML / AI Engineer'],heavy:true},
+        MATH122:{code:'MATH 122',name:'Calculus II',cr:4,cat:'math',desc:'Integration techniques and series that support statistics and ML.',pre:['MATH121'],careers:['ML / AI Engineer'],heavy:true},
+        MATH221:{code:'MATH 221',name:'Linear Algebra',cr:3,cat:'math',desc:'Vectors, matrices, and transformations — the core math behind machine learning.',pre:['MATH122'],careers:['ML / AI Engineer']},
+        STAT201:{code:'STAT 201',name:'Statistics',cr:3,cat:'math',desc:'Probability, distributions, and inference used across data-heavy CS work.',pre:['MATH122'],careers:['ML / AI Engineer']},
+        PHYS101:{code:'PHYS 101',name:'Physics I',cr:4,cat:'math',desc:'Mechanics with calculus — satisfies the science requirement and builds modeling intuition.',pre:['MATH121']},
+        ENGL101:{code:'ENGL 101',name:'Composition',cr:3,cat:'gen',desc:'College writing and argumentation.',pre:[],flex:true},
+        ENGL201:{code:'ENGL 201',name:'Technical Writing',cr:3,cat:'gen',desc:'Clear documentation and communication for engineers.',pre:[],flex:true,careers:['Software Engineer']},
+        UNIV101:{code:'UNIV 101',name:'First-Year Seminar',cr:2,cat:'gen',desc:'Orientation to university academics and success skills.',pre:[],flex:true},
+        HUM110:{code:'HUM 110',name:'Humanities Elective',cr:3,cat:'gen',desc:'Breadth requirement in the humanities.',pre:[],flex:true},
+        SOC110:{code:'SOC 110',name:'Social Science Elective',cr:3,cat:'gen',desc:'Breadth requirement in the social sciences.',pre:[],flex:true},
+        ETH210:{code:'ETH 210',name:'Ethics in Technology',cr:3,cat:'gen',desc:'Privacy, bias, and responsibility in computing.',pre:[],flex:true},
+        FREE1:{code:'ELEC 1',name:'Free Elective',cr:3,cat:'gen',desc:'Open elective — explore an interest or minor.',pre:[],flex:true},
+        FREE2:{code:'ELEC 2',name:'Free Elective',cr:3,cat:'gen',desc:'Open elective — explore an interest or minor.',pre:[],flex:true},
+        FREE3:{code:'ELEC 3',name:'Free Elective',cr:3,cat:'gen',desc:'Open elective — explore an interest or minor.',pre:[],flex:true}
+      },
+      plan: [
+        ['CS101','MATH121','ENGL101','UNIV101'],
+        ['CS102','MATH122','PHYS101','HUM110'],
+        ['CS201','CS210','MATH221','STAT201'],
+        ['CS202','CS215','ENGL201','SOC110'],
+        ['CS301','CS310','CS320','ETH210'],
+        ['CS302','CS330','CS340','FREE1'],
+        ['CS401','CS410','CSCAP1','FREE2'],
+        ['CS402','CS420','CSCAP2','FREE3']
+      ]
+    },
+
+    'Business Administration': {
+      careers: ['Product Manager','Marketing Manager','Management Consultant'],
+      courses: {
+        BUS101:{code:'BUS 101',name:'Intro to Business',cr:3,cat:'major',desc:'Survey of how firms create value across functions.',pre:[],careers:['Product Manager','Marketing Manager','Management Consultant']},
+        BUS110:{code:'BUS 110',name:'Business Communication',cr:3,cat:'core',desc:'Professional writing, presenting, and stakeholder communication.',pre:[],flex:true},
+        ACCT101:{code:'ACCT 101',name:'Financial Accounting',cr:3,cat:'core',desc:'Reading balance sheets, income statements, and cash flows.',pre:[],careers:['Management Consultant'],heavy:true},
+        ACCT102:{code:'ACCT 102',name:'Managerial Accounting',cr:3,cat:'core',desc:'Costing, budgeting, and internal decision-making.',pre:['ACCT101'],heavy:true},
+        ECON101:{code:'ECON 101',name:'Microeconomics',cr:3,cat:'core',desc:'Supply, demand, and firm behavior.',pre:[],careers:['Management Consultant'],heavy:true},
+        ECON102:{code:'ECON 102',name:'Macroeconomics',cr:3,cat:'core',desc:'Growth, inflation, and monetary/fiscal policy.',pre:[],heavy:true},
+        MATH110:{code:'MATH 110',name:'Business Math',cr:3,cat:'math',desc:'Applied quantitative methods for business decisions.',pre:[]},
+        STAT205:{code:'STAT 205',name:'Business Statistics',cr:3,cat:'math',desc:'Data analysis, regression, and inference for managers.',pre:['MATH110'],careers:['Product Manager','Management Consultant'],heavy:true},
+        MIS201:{code:'MIS 201',name:'Information Systems',cr:3,cat:'core',desc:'How data and software drive modern operations.',pre:[],careers:['Product Manager']},
+        MKT201:{code:'MKT 201',name:'Principles of Marketing',cr:3,cat:'major',desc:'Segmentation, positioning, and the marketing mix.',pre:['BUS101'],careers:['Marketing Manager']},
+        MGT201:{code:'MGT 201',name:'Principles of Management',cr:3,cat:'major',desc:'Planning, organizing, and leading teams.',pre:['BUS101'],careers:['Management Consultant','Product Manager']},
+        FIN201:{code:'FIN 201',name:'Business Finance',cr:3,cat:'major',desc:'Time value of money, capital budgeting, and valuation basics.',pre:['ACCT101'],careers:['Management Consultant'],heavy:true},
+        BLAW201:{code:'BLAW 201',name:'Business Law',cr:3,cat:'core',desc:'Contracts, liability, and the legal environment of business.',pre:[],heavy:true},
+        MKT301:{code:'MKT 301',name:'Consumer Behavior',cr:3,cat:'major',desc:'Psychology and data behind buying decisions.',pre:['MKT201'],careers:['Marketing Manager','Product Manager']},
+        MGT301:{code:'MGT 301',name:'Organizational Behavior',cr:3,cat:'major',desc:'How individuals and teams actually behave inside organizations.',pre:['MGT201'],careers:['Management Consultant']},
+        OM301:{code:'OM 301',name:'Operations Management',cr:3,cat:'major',desc:'Process design, supply chains, and quality.',pre:['STAT205'],careers:['Product Manager','Management Consultant']},
+        BUS310:{code:'BUS 310',name:'Business Analytics',cr:3,cat:'major',desc:'Turning data into decisions with dashboards and models.',pre:['STAT205'],careers:['Product Manager','Management Consultant']},
+        MKT310:{code:'MKT 310',name:'Digital Marketing',cr:3,cat:'major',desc:'SEO, paid media, funnels, and growth analytics.',pre:['MKT301'],careers:['Marketing Manager']},
+        FIN310:{code:'FIN 310',name:'Corporate Finance',cr:3,cat:'major',desc:'Capital structure, risk, and financial strategy.',pre:['FIN201'],careers:['Management Consultant']},
+        MGT310:{code:'MGT 310',name:'Strategic Management',cr:3,cat:'major',desc:'Competitive analysis and long-run firm strategy.',pre:['MGT301'],careers:['Management Consultant']},
+        MGT401:{code:'MGT 401',name:'Leadership',cr:3,cat:'major',desc:'Influence, motivation, and leading change.',pre:['MGT301'],careers:['Product Manager','Management Consultant']},
+        ENT401:{code:'ENT 401',name:'Entrepreneurship',cr:3,cat:'major',desc:'Building and validating a new venture.',pre:['BUS101'],careers:['Product Manager']},
+        BUS410:{code:'BUS 410',name:'Global Business',cr:3,cat:'major',desc:'Operating across borders, cultures, and markets.',pre:['MGT301']},
+        MGT420:{code:'MGT 420',name:'Project Management',cr:3,cat:'major',desc:'Scope, timelines, and cross-functional delivery.',pre:['MGT201'],careers:['Product Manager']},
+        BCAP1:{code:'BUS 490',name:'Capstone I: Strategy',cr:3,cat:'cap',desc:'Scoping a real consulting-style business case.',pre:['MGT310']},
+        BCAP2:{code:'BUS 491',name:'Capstone II: Pitch',cr:3,cat:'cap',desc:'Delivering strategic recommendations to a panel.',pre:['BCAP1']},
+        ENGL101:{code:'ENGL 101',name:'Composition',cr:3,cat:'gen',desc:'College writing and argumentation.',pre:[],flex:true},
+        HUM110:{code:'HUM 110',name:'Humanities Elective',cr:3,cat:'gen',desc:'Breadth requirement in the humanities.',pre:[],flex:true},
+        SOC110:{code:'SOC 110',name:'Social Science Elective',cr:3,cat:'gen',desc:'Breadth requirement in the social sciences.',pre:[],flex:true},
+        FREE1:{code:'ELEC 1',name:'Free Elective',cr:3,cat:'gen',desc:'Open elective — pair with a minor or concentration.',pre:[],flex:true},
+        FREE2:{code:'ELEC 2',name:'Free Elective',cr:3,cat:'gen',desc:'Open elective — pair with a minor or concentration.',pre:[],flex:true},
+        FREE3:{code:'ELEC 3',name:'Free Elective',cr:3,cat:'gen',desc:'Open elective — pair with a minor or concentration.',pre:[],flex:true}
+      },
+      plan: [
+        ['BUS101','ECON101','MATH110','ENGL101'],
+        ['ACCT101','ECON102','BUS110','HUM110'],
+        ['ACCT102','MKT201','STAT205','MIS201'],
+        ['FIN201','MGT201','BLAW201','SOC110'],
+        ['MKT301','MGT301','OM301','BUS310'],
+        ['MGT310','MKT310','FIN310','FREE1'],
+        ['MGT401','ENT401','BCAP1','FREE2'],
+        ['BUS410','MGT420','BCAP2','FREE3']
+      ]
+    },
+
+    'Accounting & Economics': {
+      careers: ['CPA (Accountant)','Financial Analyst','Economist'],
+      courses: {
+        ACCT101:{code:'ACCT 101',name:'Financial Accounting',cr:3,cat:'core',desc:'The language of business: statements, accruals, and reporting.',pre:[],careers:['CPA (Accountant)','Financial Analyst'],heavy:true},
+        ACCT102:{code:'ACCT 102',name:'Managerial Accounting',cr:3,cat:'core',desc:'Cost behavior, budgeting, and internal decision support.',pre:['ACCT101'],careers:['CPA (Accountant)'],heavy:true},
+        ECON101:{code:'ECON 101',name:'Microeconomics',cr:3,cat:'core',desc:'Markets, incentives, and firm behavior.',pre:[],careers:['Economist','Financial Analyst'],heavy:true},
+        ECON102:{code:'ECON 102',name:'Macroeconomics',cr:3,cat:'core',desc:'Aggregate output, inflation, and policy.',pre:[],careers:['Economist'],heavy:true},
+        MATH121:{code:'MATH 121',name:'Calculus I',cr:4,cat:'math',desc:'Derivatives and optimization used across economics.',pre:[],careers:['Economist'],heavy:true},
+        STAT201:{code:'STAT 201',name:'Statistics',cr:3,cat:'math',desc:'Probability and inference — the base for econometrics.',pre:[],careers:['Financial Analyst','Economist'],heavy:true},
+        ACCT201:{code:'ACCT 201',name:'Intermediate Accounting I',cr:3,cat:'major',desc:'Deep dive into assets, revenue recognition, and GAAP.',pre:['ACCT102'],careers:['CPA (Accountant)'],heavy:true},
+        ACCT202:{code:'ACCT 202',name:'Intermediate Accounting II',cr:3,cat:'major',desc:'Liabilities, equity, and complex reporting — heavy CPA content.',pre:['ACCT201'],careers:['CPA (Accountant)'],heavy:true},
+        ECON201:{code:'ECON 201',name:'Intermediate Microeconomics',cr:3,cat:'major',desc:'Rigorous consumer and producer theory with calculus.',pre:['ECON101','MATH121'],careers:['Economist'],heavy:true},
+        ECON202:{code:'ECON 202',name:'Intermediate Macroeconomics',cr:3,cat:'major',desc:'Growth models, business cycles, and monetary theory.',pre:['ECON102','MATH121'],careers:['Economist'],heavy:true},
+        ECON210:{code:'ECON 210',name:'Econometrics',cr:3,cat:'major',desc:'Regression modeling and causal inference with real data.',pre:['STAT201','ECON101'],careers:['Economist','Financial Analyst'],heavy:true},
+        FIN201:{code:'FIN 201',name:'Business Finance',cr:3,cat:'core',desc:'Valuation, time value of money, and capital budgeting.',pre:['ACCT101'],careers:['Financial Analyst'],heavy:true},
+        BLAW201:{code:'BLAW 201',name:'Business Law',cr:3,cat:'core',desc:'Legal environment relevant to accounting and the CPA exam.',pre:[],careers:['CPA (Accountant)'],heavy:true},
+        MIS201:{code:'MIS 201',name:'Information Systems',cr:3,cat:'core',desc:'Data systems that back modern accounting and analysis.',pre:[]},
+        ACCT301:{code:'ACCT 301',name:'Cost Accounting',cr:3,cat:'major',desc:'Activity-based costing and managerial cost analysis.',pre:['ACCT201'],careers:['CPA (Accountant)']},
+        ACCT310:{code:'ACCT 310',name:'Federal Taxation I',cr:3,cat:'major',desc:'Individual income tax — core CPA-exam and career content.',pre:['ACCT201'],careers:['CPA (Accountant)'],heavy:true},
+        ACCT302:{code:'ACCT 302',name:'Auditing',cr:3,cat:'major',desc:'Assurance, internal controls, and audit procedures.',pre:['ACCT202'],careers:['CPA (Accountant)'],heavy:true},
+        ACCT320:{code:'ACCT 320',name:'Federal Taxation II',cr:3,cat:'major',desc:'Corporate and partnership taxation.',pre:['ACCT310'],careers:['CPA (Accountant)']},
+        ECON301:{code:'ECON 301',name:'Money & Banking',cr:3,cat:'major',desc:'Financial institutions, central banking, and interest rates.',pre:['ECON202'],careers:['Financial Analyst','Economist']},
+        ECON310:{code:'ECON 310',name:'Public Finance',cr:3,cat:'major',desc:'Taxation, spending, and the economics of government.',pre:['ECON201'],careers:['Economist']},
+        FIN301:{code:'FIN 301',name:'Investments',cr:3,cat:'major',desc:'Portfolio theory, securities, and market analysis.',pre:['FIN201'],careers:['Financial Analyst']},
+        FIN310:{code:'FIN 310',name:'Financial Modeling',cr:3,cat:'major',desc:'Building valuation and forecasting models in spreadsheets.',pre:['FIN301'],careers:['Financial Analyst']},
+        ACCT401:{code:'ACCT 401',name:'Advanced Accounting',cr:3,cat:'major',desc:'Consolidations, partnerships, and advanced reporting.',pre:['ACCT202'],careers:['CPA (Accountant)']},
+        ACCT410:{code:'ACCT 410',name:'Accounting Info Systems',cr:3,cat:'major',desc:'Controls and technology in the accounting function.',pre:['MIS201','ACCT201'],careers:['CPA (Accountant)']},
+        FIN410:{code:'FIN 410',name:'Portfolio Management',cr:3,cat:'major',desc:'Risk, return, and managing investment portfolios.',pre:['FIN310'],careers:['Financial Analyst']},
+        ECON410:{code:'ECON 410',name:'International Economics',cr:3,cat:'major',desc:'Trade, exchange rates, and the global economy.',pre:['ECON202'],careers:['Economist']},
+        AECAP1:{code:'AE 490',name:'Capstone I: Analysis',cr:3,cat:'cap',desc:'Scoping a data-driven accounting or economics research project.',pre:['ECON210']},
+        AECAP2:{code:'AE 491',name:'Capstone II: Report',cr:3,cat:'cap',desc:'Delivering findings and a professional written report.',pre:['AECAP1']},
+        ENGL101:{code:'ENGL 101',name:'Composition',cr:3,cat:'gen',desc:'College writing and argumentation.',pre:[],flex:true},
+        HUM110:{code:'HUM 110',name:'Humanities Elective',cr:3,cat:'gen',desc:'Breadth requirement in the humanities.',pre:[],flex:true},
+        SOC110:{code:'SOC 110',name:'Social Science Elective',cr:3,cat:'gen',desc:'Breadth requirement in the social sciences.',pre:[],flex:true},
+        FREE1:{code:'ELEC 1',name:'Free Elective',cr:3,cat:'gen',desc:'Open elective toward the 150-credit CPA path or a minor.',pre:[],flex:true},
+        FREE2:{code:'ELEC 2',name:'Free Elective',cr:3,cat:'gen',desc:'Open elective toward the 150-credit CPA path or a minor.',pre:[],flex:true}
+      },
+      plan: [
+        ['ACCT101','ECON101','MATH121','ENGL101'],
+        ['ACCT102','ECON102','STAT201','HUM110'],
+        ['ACCT201','ECON201','FIN201','BLAW201'],
+        ['ACCT202','ECON202','ECON210','MIS201'],
+        ['ACCT301','ACCT310','ECON301','FIN301'],
+        ['ACCT302','ACCT320','ECON310','FIN310'],
+        ['ACCT401','ACCT410','ECON401_x','AECAP1'],
+        ['FIN410','ECON410','FREE1','AECAP2']
+      ]
+    }
+  };
+  // fix: Accounting plan referenced a non-existent id — replace with a real course
+  MAJORS['Accounting & Economics'].plan[6][2] = 'FREE2';
+
+  const YEARS = ['Freshman','Sophomore','Junior','Senior'];
+  const WORKLOADS = {
+    'Balanced':   { target:15, blurb:'~15 credits/semester — the standard on-time pace.' },
+    'Fast-Track': { target:18, blurb:'~18 credits/semester — heavier load to accelerate or double up.' },
+    'Low-Stress': { target:12, blurb:'~12 credits/semester — lighter load, more breathing room.' }
+  };
+
+  /* ===== Philadelphia universities & academic calendars ===== */
+  const UNIVERSITIES = {
+    'Drexel University':           { short:'Drexel',    system:'quarter',  years:5, terms:['Fall','Winter','Spring','Summer'],
+                                     coop:[7,8,11,12,15,16], breakT:[3,19],
+                                     note:'5-year co-op program · quarter calendar' },
+    'University of Pennsylvania':  { short:'Penn',      system:'semester', years:4, terms:['Fall','Spring'], note:'4-year · semester calendar' },
+    'Temple University':           { short:'Temple',    system:'semester', years:4, terms:['Fall','Spring'], note:'4-year · semester calendar' },
+    "Saint Joseph's University":   { short:"St. Joe's", system:'semester', years:4, terms:['Fall','Spring'], note:'4-year · semester calendar' },
+    'Thomas Jefferson University': { short:'Jefferson', system:'semester', years:4, terms:['Fall','Spring'], note:'4-year · semester calendar' },
+    'La Salle University':         { short:'La Salle',  system:'semester', years:4, terms:['Fall','Spring'], note:'4-year · semester calendar' }
+  };
+  const DEFAULT_UNIVERSITY = 'Drexel University';
+  // Philly-flavored co-op role suggestions the AI Advisor slots into Drexel co-op blocks
+  const COOP_ROLES = {
+    'Accounting & Economics':  ['Financial Associate — Vanguard (Malvern)','Audit Co-op — PwC Philadelphia','Corporate Finance Co-op — Comcast','Tax Co-op — EY Philadelphia'],
+    'Computer Science':        ['Software Engineering Co-op — Comcast','Backend Co-op — SEI (Oaks, PA)','Cloud Co-op — Amazon (Philadelphia)','Security Co-op — Independence Blue Cross'],
+    'Business Administration': ['Product Co-op — Comcast','Operations Co-op — QVC (West Chester)','Brand Co-op — Urban Outfitters','Strategy Co-op — Vanguard']
+  };
+  const uni = () => UNIVERSITIES[state.university] || UNIVERSITIES[DEFAULT_UNIVERSITY];
+
+  /* =========================================================================
+     STATE
+     ========================================================================= */
+  let state = {
+    step: 1,
+    university: null,      // selected Philadelphia institution
+    major: null,
+    year: null,
+    career: null,
+    workload: null,
+    prior: new Set(),      // course ids marked complete
+    terms: []              // [{year, term, type:'class'|'coop'|'break', courses:[ids], coopNum?, role?}]
+  };
+
+  const el = (id) => document.getElementById(id);
+  // courses added straight from the database (no wizard) live here, keyed by normalized code
+  const customCourses = {};
+  let pendingAdd = null;   // course id queued to slot into a term
+  // unified course lookup: major curriculum (if any) merged with database-added courses
+  function courseData(){
+    const base = (state.major && MAJORS[state.major]) ? MAJORS[state.major].courses : {};
+    return Object.assign({}, base, customCourses);
+  }
+
+  /* =========================================================================
+     INTAKE FLOW
+     ========================================================================= */
+  function renderMajorChoices(){
+    el('majorChoices').innerHTML = Object.keys(MAJORS).map(m => `
+      <button type="button" class="choice ${state.major===m?'active':''}" onclick="pickMajor('${m}')">
+        <span class="t">${m}</span>
+        <span class="d">${MAJORS[m].careers.length} career tracks · prerequisite-mapped</span>
+      </button>`).join('');
+  }
+  function pickMajor(m){
+    state.major = m;
+    // reset downstream selections that depend on major
+    state.career = null; state.prior = new Set();
+    renderMajorChoices();
+    updateStepHint();
+  }
+
+  function renderUniversityList(){
+    el('uniList').innerHTML = Object.keys(UNIVERSITIES).map(u=>`<option value="${u}"></option>`).join('');
+    if(state.university) el('uniInput').value = state.university;
+    updateUniNote();
+  }
+  function pickUniversity(val){
+    const match = Object.keys(UNIVERSITIES).find(u=> u.toLowerCase() === val.trim().toLowerCase());
+    state.university = match || null;
+    updateUniNote();
+    updateStepHint();
+  }
+  function updateUniNote(){
+    const u = state.university && UNIVERSITIES[state.university];
+    el('uniNote').textContent = u ? `✓ ${UNIVERSITIES[state.university].short} — ${u.note}` : (el('uniInput').value ? 'Pick a school from the list' : '');
+  }
+
+  function renderYearChoices(){
+    el('yearChoices').innerHTML = YEARS.map(y => `
+      <button type="button" class="choice ${state.year===y?'active':''}" onclick="pickYear('${y}')">
+        <span class="t">${y}</span>
+        <span class="d">Year ${YEARS.indexOf(y)+1}</span>
+      </button>`).join('');
+  }
+  function pickYear(y){ state.year = y; renderYearChoices(); }
+
+  function renderCareerChoices(){
+    const list = MAJORS[state.major].careers;
+    el('careerChoices').innerHTML = list.map(c => `
+      <button type="button" class="choice ${state.career===c?'active':''}" onclick="pickCareer('${c.replace(/'/g,"\\'")}')">
+        <span class="t">${c}</span>
+        <span class="d">Bias electives toward this path</span>
+      </button>`).join('');
+  }
+  function pickCareer(c){ state.career = c; renderCareerChoices(); }
+
+  function renderWorkloadChoices(){
+    el('workloadChoices').innerHTML = Object.keys(WORKLOADS).map(w => `
+      <button type="button" class="choice ${state.workload===w?'active':''}" onclick="pickWorkload('${w}')">
+        <span class="t">${w}</span>
+        <span class="d">${WORKLOADS[w].blurb}</span>
+      </button>`).join('');
+  }
+  function pickWorkload(w){ state.workload = w; renderWorkloadChoices(); }
+
+  function renderPriorChoices(){
+    const c = courseData();
+    // offer real (non gen-ed filler) courses so "prior credit" feels meaningful
+    const ids = Object.keys(c).filter(id => !c[id].flex);
+    el('priorChoices').innerHTML = ids.map(id => `
+      <button type="button" data-id="${id}" data-label="${(c[id].code+' '+c[id].name).toLowerCase()}"
+        class="choice !flex-row !items-center !p-2.5 !gap-2 ${state.prior.has(id)?'active':''}" style="width:auto" onclick="togglePrior('${id}')">
+        <span style="font-weight:800;font-size:.8rem">${c[id].code}</span>
+        <span class="d">${c[id].name}</span>
+      </button>`).join('');
+  }
+  function togglePrior(id){
+    if(state.prior.has(id)) state.prior.delete(id); else state.prior.add(id);
+    renderPriorChoices();
+  }
+  function filterPrior(){
+    const q = el('priorSearch').value.toLowerCase();
+    el('priorChoices').querySelectorAll('[data-id]').forEach(b=>{
+      b.style.display = (!q || b.dataset.label.includes(q)) ? '' : 'none';
+    });
+  }
+
+  function showStep(n){
+    state.step = n;
+    document.querySelectorAll('.qstep').forEach(s => s.hidden = (+s.dataset.step !== n));
+    for(let i=1;i<=5;i++){ el('pg'+i).style.width = (i <= n ? '100%' : '0%'); }
+    el('backBtn').hidden = (n===1);
+    el('nextBtn').textContent = (n===5 ? 'Generate My Map ✨' : 'Continue →');
+    if(n===1){ renderUniversityList(); renderMajorChoices(); }
+    if(n===2) renderYearChoices();
+    if(n===3) renderCareerChoices();
+    if(n===4) renderWorkloadChoices();
+    if(n===5) renderPriorChoices();
+    updateStepHint();
+  }
+  function stepNeeds(){
+    return { 1:!(state.university && state.major), 2:!state.year, 3:!state.career, 4:!state.workload, 5:false };
+  }
+  function updateStepHint(){
+    const need = stepNeeds();
+    el('stepHint').textContent = need[state.step] ? (state.step===1 ? 'Pick a school and a major' : 'Pick one to continue') : '';
+    el('nextBtn').style.opacity = need[state.step] ? .5 : 1;
+  }
+  function nextQ(){
+    if(stepNeeds()[state.step]){ toast(state.step===1 ? 'Choose a school and a major' : 'Please make a selection'); return; }
+    if(state.step < 5){ showStep(state.step+1); return; }
+    generateMap();
+  }
+  function prevQ(){ if(state.step>1) showStep(state.step-1); }
+
+  /* =========================================================================
+     TIMELINE ENGINE — builds a term grid from the selected university's calendar
+     (4-year semester schools, or Drexel's 5-year quarter system with co-op blocks)
+     ========================================================================= */
+  function loadTarget(){ // per-term credit target (quarters carry fewer credits than semesters)
+    const t = WORKLOADS[state.workload].target;
+    return uni().system === 'quarter' ? Math.max(9, t - 3) : t;
+  }
+
+  function buildTimeline(){
+    const u = uni();
+    const tpy = u.terms.length;
+    const total = u.years * tpy;
+    const terms = [];
+    for(let i=0;i<total;i++){
+      let type = 'class';
+      if(u.system === 'quarter'){
+        if((u.coop||[]).includes(i)) type = 'coop';
+        else if((u.breakT||[]).includes(i)) type = 'break';
+      }
+      terms.push({ year: Math.floor(i/tpy)+1, term: u.terms[i%tpy], type, courses: [] });
+    }
+    // ordered, prereq-respecting id list from the major's canonical plan, minus prior credits
+    // (empty when there's no major yet — a blank schedule the user fills from the database)
+    const ordered = state.major ? MAJORS[state.major].plan.flat().filter(id => !state.prior.has(id)) : [];
+    const classIdx = terms.map((t,i)=> t.type==='class' ? i : -1).filter(i=> i>=0);
+    // balanced distribution across class terms
+    const n = ordered.length, slots = classIdx.length || 1;
+    const base = Math.floor(n/slots), rem = n % slots;
+    let p = 0;
+    classIdx.forEach((ci,k)=>{ const take = base + (k < rem ? 1 : 0); for(let j=0;j<take && p<n;j++) terms[ci].courses.push(ordered[p++]); });
+    state.terms = terms;
+    SEMESTER_LABELS = terms.map(t=> `${t.term} · Year ${t.year}`);
+    assignCoops();
+  }
+  function assignCoops(){
+    const roles = COOP_ROLES[state.major] || COOP_ROLES['Business Administration'];
+    let coopNum = 0, half = 0, role = '';
+    state.terms.forEach(t=>{
+      if(t.type === 'coop'){
+        if(half === 0){ coopNum++; role = roles[(coopNum-1) % roles.length]; }
+        t.coopNum = coopNum; t.role = role; t.coopHalf = half === 0 ? 'start' : 'end';
+        half = half === 0 ? 1 : 0;
+      }
+    });
+  }
+  const classTerms = () => state.terms.map((t,i)=>({t,i})).filter(x=> x.t.type==='class');
+
+  function generateMap(){
+    if(!state.university) state.university = DEFAULT_UNIVERSITY;
+    el('intake').hidden = true;
+    el('loading').hidden = false;
+    const msgs = ['Resolving prerequisites…','Sequencing '+state.major+' core…',
+      uni().system==='quarter' ? 'Laying out Drexel co-op quarters…' : 'Building your semester grid…',
+      'Aligning electives with '+state.career+'…'];
+    let mi=0; el('loadMsg').textContent = msgs[0];
+    const iv = setInterval(()=>{ mi++; if(msgs[mi]) el('loadMsg').textContent = msgs[mi]; }, 480);
+
+    buildTimeline();
+
+    setTimeout(()=>{
+      clearInterval(iv);
+      el('loading').hidden = true;
+      showWorkspace();
+      el('btnRestart').hidden = false;
+      updatePlanCount();
+      window.scrollTo({top:0,behavior:'smooth'});
+    }, 1800);
+  }
+
+  /* =========================================================================
+     VIEW SWITCHING — database home / schedule drawer / full planner / wizard
+     ========================================================================= */
+  function showDb(){
+    el('intake').hidden = true; el('workspace').hidden = true; el('loading').hidden = true;
+    el('dbview').hidden = false;
+    el('navDb').hidden = true;                 // already here
+    refreshLiveUI();
+    window.scrollTo({top:0,behavior:'smooth'});
+  }
+  function showWorkspace(){
+    if(!state.terms.length) initBlankPlan();
+    el('intake').hidden = true; el('dbview').hidden = true; el('loading').hidden = true;
+    el('workspace').hidden = false;
+    el('navDb').hidden = false;
+    el('btnRestart').hidden = false;
+    populateSchoolSelect();
+    renderWorkspaceHeader();
+    renderTimeline(true);
+    runAdvisor();
+    closePlan();
+    window.scrollTo({top:0,behavior:'smooth'});
+  }
+  function openGuided(){
+    closePlan();
+    el('dbview').hidden = true; el('workspace').hidden = true;
+    el('intake').hidden = false;
+    el('navDb').hidden = false;
+    showStep(1);
+    window.scrollTo({top:0,behavior:'smooth'});
+  }
+  function openPlan(){
+    if(!state.terms.length) initBlankPlan();
+    populatePdSchool();
+    renderPlanDrawer();
+    el('planScrim').classList.add('open');
+    el('planDrawer').classList.add('open');
+    document.documentElement.classList.add('drawer-pushed');   // push content aside
+  }
+  function closePlan(){
+    el('planScrim').classList.remove('open');
+    el('planDrawer').classList.remove('open');
+    document.documentElement.classList.remove('drawer-pushed');
+    if(pendingAdd){ pendingAdd = null; renderLiveTable(); }
+  }
+  function clearPlan(){
+    state.terms.forEach(t=> t.courses = []);
+    for(const k in customCourses) delete customCourses[k];
+    pendingAdd = null;
+    renderPlanDrawer(); updatePlanCount();
+    if(!el('workspace').hidden){ renderTimeline(false); runAdvisor(); }
+    renderLiveTable();
+    toast('Schedule cleared');
+  }
+  // create an empty timeline (default Drexel) the user fills from the database
+  function initBlankPlan(){
+    if(!state.university) state.university = DEFAULT_UNIVERSITY;
+    if(!state.year) state.year = 'Freshman';
+    if(!state.workload) state.workload = 'Balanced';
+    buildTimeline();  // no major → empty terms
+  }
+  function updatePlanCount(){
+    const n = state.terms.reduce((s,t)=> s + t.courses.length, 0);
+    const badge = el('planCount'); if(badge) badge.textContent = n;
+  }
+  function populatePdSchool(){
+    const sel = el('pdSchool'); if(!sel) return;
+    sel.innerHTML = Object.keys(UNIVERSITIES).map(u=>`<option ${u===state.university?'selected':''}>${UNIVERSITIES[u].short}${u===state.university?'':''}</option>`).join('');
+    // use full names as values
+    sel.innerHTML = Object.keys(UNIVERSITIES).map(u=>`<option value="${u}" ${u===state.university?'selected':''}>${UNIVERSITIES[u].short}</option>`).join('');
+  }
+
+  /* =========================================================================
+     ADD-TO-SCHEDULE (database → timeline) — locks the specific section/CRN
+     ========================================================================= */
+  const lockedSection = {};   // course id -> chosen section meeting {crn, days, start, end, ...}
+  function sectionByCrn(crn){ return liveData ? liveData.sections.find(s=> String(s.crn)===String(crn)) : null; }
+  function sectionMeeting(s){
+    return { crn:String(s.crn), days:(s.days&&s.days.length)?s.days:null, start:s.start_time||null, end:s.end_time||null,
+             method:s.instruction_method||'', instr:(s.instructors&&s.instructors[0]&&s.instructors[0].name)||'STAFF' };
+  }
+  function ensureCourseFromSection(s){
+    const id = normKey(s.subject_code, s.course_number);
+    const existing = (state.major && MAJORS[state.major] && MAJORS[state.major].courses[id]);
+    if(!existing && !customCourses[id]){
+      const hasPre = !/^\s*(none)?\s*$/i.test(s.prereqs||'');
+      customCourses[id] = {
+        code:`${s.subject_code} ${s.course_number}`, name:s.course_title,
+        cr:Number(s.credits)||3, cat:'core',
+        desc:`${s.course_title}. Added from the ${liveData.term} schedule` + (hasPre? ` · prerequisites: ${s.prereqs}` : '') + '.',
+        pre:[], careers:[], _fromDb:true
+      };
+    }
+    return id;
+  }
+  function firstOpenClassTerm(){
+    const c = courseData(); const target = loadTarget();
+    const cts = classTerms();
+    const withRoom = cts.find(({t})=> t.courses.reduce((s,id)=>s+(c[id]?.cr||0),0) < target);
+    return (withRoom || cts[0]).i;
+  }
+  function courseIsPlaced(id){ return semesterOf(id) > -1; }
+  const idFromSection = (s)=> normKey(s.subject_code, s.course_number);
+
+  function addFromRow(crn){
+    const s = sectionByCrn(crn); if(!s) return;
+    if(!state.terms.length) initBlankPlan();
+    const id = ensureCourseFromSection(s);
+    const already = courseIsPlaced(id);
+    lockedSection[id] = sectionMeeting(s);      // lock in this exact CRN
+    if(already){
+      // swap the locked section without moving the course
+      openPlan();
+      if(!el('workspace').hidden) renderTimeline(false);
+      renderPlanDrawer(); renderLiveTable();
+      toast(`Locked ${courseData()[id].code} → section ${s.section} · CRN ${crn}`);
+      return;
+    }
+    const dest = firstOpenClassTerm();
+    state.terms[dest].courses.push(id);
+    pendingAdd = id;
+    updatePlanCount();
+    if(!el('workspace').hidden){ renderTimeline(false); runAdvisor(); }
+    renderLiveTable();
+    openPlan();
+    const clash = conflictIdsInTerm(dest).has(id);
+    toast(clash
+      ? `⚠ ${courseData()[id].code} added to ${SEMESTER_LABELS[dest]} — time conflict, drag to move`
+      : `Added ${courseData()[id].code} (CRN ${crn}) → ${SEMESTER_LABELS[dest]}`);
+    setTimeout(()=>{ if(pendingAdd===id){ pendingAdd=null; renderPlanDrawer(); } }, 2600);
+  }
+  // + / ✓ toggle straight from a table row
+  function toggleRow(crn){
+    const s = sectionByCrn(crn); if(!s) return;
+    const id = idFromSection(s);
+    if(courseIsPlaced(id)) removeFromPlan(id);
+    else addFromRow(crn);
+  }
+  function removeFromPlan(id){
+    for(const t of state.terms){ const k=t.courses.indexOf(id); if(k>-1){ t.courses.splice(k,1); break; } }
+    delete lockedSection[id];
+    if(customCourses[id] && !courseIsPlaced(id)) delete customCourses[id];
+    renderPlanDrawer(); updatePlanCount();
+    if(!el('workspace').hidden){ renderTimeline(false); runAdvisor(); }
+    renderLiveTable();
+    toast('Removed from schedule');
+  }
+  function placePending(termIdx){
+    if(pendingAdd==null) return;
+    if(state.terms[termIdx]?.type!=='class'){ toast('Co-op & break terms can’t hold courses'); return; }
+    const id = pendingAdd;
+    moveCourse(id, termIdx);
+    const clash = conflictIdsInTerm(termIdx).has(id);
+    toast(clash ? `⚠ Moved ${courseData()[id].code} — still a time conflict here` : `Moved ${courseData()[id].code} → ${SEMESTER_LABELS[termIdx]}`);
+    pendingAdd = null;
+    renderPlanDrawer(); renderLiveTable();
+  }
+
+  /* ===== time-conflict detection (ignores TBD / async sections) ===== */
+  const toMin = (hhmm)=>{ const [h,m]=hhmm.split(':').map(Number); return h*60+m; };
+  function sectionsClash(a,b){
+    if(!a||!b) return false;
+    if(!a.days || !b.days || !a.start || !a.end || !b.start || !b.end) return false; // async/TBD never clash
+    if(!a.days.some(d=> b.days.includes(d))) return false;                            // no shared day
+    return toMin(a.start) < toMin(b.end) && toMin(b.start) < toMin(a.end);            // overlapping window
+  }
+  // ids in a term that clash with another course there
+  function conflictIdsInTerm(termIdx){
+    const t = state.terms[termIdx]; const bad = new Set();
+    if(!t || t.type!=='class') return bad;
+    const ids = t.courses.filter(id=> lockedSection[id]);
+    for(let a=0;a<ids.length;a++) for(let b=a+1;b<ids.length;b++){
+      if(sectionsClash(lockedSection[ids[a]], lockedSection[ids[b]])){ bad.add(ids[a]); bad.add(ids[b]); }
+    }
+    return bad;
+  }
+  function conflictPairsInTerm(termIdx){
+    const t = state.terms[termIdx]; const pairs = [];
+    if(!t || t.type!=='class') return pairs;
+    const c = courseData();
+    const ids = t.courses.filter(id=> lockedSection[id]);
+    for(let a=0;a<ids.length;a++) for(let b=a+1;b<ids.length;b++){
+      if(sectionsClash(lockedSection[ids[a]], lockedSection[ids[b]])) pairs.push([c[ids[a]]?.code, c[ids[b]]?.code]);
+    }
+    return pairs;
+  }
+  function totalConflicts(){ let n=0; state.terms.forEach((t,i)=>{ n += conflictPairsInTerm(i).length; }); return n; }
+
+  /* =========================================================================
+     SCHEDULE DRAWER RENDERING
+     ========================================================================= */
+  function renderPlanDrawer(){
+    const c = courseData();
+    const total = state.terms.reduce((s,t)=> s + t.courses.reduce((a,id)=>a+(c[id]?.cr||0),0), 0);
+    const count = state.terms.reduce((s,t)=> s + t.courses.length, 0);
+    el('pdCredits').textContent = total;
+    el('pdCourses').textContent = count;
+    const v = computeViolations();
+    const clashes = totalConflicts();
+    const hEl = el('pdHealth');
+    if(v.size){ hEl.textContent='Fix'; hEl.style.color='var(--red)'; }
+    else if(clashes){ hEl.textContent='Clash'; hEl.style.color='var(--red)'; }
+    else { hEl.textContent='OK'; hEl.style.color='var(--green)'; }
+    el('pdSub').textContent = `${uni().short} · ${uni().system==='quarter'?'5-yr co-op quarters':'4-yr semesters'}`;
+
+    // pending banner
+    const pb = el('pdPending');
+    if(pendingAdd!=null && c[pendingAdd]){
+      pb.hidden = false;
+      pb.innerHTML = `Placing <b>${c[pendingAdd].code}</b> — tap a highlighted term to move it, or drag it.`;
+    } else pb.hidden = true;
+
+    const bad = computeViolations();
+    el('pdTimeline').innerHTML = state.terms.map((t,i)=>{
+      if(t.type==='coop') return `<div class="pd-coop">🧭 Co-op ${t.coopNum} · ${t.term} Y${t.year}<div style="color:var(--muted);margin-top:2px">${t.role}</div></div>`;
+      if(t.type==='break') return `<div class="pd-coop" style="color:var(--muted);border-color:var(--line)">☀️ ${t.term} Y${t.year} · break</div>`;
+      const cr = t.courses.reduce((s,id)=>s+(c[id]?.cr||0),0);
+      const eligible = pendingAdd!=null;
+      const clashIds = conflictIdsInTerm(i);
+      const pairs = conflictPairsInTerm(i);
+      return `<div class="pd-term ${eligible?'eligible':''} ${pairs.length?'conflict':''}" data-sem="${i}"
+          ${eligible?`onclick="placePending(${i})"`:''}
+          ondragover="onDragOver(event,${i})" ondragleave="onDragLeave(event)" ondrop="onDrop(event,${i})">
+        <div class="flex items-center justify-between mb-2">
+          <span class="text-xs font-bold">${t.term} · Year ${t.year}</span>
+          <span class="text-[.68rem]" style="color:var(--muted)">${cr} cr</span>
+        </div>
+        <div class="flex flex-col gap-1.5">
+          ${t.courses.map(id=>{ const co=c[id]; if(!co) return ''; const inv=bad.has(id); const clash=clashIds.has(id); const sec=lockedSection[id];
+            const meta = sec ? `CRN ${sec.crn}${sec.days? ' · '+sec.days.map(d=>DAY_ABBR[d]||'').join('')+' '+t12(sec.start) : ' · async'}` : '';
+            return `<div class="pd-chip ${clash?'conflict':''}" draggable="true" data-id="${id}" style="${inv&&!clash?'border-color:color-mix(in srgb,var(--red) 55%,var(--line))':''}"
+              ondragstart="onDragStart(event,'${id}')" ondragend="onDragEnd(event)">
+              <span class="cat-dot" style="background:${clash?'var(--red)':CAT[co.cat]?.color||'var(--muted)'}"></span>
+              <span onclick="openModal('${id}')" style="cursor:pointer;min-width:0"><b>${co.code}</b> <span style="color:var(--muted)">${co.cr}cr</span>${meta?`<div style="color:var(--muted);font-size:.68rem">${meta}</div>`:''}</span>
+              <span class="x" data-tip="Remove" onclick="removeFromPlan('${id}')">✕</span>
+            </div>`; }).join('') || `<div class="text-xs italic" style="color:var(--muted)">${eligible?'Tap to add here':'Empty'}</div>`}
+        </div>
+        ${pairs.length? `<div class="conflict-note">⚠ Time conflict: ${pairs.map(p=>p.join(' ↔ ')).join(', ')}</div>` : ''}
+      </div>`;
+    }).join('');
+    renderWeekGrid();
+    updatePlanCount();
+  }
+
+  function populateSchoolSelect(){
+    const sel = el('schoolSelect'); if(!sel) return;
+    sel.innerHTML = Object.keys(UNIVERSITIES).map(u=>`<option ${u===state.university?'selected':''}>${u}</option>`).join('');
+  }
+  function distributeIntoClassTerms(ids){
+    if(!ids.length) return;
+    const cts = classTerms().map(x=> x.i);
+    const n = ids.length, slots = cts.length||1;
+    const base = Math.floor(n/slots), rem = n%slots; let p=0;
+    cts.forEach((ci,k)=>{ const take = base + (k<rem?1:0); for(let j=0;j<take && p<n;j++) state.terms[ci].courses.push(ids[p++]); });
+  }
+  function switchUniversity(name){
+    if(!UNIVERSITIES[name] || name === state.university) return;
+    // preserve database-added courses across a calendar change (major plans regenerate)
+    const carry = state.major ? [] : state.terms.flatMap(t=> t.courses);
+    state.university = name;
+    buildTimeline();
+    if(carry.length) distributeIntoClassTerms(carry);
+    populateSchoolSelect(); populatePdSchool();
+    renderWorkspaceHeader();
+    if(!el('workspace').hidden) renderTimeline(true);
+    renderPlanDrawer();
+    runAdvisor();
+    updatePlanCount();
+    const u = uni();
+    toast(`Switched to ${u.short} — ${u.system==='quarter' ? '5-year co-op quarters' : '4-year semesters'}`);
+  }
+
+  function renderWorkspaceHeader(){
+    const u = uni();
+    el('wsTitle').textContent = state.major || 'My Schedule';
+    el('wsSub').textContent = state.major
+      ? `${u.short} · ${state.year} · Goal: ${state.career} · ${state.workload} load`
+      : `${u.short} · built from the Course Database`;
+    const sub = el('mapSubhead');
+    if(sub) sub.textContent = u.system==='quarter' ? 'Drag courses between quarters · co-op terms are locked' : 'Drag courses between semesters';
+  }
+
+  /* =========================================================================
+     TIMELINE RENDERING + DRAG & DROP
+     ========================================================================= */
+  const currentYearIndex = () => Math.max(0, YEARS.indexOf(state.year)); // 0..3
+  const curYearNum = () => currentYearIndex() + 1;
+
+  function courseCardHTML(id){
+    const c = courseData()[id];
+    if(!c) return '';
+    const cat = CAT[c.cat];
+    return `<div class="course" draggable="true" data-id="${id}"
+        ondragstart="onDragStart(event,'${id}')" ondragend="onDragEnd(event)" onclick="openModal('${id}')">
+        <div class="flex items-start justify-between gap-2">
+          <div class="min-w-0">
+            <div class="code">${c.code}</div>
+            <div class="nm">${c.name}</div>
+          </div>
+          <span class="badge" style="background:rgba(148,163,184,.12);color:var(--muted)">${c.cr} cr</span>
+        </div>
+        <div class="meta">
+          <span class="cat-dot" style="background:${cat.color}"></span>
+          <span class="text-[.66rem]" style="color:var(--muted)">${cat.label}</span>
+          <span class="ml-auto flex items-center gap-1.5">
+            ${c.careers && c.careers.includes(state.career) ? '<span class="badge" style="background:rgba(74,222,128,.14);color:var(--green)">★ Goal</span>':''}
+            ${liveBadgeHTML(id)}
+          </span>
+        </div>
+      </div>`;
+  }
+
+  function renderTimeline(animate){
+    const c = courseData();
+    const u = uni();
+    const tpy = u.terms.length;
+    const target = loadTarget();
+    const grid = el('mapGrid');
+    grid.style.gridTemplateColumns = `repeat(${tpy}, minmax(0,1fr))`;
+    grid.className = 'grid gap-3'; // override the default sm:grid-cols-2
+
+    grid.innerHTML = state.terms.map((t, i)=>{
+      const delay = animate ? `style="animation-delay:${i*35}ms"` : `style="animation:none"`;
+      if(t.type === 'coop'){
+        return `<div class="term-cell" ${delay}>
+          <div class="coop-block">
+            <div class="coop-badge">🧭 Full-Time Co-op</div>
+            <div class="coop-title">Co-op ${t.coopNum} · ${t.term} · Year ${t.year}</div>
+            <div class="coop-role">💼 ${t.role}</div>
+            <div class="coop-hint">Courses paused — you're working full-time this term.</div>
+          </div></div>`;
+      }
+      if(t.type === 'break'){
+        return `<div class="term-cell" ${delay}>
+          <div class="break-block"><div>☀️ ${t.term} · Year ${t.year}<div style="margin-top:4px">Break — no classes scheduled</div></div></div></div>`;
+      }
+      const cr = t.courses.reduce((s,id)=> s+(c[id]?.cr||0),0);
+      const isPast = t.year < curYearNum();
+      const isCurrent = t.year === curYearNum();
+      const over = cr > target + 1;
+      return `<div class="term-cell ${isCurrent?'current':''}" ${delay}>
+        <div class="flex items-center justify-between mb-2">
+          <div class="flex items-center gap-2 flex-wrap">
+            <span class="text-sm font-bold">${t.term} · Year ${t.year}</span>
+            ${isCurrent?'<span class="badge" style="background:color-mix(in srgb,var(--accent) 18%,transparent);color:var(--accent)">You are here</span>':''}
+            ${isPast?'<span class="badge" style="background:var(--hover);color:var(--muted)">Completed</span>':''}
+          </div>
+          <span class="text-xs font-semibold" style="color:${over?'var(--yellow)':'var(--muted)'}">${cr} cr</span>
+        </div>
+        <div class="semester ${over?'over-load':''}" data-sem="${i}"
+          ondragover="onDragOver(event,${i})" ondragleave="onDragLeave(event)" ondrop="onDrop(event,${i})">
+          ${t.courses.map(courseCardHTML).join('') || `<div class="text-xs italic grid place-items-center flex-1" style="color:var(--muted)">Drop courses here</div>`}
+        </div>
+      </div>`;
+    }).join('');
+    markViolations();
+    updateStats();
+  }
+  // back-compat alias
+  const renderMap = () => renderTimeline(false);
+
+  let dragId = null;
+  function onDragStart(e,id){ dragId=id; e.currentTarget.classList.add('dragging'); e.dataTransfer.effectAllowed='move'; }
+  function onDragEnd(e){ e.currentTarget.classList.remove('dragging'); document.querySelectorAll('.semester').forEach(s=>s.classList.remove('drop-target')); }
+  function onDragOver(e,i){ if(state.terms[i]?.type!=='class') return; e.preventDefault(); e.currentTarget.classList.add('drop-target'); }
+  function onDragLeave(e){ e.currentTarget.classList.remove('drop-target'); }
+  function onDrop(e, semIdx){
+    e.preventDefault();
+    e.currentTarget.classList.remove('drop-target');
+    if(dragId==null) return;
+    if(state.terms[semIdx]?.type!=='class'){ toast('Co-op & break terms can’t hold courses'); dragId=null; return; }
+    moveCourse(dragId, semIdx);
+    dragId=null;
+  }
+
+  function moveCourse(id, destTerm){
+    if(state.terms[destTerm]?.type!=='class') return;
+    for(const t of state.terms){ const k = t.courses.indexOf(id); if(k>-1){ t.courses.splice(k,1); break; } }
+    state.terms[destTerm].courses.push(id);
+    if(!el('workspace').hidden){ renderTimeline(false); runAdvisor(); }
+    if(el('planDrawer').classList.contains('open')) renderPlanDrawer();
+    updatePlanCount();
+  }
+
+  // find which term a course sits in (-1 if not placed)
+  function semesterOf(id){
+    for(let i=0;i<state.terms.length;i++){ if(state.terms[i].courses.includes(id)) return i; }
+    return -1;
+  }
+
+  function markViolations(){
+    const bad = computeViolations();
+    const clash = new Set(); state.terms.forEach((t,i)=> conflictIdsInTerm(i).forEach(id=> clash.add(id)));
+    document.querySelectorAll('.course').forEach(elx=>{
+      elx.classList.toggle('invalid', bad.has(elx.dataset.id) || clash.has(elx.dataset.id));
+    });
+  }
+  // a course is violating if a prereq is missing (not prior, not in an earlier semester)
+  function computeViolations(){
+    const c = courseData();
+    const bad = new Set();
+    for(let i=0;i<state.terms.length;i++){
+      for(const id of state.terms[i].courses){
+        const pre = c[id]?.pre || [];
+        for(const p of pre){
+          if(state.prior.has(p)) continue;
+          const ps = semesterOf(p);
+          if(ps === -1 || ps >= i){ bad.add(id); }
+        }
+      }
+    }
+    return bad;
+  }
+
+  function updateStats(){
+    const c = courseData();
+    let total=0; state.terms.forEach(t=> t.courses.forEach(id=> total += c[id]?.cr||0));
+    let prior=0; state.prior.forEach(id=> prior += c[id]?.cr||0);
+    el('statCredits').textContent = total + prior;
+    el('statPrior').textContent = prior;
+    // grad timeline: year of the last term that has courses
+    let gradYear = uni().years; state.terms.forEach(t=>{ if(t.courses.length) gradYear = t.year; });
+    el('statGrad').textContent = gradYear + (gradYear===1?' yr':' yrs');
+    const v = computeViolations();
+    const clashes = totalConflicts();
+    const target = loadTarget();
+    const overloaded = classTerms().some(({t})=> t.courses.reduce((s,id)=>s+(c[id]?.cr||0),0) > target+1);
+    const health = el('statHealth');
+    if(v.size){ health.textContent='Needs fixes'; health.style.color='var(--red)'; }
+    else if(clashes){ health.textContent='Time clash'; health.style.color='var(--red)'; }
+    else if(overloaded){ health.textContent='Heavy'; health.style.color='var(--yellow)'; }
+    else { health.textContent='Healthy'; health.style.color='var(--green)'; }
+  }
+
+  /* =========================================================================
+     AI ADVISOR — live analysis
+     ========================================================================= */
+  function runAdvisor(){
+    const c = courseData();
+    const items = [];
+    const target = loadTarget();
+
+    // 1) prereq violations (errors)
+    const v = computeViolations();
+    if(v.size){
+      for(const id of v){
+        const missing = (c[id].pre||[]).filter(p=> !state.prior.has(p) && (semesterOf(p)===-1 || semesterOf(p)>=semesterOf(id)));
+        items.push({sev:'error', icon:'⛔', h:`${c[id].code} is out of sequence`,
+          b:`It needs ${missing.map(p=>c[p].code).join(', ')} beforehand. Move ${c[id].code} later, or pull its prerequisite earlier.`});
+      }
+    }
+
+    // 2) per-term load + reading-heavy combos (class terms only)
+    classTerms().forEach(({t,i})=>{
+      const cr = t.courses.reduce((s,id)=> s+(c[id]?.cr||0),0);
+      if(cr > target + 2){
+        items.push({sev:'warn', icon:'⚠️', h:`${SEMESTER_LABELS[i]} is overloaded`,
+          b:`${cr} credits is above your ${state.workload.toLowerCase()} target for a ${uni().system==='quarter'?'quarter':'semester'} (${target}). Consider shifting an elective to a lighter term.`});
+      }
+      const heavy = t.courses.filter(id=> c[id]?.heavy);
+      if(heavy.length >= 3){
+        items.push({sev:'warn', icon:'📚', h:`Heavy reading/quant load in ${SEMESTER_LABELS[i]}`,
+          b:`You've stacked ${heavy.map(id=>c[id].code).join(', ')} together — all reading/quant-intensive. Spreading one out protects your GPA.`});
+      }
+    });
+
+    // 2a) time conflicts between locked sections (ignores TBD/async)
+    classTerms().forEach(({t,i})=>{
+      const pairs = conflictPairsInTerm(i);
+      pairs.forEach(([a,b])=> items.push({sev:'error', icon:'⏰', h:`Time conflict in ${SEMESTER_LABELS[i]}`,
+        b:`${a} and ${b} meet at overlapping times. Pick a different section (CRN) for one, or move it to another term.`}));
+    });
+
+    // 2b) Drexel co-op guidance — suggest a real role per block
+    coopAdvice().forEach(a=> items.push(a));
+
+    // 3) career-boosting tips
+    careerTips(c).forEach(t=> items.push(t));
+
+    // 3b) live Drexel availability (only when a schedule has been imported)
+    const la = liveAdvice(); if(la) items.push(la);
+
+    // 4) underloaded upcoming term (accelerate)
+    const light = classTerms().find(({t,i})=> t.year >= curYearNum() && t.courses.length && t.courses.reduce((s,id)=>s+(c[id]?.cr||0),0) < target-4);
+    if(light && state.workload!=='Low-Stress'){
+      items.push({sev:'tip', icon:'⚡', h:`${SEMESTER_LABELS[light.i]} has room`,
+        b:`This term is light. If you want to graduate sooner, you could pull a future elective forward here.`});
+    }
+
+    // 5) all-clear
+    if(!items.some(x=>x.sev==='error') && !items.some(x=>x.sev==='warn')){
+      items.unshift({sev:'good', icon:'✅', h:'Your map is on track',
+        b:'No prerequisite conflicts and no overloaded semesters. Every course is sequenced correctly for on-time graduation.'});
+    }
+
+    // summary line
+    const errCount = items.filter(x=>x.sev==='error').length;
+    const warnCount = items.filter(x=>x.sev==='warn').length;
+    let sum;
+    if(errCount) sum = `I found <b style="color:var(--red)">${errCount} sequencing ${errCount===1?'issue':'issues'}</b> that could delay graduation. Fix these first.`;
+    else if(warnCount) sum = `Sequencing looks valid, but <b style="color:var(--yellow)">${warnCount} ${warnCount===1?'semester needs':'semesters need'} balancing</b>. Suggestions below.`;
+    else sum = `Nice work — this plan is <b style="color:var(--green)">clean and graduation-ready</b>. Here are ways to make it even stronger.`;
+    el('advisorSummary').innerHTML = sum;
+
+    el('advisorList').innerHTML = items.map(it=>`
+      <div class="advice ${it.sev==='error'?'error':it.sev==='warn'?'warn':it.sev==='tip'?'tip':'good'}">
+        <div class="h">${it.icon} ${it.h}</div>
+        <div class="b">${it.b}</div>
+      </div>`).join('');
+
+    // pulse color
+    el('advisorPulse').style.background = errCount?'var(--red)':warnCount?'var(--yellow)':'var(--green)';
+    el('advisorPulse').style.boxShadow = `0 0 0 4px ${errCount?'rgba(248,113,113,.15)':warnCount?'rgba(250,204,21,.15)':'rgba(74,222,128,.15)'}`;
+  }
+
+  // Drexel co-op guidance — ties the co-op blocks to real Philly roles by major
+  function coopAdvice(){
+    const coops = state.terms.filter(t=> t.type==='coop' && t.coopHalf==='start');
+    if(!coops.length) return [];
+    const first = coops[0];
+    return [{
+      sev:'tip', icon:'🧭', h:`Drexel co-op: ${coops.length} full-time blocks`,
+      b:`Your 5-year plan reserves ${coops.length} six-month co-ops. For a ${state.major} major we'd slot Co-op ${first.coopNum} (${first.term} Year ${first.year}) into a role like ${first.role}. Line up applications ~2 terms ahead.`
+    }];
+  }
+
+  function careerTips(c){
+    const tips = [];
+    const placed = new Set(); state.terms.forEach(t=> t.courses.forEach(id=> placed.add(id)));
+    const goalCourses = Object.keys(c).filter(id=> c[id].careers && c[id].careers.includes(state.career));
+
+    // find goal courses and where they sit
+    const highlight = goalCourses.filter(id=> placed.has(id));
+    if(highlight.length){
+      const sample = highlight.slice(0,3).map(id=> c[id].code).join(', ');
+      tips.push({sev:'tip', icon:'🎯', h:`Aligned with ${state.career}`,
+        b:`Your map already includes ${sample}${highlight.length>3?` and ${highlight.length-3} more`:''} — the courses that matter most for this path. Prioritize these over free electives.`});
+    }
+
+    // specific, hand-authored career nudges
+    if(state.career === 'CPA (Accountant)'){
+      const tax = semesterOf('ACCT310'); const aud = semesterOf('ACCT302');
+      if(tax>-1) tips.push({sev:'tip', icon:'🧾', h:'CPA path: tax + audit are locked in',
+        b:`Because you want the CPA, we placed Federal Taxation I in ${SEMESTER_LABELS[tax]} and Auditing in ${SEMESTER_LABELS[aud]}. Keep those before senior year so you're exam-ready.`});
+      tips.push({sev:'tip', icon:'📈', h:'Mind the 150-credit rule',
+        b:`Most states require 150 credits to sit for the CPA. Your free electives are the natural place to close that gap — consider a minor.`});
+    }
+    if(state.career === 'Software Engineer'){
+      if(placed.has('CS320')) tips.push({sev:'tip', icon:'💻', h:'Ship a portfolio early',
+        b:`Software Engineering (CS 320) and your capstone give you real teamwork artifacts. Start a public GitHub project by end of Year 2 — recruiters weigh it heavily.`});
+    }
+    if(state.career === 'ML / AI Engineer'){
+      const ml = semesterOf('CS340');
+      if(ml>-1) tips.push({sev:'tip', icon:'🧠', h:'Front-load the math for ML',
+        b:`Machine Learning (CS 340) leans on Linear Algebra and Statistics. Keep those before ${SEMESTER_LABELS[ml]} so you're not learning the math and the models at once.`});
+    }
+    if(state.career === 'Financial Analyst'){
+      if(placed.has('FIN310')) tips.push({sev:'tip', icon:'📊', h:'Modeling is your edge',
+        b:`Financial Modeling and Investments are the interview-relevant courses for analysts. Pair them with a valuation project to stand out.`});
+    }
+    if(state.career === 'Product Manager'){
+      if(placed.has('BUS310')) tips.push({sev:'tip', icon:'🚀', h:'Blend analytics + communication',
+        b:`PMs live at the data/communication intersection. Business Analytics plus a technical free elective (SQL or intro CS) makes your profile much stronger.`});
+    }
+    return tips;
+  }
+
+  /* =========================================================================
+     AUTO-OPTIMIZE — one-click fix of sequencing + load
+     ========================================================================= */
+  function autoOptimize(){
+    const c = courseData();
+    const target = loadTarget();
+    const classIdx = classTerms().map(x=> x.i);
+    const nextClassAfter = (i)=>{ for(const ci of classIdx){ if(ci>i) return ci; } return classIdx[classIdx.length-1]; };
+    const termCredits = (i)=> state.terms[i].courses.reduce((s,id)=> s+(c[id]?.cr||0),0);
+
+    // 1) enforce prereq ordering — move a course to the first class term after its latest prereq
+    let changed = true, guard = 0;
+    while(changed && guard++ < 80){
+      changed = false;
+      for(const i of classIdx){
+        for(const id of [...state.terms[i].courses]){
+          const pre = (c[id]?.pre||[]).filter(p=> !state.prior.has(p));
+          const maxPre = Math.max(-1, ...pre.map(p=> semesterOf(p)));
+          if(maxPre >= i){
+            const dest = nextClassAfter(maxPre);
+            if(dest===i) continue;
+            const k = state.terms[i].courses.indexOf(id); state.terms[i].courses.splice(k,1);
+            state.terms[dest].courses.push(id);
+            changed = true;
+          }
+        }
+      }
+    }
+    // 2) balance flex (elective) courses off overloaded class terms into later ones with room
+    for(const i of classIdx){
+      while(termCredits(i) > target+1){
+        const fIdx = state.terms[i].courses.findIndex(id=> c[id]?.flex);
+        if(fIdx===-1) break;
+        const moved = state.terms[i].courses[fIdx];
+        const need = c[moved]?.cr || 3;
+        let dest = -1;
+        for(const j of classIdx){ if(j>i && termCredits(j)+need <= target+1){ dest=j; break; } }
+        if(dest===-1) break;
+        state.terms[i].courses.splice(fIdx,1);
+        state.terms[dest].courses.push(moved);
+      }
+    }
+    renderTimeline(false);
+    runAdvisor();
+    toast('✨ Optimized — sequencing and load rebalanced');
+  }
+
+  /* =========================================================================
+     COURSE MODAL
+     ========================================================================= */
+  function openModal(id){
+    const c = courseData(); const course = c[id];
+    if(!course) return;
+    el('mCode').textContent = course.code;
+    el('mName').textContent = course.name;
+    const cat = CAT[course.cat];
+    const badges = [`<span class="badge" style="background:${hexA(cat.color)};color:${cat.color}">${cat.label}</span>`,
+      `<span class="badge" style="background:rgba(148,163,184,.14);color:var(--muted)">${course.cr} credits</span>`];
+    if(course.heavy) badges.push(`<span class="badge" style="background:rgba(250,204,21,.14);color:var(--yellow)">Reading/Quant heavy</span>`);
+    if(course.careers && course.careers.includes(state.career)) badges.push(`<span class="badge" style="background:rgba(74,222,128,.14);color:var(--green)">★ ${state.career}</span>`);
+    el('mBadges').innerHTML = badges.join('');
+    el('mDesc').textContent = course.desc;
+
+    // prereqs
+    const pre = course.pre||[];
+    el('mPrereqs').innerHTML = pre.length
+      ? pre.map(p=>{
+          const done = state.prior.has(p) || (semesterOf(p)>-1 && semesterOf(p)<semesterOf(id));
+          return `<span class="prereq-line inline-flex items-center gap-1 mr-3">${done?'✅':'⚠️'} ${c[p]?c[p].code:p}${state.prior.has(p)?' (prior)':''}</span>`;
+        }).join('')
+      : '<span class="prereq-line">None — you can take this any time.</span>';
+
+    // unlocks (dependents)
+    const deps = Object.keys(c).filter(k=> (c[k].pre||[]).includes(id));
+    el('mUnlocks').innerHTML = deps.length
+      ? deps.map(d=> `<span class="prereq-line inline-flex items-center gap-1 mr-3">🔓 ${c[d].code}</span>`).join('')
+      : '<span class="prereq-line">Nothing depends on this course.</span>';
+
+    el('mWhy').textContent = whyRecommended(id);
+
+    // live sections (if Drexel data imported)
+    const secs = matchedSections(id);
+    if(liveData && secs.length){
+      el('mLiveWrap').hidden = false;
+      el('mLive').innerHTML = secs.slice(0,4).map(sectionRowHTML).join('') +
+        (secs.length>4?`<div class="text-xs" style="color:var(--muted)">+${secs.length-4} more — see 📡 Live Sections</div>`:'');
+    } else if(liveData){
+      el('mLiveWrap').hidden = false;
+      el('mLive').innerHTML = `<div class="live-sec" style="color:var(--muted)">Not offered in the imported term (${liveData.term}).</div>`;
+    } else {
+      el('mLiveWrap').hidden = true;
+    }
+
+    // move-to dropdown
+    el('mMoveTo').innerHTML = '<option value="">—</option>' + SEMESTER_LABELS.map((l,i)=>`<option value="${i}" ${semesterOf(id)===i?'selected':''}>${l}</option>`).join('');
+    el('mMoveTo').dataset.course = id;
+
+    el('courseModal').classList.add('show');
+  }
+  function moveViaModal(v){
+    if(v==='') return;
+    const id = el('mMoveTo').dataset.course;
+    moveCourse(id, +v);
+    closeModal();
+    toast('Moved '+courseData()[id].code+' → '+SEMESTER_LABELS[+v]);
+  }
+  function closeModal(){ el('courseModal').classList.remove('show'); }
+
+  function whyRecommended(id){
+    const c = courseData(); const course = c[id];
+    if(course._fromDb || !state.major){
+      const secs = matchedSections(id);
+      let s = `You added ${course.code} straight from the course database`;
+      s += liveData ? ` (${liveData.term}).` : '.';
+      if(secs.length){ const open = secs.filter(isSectionOpen).length;
+        s += ` There ${secs.length===1?'is':'are'} ${secs.length} section${secs.length>1?'s':''} this term${open?` — ${open} with open seats`:' — all currently full'}.`; }
+      s += ` It's slotted into your schedule; drag it to any term that fits your plan.`;
+      return s;
+    }
+    const isGoal = course.careers && course.careers.includes(state.career);
+    const deps = Object.keys(c).filter(k=> (c[k].pre||[]).includes(id));
+    let s = '';
+    if(isGoal){
+      s = `You told us your goal is ${state.career}, and ${course.code} is one of the highest-signal courses for that path — it's why the AI placed it in your core sequence rather than treating it as optional.`;
+    } else if(course.cat==='cap'){
+      s = `Capstone courses are where everything comes together into a portfolio piece. The AI scheduled ${course.code} in senior year, after its prerequisites, so you build on a full foundation.`;
+    } else if(course.cat==='math'){
+      s = `${course.code} is a quantitative foundation. The AI placed it early because ${deps.length? c[deps[0]].code+' and other upper-level courses depend on it':'it supports later analytical work'}.`;
+    } else if(course.cat==='gen'){
+      s = `${course.code} satisfies a breadth/general-education requirement. The AI slotted it into a lighter semester so it balances your heavier ${state.major} courses instead of competing with them.`;
+    } else {
+      s = `${course.code} is part of the required ${state.major} core.`;
+    }
+    if(deps.length){
+      s += ` It also unlocks ${deps.slice(0,3).map(d=>c[d].code).join(', ')}${deps.length>3?' and more':''}, so taking it on time keeps your whole track moving.`;
+    }
+    if(course.heavy){
+      s += ` Heads up: it's reading/quant-intensive, so the AI tried not to stack it with other heavy courses.`;
+    }
+    return s;
+  }
+
+  function hexA(color){
+    // rough translucent bg for badge based on the css var color
+    if(color.startsWith('var')) return 'rgba(148,163,184,.14)';
+    return color+'22';
+  }
+
+  /* =========================================================================
+     SAVE / EXPORT
+     ========================================================================= */
+  const STORAGE_KEY = 'majormap_ai_plan_v1';
+  function serialize(){
+    return {
+      version:2, savedAt:new Date().toISOString(),
+      university:state.university, calendar:uni().system,
+      major:state.major, year:state.year, career:state.career, workload:state.workload,
+      priorCredits:[...state.prior],
+      terms: state.terms.map((t,i)=>({
+        term:`${t.term} · Year ${t.year}`, type:t.type,
+        coop: t.type==='coop' ? { number:t.coopNum, suggestedRole:t.role } : undefined,
+        courses: t.courses.map(id=>{ const c=courseData()[id]; return {code:c.code,name:c.name,credits:c.cr}; })
+      }))
+    };
+  }
+  function saveMap(){
+    try{ localStorage.setItem(STORAGE_KEY, JSON.stringify({state:{...state, prior:[...state.prior]}})); toast('💾 Map saved to this browser'); }
+    catch(e){ toast('Could not save (storage blocked)'); }
+  }
+  function loadSaved(){
+    try{
+      const raw = localStorage.getItem(STORAGE_KEY);
+      if(!raw) return false;
+      const d = JSON.parse(raw).state;
+      if(!d || !MAJORS[d.major]) return false;
+      state = {...d, prior:new Set(d.prior||[]), step:5};
+      return true;
+    }catch(e){ return false; }
+  }
+  function exportJSON(){
+    toggleExport();
+    const blob = new Blob([JSON.stringify(serialize(),null,2)], {type:'application/json'});
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(blob);
+    a.download = `majormap-${(state.major||'schedule').toLowerCase().replace(/[^a-z]+/g,'-')}.json`;
+    a.click(); URL.revokeObjectURL(a.href);
+    toast('🧾 JSON exported');
+  }
+  function exportPDF(){
+    toggleExport();
+    toast('🖨 Opening print dialog — choose “Save as PDF”');
+    setTimeout(()=> window.print(), 300);
+  }
+  function toggleExport(){ el('exportMenu').hidden = !el('exportMenu').hidden; }
+  document.addEventListener('click', (e)=>{
+    if(!e.target.closest('#exportMenu') && !e.target.closest('[onclick="toggleExport()"]')) el('exportMenu').hidden = true;
+  });
+
+  /* =========================================================================
+     MISC
+     ========================================================================= */
+  function restartIntake(){
+    state = { step:1, university:null, major:null, year:null, career:null, workload:null, prior:new Set(), terms:[] };
+    el('workspace').hidden = true;
+    el('loading').hidden = true;
+    el('intake').hidden = false;
+    el('btnRestart').hidden = true;
+    el('planPill').textContent = 'Degree Planner';
+    showStep(1);
+    window.scrollTo({top:0,behavior:'smooth'});
+  }
+  let toastTimer;
+  function toast(msg){
+    const t = el('toast'); t.textContent = msg; t.classList.add('show');
+    clearTimeout(toastTimer); toastTimer = setTimeout(()=> t.classList.remove('show'), 2400);
+  }
+  document.addEventListener('keydown', e=>{ if(e.key==='Escape'){ if(el('courseModal').classList.contains('show')) closeModal(); else closePlan(); const em=el('exportMenu'); if(em) em.hidden=true; } });
+
+  /* =========================================================================
+     LIVE DREXEL SECTIONS  (import a data.json produced by the drexel-scraper)
+     Scraper output shape: { "<crn>": {subject_code, course_number, section, crn,
+       enroll, max_enroll, course_title, days[], start_time, end_time,
+       instructors:[{name, rating?}], prereqs, credits}, ... }
+     ========================================================================= */
+  const SAMPLE_LIVE = {"10007":{"subject_code":"CS","course_number":"101","instruction_type":"Lecture","instruction_method":"Hybrid","section":"001","crn":10007,"enroll":"FULL","max_enroll":"FULL","course_title":"Intro to Programming","days":["Wednesday"],"start_time":"15:30","end_time":"16:30","instructors":[{"name":"Daniel Dougherty","rating":{"quality":3.9,"difficulty":3.3}}],"prereqs":"None","credits":"4.0"},"10016":{"subject_code":"CS","course_number":"101","instruction_type":"Lecture","instruction_method":"Online","section":"002","crn":10016,"enroll":"29","max_enroll":"30","course_title":"Intro to Programming","days":["Monday","Wednesday","Friday"],"start_time":"08:00","end_time":"09:00","instructors":[{"name":"Maria Schultheis","rating":{"quality":4.2,"difficulty":2.7}}],"prereqs":"None","credits":"4.0"},"10026":{"subject_code":"CS","course_number":"102","instruction_type":"Lecture","instruction_method":"Face To Face","section":"001","crn":10026,"enroll":"24","max_enroll":"30","course_title":"Object-Oriented Programming","days":null,"start_time":null,"end_time":null,"instructors":[{"name":"Jeffrey Popyack","rating":{"quality":4.1,"difficulty":3.2}}],"prereqs":"CS 101 [Min Grade: C]","credits":"4.0"},"10046":{"subject_code":"CS","course_number":"102","instruction_type":"Lecture","instruction_method":"Online","section":"002","crn":10046,"enroll":"FULL","max_enroll":"FULL","course_title":"Object-Oriented Programming","days":["Tuesday","Thursday"],"start_time":"11:00","end_time":"12:00","instructors":[{"name":"Mark Boady","rating":{"quality":4.4,"difficulty":3.0}},{"name":"Amy Ruymann","rating":{"quality":4.6,"difficulty":2.4}}],"prereqs":"CS 101 [Min Grade: C]","credits":"4.0"},"10055":{"subject_code":"CS","course_number":"201","instruction_type":"Lecture","instruction_method":"Online","section":"001","crn":10055,"enroll":"18","max_enroll":"30","course_title":"Data Structures","days":["Monday","Wednesday"],"start_time":"08:00","end_time":"10:00","instructors":[{"name":"Daniel Dougherty","rating":{"quality":3.9,"difficulty":3.3}},{"name":"Ellen Bass","rating":{"quality":4.3,"difficulty":2.9}}],"prereqs":"CS 102 [Min Grade: C]","credits":"4.0"},"10068":{"subject_code":"CS","course_number":"201","instruction_type":"Lecture","instruction_method":"Face To Face","section":"002","crn":10068,"enroll":"43","max_enroll":"45","course_title":"Data Structures","days":["Wednesday"],"start_time":"14:00","end_time":"16:00","instructors":[{"name":"Brian Mitchell","rating":{"quality":3.2,"difficulty":3.8}},{"name":"Amy Ruymann","rating":{"quality":4.6,"difficulty":2.4}}],"prereqs":"CS 102 [Min Grade: C]","credits":"4.0"},"10080":{"subject_code":"CS","course_number":"201","instruction_type":"Lecture","instruction_method":"Online","section":"003","crn":10080,"enroll":"52","max_enroll":"60","course_title":"Data Structures","days":null,"start_time":null,"end_time":null,"instructors":[{"name":"Amy Ruymann","rating":{"quality":4.6,"difficulty":2.4}},{"name":"Amy Ruymann","rating":{"quality":4.6,"difficulty":2.4}}],"prereqs":"CS 102 [Min Grade: C]","credits":"4.0"},"10096":{"subject_code":"CS","course_number":"320","instruction_type":"Lecture","instruction_method":"Hybrid","section":"001","crn":10096,"enroll":"28","max_enroll":"60","course_title":"Software Engineering","days":["Tuesday","Thursday"],"start_time":"18:00","end_time":"19:00","instructors":[{"name":"Geoffrey Mainland","rating":{"quality":3.7,"difficulty":4.1}},{"name":"Geoffrey Mainland","rating":{"quality":3.7,"difficulty":4.1}}],"prereqs":"CS 201 [Min Grade: C]","credits":"3.0"},"10110":{"subject_code":"CS","course_number":"320","instruction_type":"Lecture","instruction_method":"Face To Face","section":"002","crn":10110,"enroll":"53","max_enroll":"60","course_title":"Software Engineering","days":null,"start_time":null,"end_time":null,"instructors":[{"name":"Santiago Ontanon","rating":{"quality":4.0,"difficulty":3.5}}],"prereqs":"CS 201 [Min Grade: C]","credits":"3.0"},"10128":{"subject_code":"CS","course_number":"320","instruction_type":"Lecture","instruction_method":"Online","section":"003","crn":10128,"enroll":"39","max_enroll":"45","course_title":"Software Engineering","days":["Monday","Wednesday","Friday"],"start_time":"08:00","end_time":"10:00","instructors":[{"name":"Ellen Bass","rating":{"quality":4.3,"difficulty":2.9}}],"prereqs":"CS 201 [Min Grade: C]","credits":"3.0"},"10142":{"subject_code":"CS","course_number":"340","instruction_type":"Lecture","instruction_method":"Face To Face","section":"001","crn":10142,"enroll":"FULL","max_enroll":"FULL","course_title":"Machine Learning","days":["Monday","Wednesday","Friday"],"start_time":"12:30","end_time":"13:30","instructors":[{"name":"Santiago Ontanon","rating":{"quality":4.0,"difficulty":3.5}}],"prereqs":"CS 202 [Min Grade: C] and STAT 201","credits":"3.0"},"10149":{"subject_code":"CS","course_number":"340","instruction_type":"Lecture","instruction_method":"Online","section":"002","crn":10149,"enroll":"FULL","max_enroll":"FULL","course_title":"Machine Learning","days":["Tuesday","Thursday"],"start_time":"12:30","end_time":"13:30","instructors":[{"name":"Daniel Dougherty","rating":{"quality":3.9,"difficulty":3.3}}],"prereqs":"CS 202 [Min Grade: C] and STAT 201","credits":"3.0"},"10160":{"subject_code":"CS","course_number":"340","instruction_type":"Lecture","instruction_method":"Online","section":"003","crn":10160,"enroll":"62","max_enroll":"90","course_title":"Machine Learning","days":["Tuesday","Thursday"],"start_time":"18:00","end_time":"19:00","instructors":[{"name":"Ellen Bass","rating":{"quality":4.3,"difficulty":2.9}},{"name":"Brian Mitchell","rating":{"quality":3.2,"difficulty":3.8}}],"prereqs":"CS 202 [Min Grade: C] and STAT 201","credits":"3.0"},"10165":{"subject_code":"MATH","course_number":"121","instruction_type":"Lecture","instruction_method":"Hybrid","section":"001","crn":10165,"enroll":"FULL","max_enroll":"FULL","course_title":"Calculus I","days":["Tuesday","Thursday"],"start_time":"09:30","end_time":"10:30","instructors":[{"name":"Santiago Ontanon","rating":{"quality":4.0,"difficulty":3.5}}],"prereqs":"MATH 100 [Min Grade: C] or Placement","credits":"4.0"},"10177":{"subject_code":"MATH","course_number":"121","instruction_type":"Lecture","instruction_method":"Face To Face","section":"002","crn":10177,"enroll":"28","max_enroll":"45","course_title":"Calculus I","days":["Monday","Wednesday","Friday"],"start_time":"09:30","end_time":"10:30","instructors":[{"name":"Daniel Dougherty","rating":{"quality":3.9,"difficulty":3.3}},{"name":"Maria Schultheis","rating":{"quality":4.2,"difficulty":2.7}}],"prereqs":"MATH 100 [Min Grade: C] or Placement","credits":"4.0"},"10181":{"subject_code":"MATH","course_number":"122","instruction_type":"Lecture","instruction_method":"Online","section":"001","crn":10181,"enroll":"61","max_enroll":"90","course_title":"Calculus II","days":["Wednesday"],"start_time":"18:00","end_time":"20:00","instructors":[{"name":"Rachel Greene","rating":{"quality":4.8,"difficulty":2.1}}],"prereqs":"MATH 121 [Min Grade: C]","credits":"4.0"},"10196":{"subject_code":"MATH","course_number":"122","instruction_type":"Lecture","instruction_method":"Online","section":"002","crn":10196,"enroll":"19","max_enroll":"40","course_title":"Calculus II","days":["Monday","Wednesday","Friday"],"start_time":"09:30","end_time":"10:30","instructors":[{"name":"Jeffrey Popyack","rating":{"quality":4.1,"difficulty":3.2}},{"name":"Amy Ruymann","rating":{"quality":4.6,"difficulty":2.4}}],"prereqs":"MATH 121 [Min Grade: C]","credits":"4.0"},"10199":{"subject_code":"MATH","course_number":"122","instruction_type":"Lecture","instruction_method":"Hybrid","section":"003","crn":10199,"enroll":"27","max_enroll":"40","course_title":"Calculus II","days":null,"start_time":null,"end_time":null,"instructors":[{"name":"Amy Ruymann","rating":{"quality":4.6,"difficulty":2.4}}],"prereqs":"MATH 121 [Min Grade: C]","credits":"4.0"},"10214":{"subject_code":"STAT","course_number":"201","instruction_type":"Lecture","instruction_method":"Face To Face","section":"001","crn":10214,"enroll":"33","max_enroll":"45","course_title":"Statistics","days":["Tuesday","Thursday"],"start_time":"15:30","end_time":"16:30","instructors":[{"name":"Rachel Greene","rating":{"quality":4.8,"difficulty":2.1}}],"prereqs":"MATH 122 [Min Grade: D]","credits":"3.0"},"10231":{"subject_code":"STAT","course_number":"201","instruction_type":"Lecture","instruction_method":"Online","section":"002","crn":10231,"enroll":"FULL","max_enroll":"FULL","course_title":"Statistics","days":["Wednesday"],"start_time":"12:30","end_time":"13:30","instructors":[{"name":"Santiago Ontanon","rating":{"quality":4.0,"difficulty":3.5}},{"name":"Rachel Greene","rating":{"quality":4.8,"difficulty":2.1}}],"prereqs":"MATH 122 [Min Grade: D]","credits":"3.0"},"10239":{"subject_code":"ACCT","course_number":"101","instruction_type":"Lecture","instruction_method":"Hybrid","section":"001","crn":10239,"enroll":"FULL","max_enroll":"FULL","course_title":"Financial Accounting","days":null,"start_time":null,"end_time":null,"instructors":[{"name":"Mark Boady","rating":{"quality":4.4,"difficulty":3.0}}],"prereqs":"None","credits":"3.0"},"10259":{"subject_code":"ACCT","course_number":"101","instruction_type":"Lecture","instruction_method":"Hybrid","section":"002","crn":10259,"enroll":"20","max_enroll":"30","course_title":"Financial Accounting","days":["Monday","Wednesday","Friday"],"start_time":"18:00","end_time":"20:00","instructors":[{"name":"Mark Boady","rating":{"quality":4.4,"difficulty":3.0}}],"prereqs":"None","credits":"3.0"},"10273":{"subject_code":"ACCT","course_number":"101","instruction_type":"Lecture","instruction_method":"Hybrid","section":"003","crn":10273,"enroll":"50","max_enroll":"90","course_title":"Financial Accounting","days":["Tuesday","Thursday"],"start_time":"14:00","end_time":"16:00","instructors":[{"name":"Brian Mitchell","rating":{"quality":3.2,"difficulty":3.8}}],"prereqs":"None","credits":"3.0"},"10283":{"subject_code":"ACCT","course_number":"102","instruction_type":"Lecture","instruction_method":"Online","section":"001","crn":10283,"enroll":"20","max_enroll":"30","course_title":"Managerial Accounting","days":["Tuesday","Thursday"],"start_time":"14:00","end_time":"15:00","instructors":[{"name":"Brian Mitchell","rating":{"quality":3.2,"difficulty":3.8}}],"prereqs":"ACCT 101 [Min Grade: D]","credits":"3.0"},"10297":{"subject_code":"ACCT","course_number":"102","instruction_type":"Lecture","instruction_method":"Face To Face","section":"002","crn":10297,"enroll":"29","max_enroll":"45","course_title":"Managerial Accounting","days":["Wednesday"],"start_time":"18:00","end_time":"20:00","instructors":[{"name":"Amy Ruymann","rating":{"quality":4.6,"difficulty":2.4}}],"prereqs":"ACCT 101 [Min Grade: D]","credits":"3.0"},"10315":{"subject_code":"ACCT","course_number":"310","instruction_type":"Lecture","instruction_method":"Face To Face","section":"001","crn":10315,"enroll":"75","max_enroll":"90","course_title":"Federal Taxation I","days":["Tuesday","Thursday"],"start_time":"11:00","end_time":"12:00","instructors":[{"name":"Geoffrey Mainland","rating":{"quality":3.7,"difficulty":4.1}}],"prereqs":"ACCT 201 [Min Grade: C]","credits":"3.0"},"10320":{"subject_code":"ACCT","course_number":"310","instruction_type":"Lecture","instruction_method":"Online","section":"002","crn":10320,"enroll":"21","max_enroll":"40","course_title":"Federal Taxation I","days":["Monday","Wednesday","Friday"],"start_time":"12:30","end_time":"14:30","instructors":[{"name":"Geoffrey Mainland","rating":{"quality":3.7,"difficulty":4.1}},{"name":"Amy Ruymann","rating":{"quality":4.6,"difficulty":2.4}}],"prereqs":"ACCT 201 [Min Grade: C]","credits":"3.0"},"10335":{"subject_code":"ECON","course_number":"101","instruction_type":"Lecture","instruction_method":"Face To Face","section":"001","crn":10335,"enroll":"17","max_enroll":"30","course_title":"Microeconomics","days":["Wednesday"],"start_time":"12:30","end_time":"14:30","instructors":[{"name":"Mark Boady","rating":{"quality":4.4,"difficulty":3.0}}],"prereqs":"None","credits":"3.0"},"10352":{"subject_code":"ECON","course_number":"101","instruction_type":"Lecture","instruction_method":"Face To Face","section":"002","crn":10352,"enroll":"46","max_enroll":"60","course_title":"Microeconomics","days":["Tuesday","Thursday"],"start_time":"14:00","end_time":"16:00","instructors":[{"name":"Daniel Dougherty","rating":{"quality":3.9,"difficulty":3.3}},{"name":"Mark Boady","rating":{"quality":4.4,"difficulty":3.0}}],"prereqs":"None","credits":"3.0"},"10355":{"subject_code":"ECON","course_number":"101","instruction_type":"Lecture","instruction_method":"Online","section":"003","crn":10355,"enroll":"16","max_enroll":"30","course_title":"Microeconomics","days":["Monday","Wednesday","Friday"],"start_time":"18:00","end_time":"20:00","instructors":[{"name":"Brian Mitchell","rating":{"quality":3.2,"difficulty":3.8}}],"prereqs":"None","credits":"3.0"},"10366":{"subject_code":"ECON","course_number":"102","instruction_type":"Lecture","instruction_method":"Online","section":"001","crn":10366,"enroll":"70","max_enroll":"90","course_title":"Macroeconomics","days":["Tuesday","Thursday"],"start_time":"11:00","end_time":"13:00","instructors":[{"name":"Jeffrey Popyack","rating":{"quality":4.1,"difficulty":3.2}}],"prereqs":"None","credits":"3.0"},"10380":{"subject_code":"ECON","course_number":"102","instruction_type":"Lecture","instruction_method":"Face To Face","section":"002","crn":10380,"enroll":"68","max_enroll":"90","course_title":"Macroeconomics","days":["Wednesday"],"start_time":"15:30","end_time":"17:30","instructors":[{"name":"Mark Boady","rating":{"quality":4.4,"difficulty":3.0}},{"name":"Daniel Dougherty","rating":{"quality":3.9,"difficulty":3.3}}],"prereqs":"None","credits":"3.0"},"10383":{"subject_code":"FIN","course_number":"301","instruction_type":"Lecture","instruction_method":"Face To Face","section":"001","crn":10383,"enroll":"16","max_enroll":"30","course_title":"Investments","days":["Wednesday"],"start_time":"18:00","end_time":"19:00","instructors":[{"name":"Rachel Greene","rating":{"quality":4.8,"difficulty":2.1}}],"prereqs":"FIN 201 [Min Grade: D]","credits":"3.0"},"10389":{"subject_code":"FIN","course_number":"301","instruction_type":"Lecture","instruction_method":"Hybrid","section":"002","crn":10389,"enroll":"28","max_enroll":"30","course_title":"Investments","days":null,"start_time":null,"end_time":null,"instructors":[{"name":"Rachel Greene","rating":{"quality":4.8,"difficulty":2.1}},{"name":"Amy Ruymann","rating":{"quality":4.6,"difficulty":2.4}}],"prereqs":"FIN 201 [Min Grade: D]","credits":"3.0"},"10409":{"subject_code":"FIN","course_number":"301","instruction_type":"Lecture","instruction_method":"Online","section":"003","crn":10409,"enroll":"28","max_enroll":"30","course_title":"Investments","days":["Monday","Wednesday","Friday"],"start_time":"09:30","end_time":"10:30","instructors":[{"name":"Jeffrey Popyack","rating":{"quality":4.1,"difficulty":3.2}},{"name":"Amy Ruymann","rating":{"quality":4.6,"difficulty":2.4}}],"prereqs":"FIN 201 [Min Grade: D]","credits":"3.0"},"10422":{"subject_code":"MKT","course_number":"201","instruction_type":"Lecture","instruction_method":"Hybrid","section":"001","crn":10422,"enroll":"48","max_enroll":"90","course_title":"Principles of Marketing","days":null,"start_time":null,"end_time":null,"instructors":[{"name":"Rachel Greene","rating":{"quality":4.8,"difficulty":2.1}}],"prereqs":"BUS 101 [Min Grade: D]","credits":"3.0"},"10441":{"subject_code":"MKT","course_number":"201","instruction_type":"Lecture","instruction_method":"Hybrid","section":"002","crn":10441,"enroll":"39","max_enroll":"60","course_title":"Principles of Marketing","days":null,"start_time":null,"end_time":null,"instructors":[{"name":"Santiago Ontanon","rating":{"quality":4.0,"difficulty":3.5}},{"name":"Daniel Dougherty","rating":{"quality":3.9,"difficulty":3.3}}],"prereqs":"BUS 101 [Min Grade: D]","credits":"3.0"},"10458":{"subject_code":"MGT","course_number":"201","instruction_type":"Lecture","instruction_method":"Online","section":"001","crn":10458,"enroll":"39","max_enroll":"60","course_title":"Principles of Management","days":["Tuesday","Thursday"],"start_time":"12:30","end_time":"13:30","instructors":[{"name":"Brian Mitchell","rating":{"quality":3.2,"difficulty":3.8}}],"prereqs":"BUS 101 [Min Grade: D]","credits":"3.0"},"10470":{"subject_code":"MGT","course_number":"201","instruction_type":"Lecture","instruction_method":"Face To Face","section":"002","crn":10470,"enroll":"FULL","max_enroll":"FULL","course_title":"Principles of Management","days":["Monday","Wednesday","Friday"],"start_time":"18:00","end_time":"19:00","instructors":[{"name":"Brian Mitchell","rating":{"quality":3.2,"difficulty":3.8}}],"prereqs":"BUS 101 [Min Grade: D]","credits":"3.0"},"10476":{"subject_code":"BUS","course_number":"310","instruction_type":"Lecture","instruction_method":"Online","section":"001","crn":10476,"enroll":"FULL","max_enroll":"FULL","course_title":"Business Analytics","days":["Wednesday"],"start_time":"12:30","end_time":"13:30","instructors":[{"name":"Ellen Bass","rating":{"quality":4.3,"difficulty":2.9}},{"name":"Geoffrey Mainland","rating":{"quality":3.7,"difficulty":4.1}}],"prereqs":"STAT 205 [Min Grade: D]","credits":"3.0"},"10492":{"subject_code":"BUS","course_number":"310","instruction_type":"Lecture","instruction_method":"Hybrid","section":"002","crn":10492,"enroll":"FULL","max_enroll":"FULL","course_title":"Business Analytics","days":["Tuesday","Thursday"],"start_time":"11:00","end_time":"12:00","instructors":[{"name":"Rachel Greene","rating":{"quality":4.8,"difficulty":2.1}}],"prereqs":"STAT 205 [Min Grade: D]","credits":"3.0"},"10495":{"subject_code":"BUS","course_number":"310","instruction_type":"Lecture","instruction_method":"Face To Face","section":"003","crn":10495,"enroll":"20","max_enroll":"45","course_title":"Business Analytics","days":["Wednesday"],"start_time":"11:00","end_time":"13:00","instructors":[{"name":"Amy Ruymann","rating":{"quality":4.6,"difficulty":2.4}}],"prereqs":"STAT 205 [Min Grade: D]","credits":"3.0"},"10506":{"subject_code":"ENGL","course_number":"101","instruction_type":"Lecture","instruction_method":"Online","section":"001","crn":10506,"enroll":"20","max_enroll":"40","course_title":"Composition & Rhetoric I","days":["Monday","Wednesday"],"start_time":"08:00","end_time":"10:00","instructors":[{"name":"Santiago Ontanon","rating":{"quality":4.0,"difficulty":3.5}},{"name":"Ellen Bass","rating":{"quality":4.3,"difficulty":2.9}}],"prereqs":"None","credits":"3.0"},"10513":{"subject_code":"ENGL","course_number":"101","instruction_type":"Lecture","instruction_method":"Online","section":"002","crn":10513,"enroll":"80","max_enroll":"90","course_title":"Composition & Rhetoric I","days":null,"start_time":null,"end_time":null,"instructors":[{"name":"Santiago Ontanon","rating":{"quality":4.0,"difficulty":3.5}}],"prereqs":"None","credits":"3.0"},"10521":{"subject_code":"PHYS","course_number":"101","instruction_type":"Lecture","instruction_method":"Face To Face","section":"001","crn":10521,"enroll":"20","max_enroll":"30","course_title":"Fundamentals of Physics I","days":["Wednesday"],"start_time":"08:00","end_time":"09:00","instructors":[{"name":"Brian Mitchell","rating":{"quality":3.2,"difficulty":3.8}},{"name":"Amy Ruymann","rating":{"quality":4.6,"difficulty":2.4}}],"prereqs":"MATH 121 [Min Grade: D]","credits":"4.0"},"10532":{"subject_code":"PHYS","course_number":"101","instruction_type":"Lecture","instruction_method":"Hybrid","section":"002","crn":10532,"enroll":"53","max_enroll":"90","course_title":"Fundamentals of Physics I","days":["Monday","Wednesday","Friday"],"start_time":"12:30","end_time":"13:30","instructors":[{"name":"Jeffrey Popyack","rating":{"quality":4.1,"difficulty":3.2}}],"prereqs":"MATH 121 [Min Grade: D]","credits":"4.0"},"10542":{"subject_code":"BLAW","course_number":"201","instruction_type":"Lecture","instruction_method":"Online","section":"001","crn":10542,"enroll":"FULL","max_enroll":"FULL","course_title":"Business Law I","days":["Monday","Wednesday","Friday"],"start_time":"09:30","end_time":"10:30","instructors":[{"name":"Santiago Ontanon","rating":{"quality":4.0,"difficulty":3.5}},{"name":"Daniel Dougherty","rating":{"quality":3.9,"difficulty":3.3}}],"prereqs":"None","credits":"3.0"},"10551":{"subject_code":"BLAW","course_number":"201","instruction_type":"Lecture","instruction_method":"Online","section":"002","crn":10551,"enroll":"16","max_enroll":"40","course_title":"Business Law I","days":["Monday","Wednesday"],"start_time":"12:30","end_time":"14:30","instructors":[{"name":"Jeffrey Popyack","rating":{"quality":4.1,"difficulty":3.2}}],"prereqs":"None","credits":"3.0"},"10554":{"subject_code":"BLAW","course_number":"201","instruction_type":"Lecture","instruction_method":"Online","section":"003","crn":10554,"enroll":"68","max_enroll":"90","course_title":"Business Law I","days":null,"start_time":null,"end_time":null,"instructors":[{"name":"Rachel Greene","rating":{"quality":4.8,"difficulty":2.1}}],"prereqs":"None","credits":"3.0"}};
+  let liveData = null; // { term, sections:[], byKey:Map }
+
+  const DAY_ABBR = {Monday:'M',Tuesday:'T',Wednesday:'W',Thursday:'R',Friday:'F',Saturday:'S',Sunday:'U'};
+  const normKey = (subj, num) => (String(subj)+String(num)).toUpperCase().replace(/\s+/g,'');
+  function courseKey(id){ const c = courseData()[id]; if(!c) return null; const p = c.code.split(/\s+/); return p.length>=2 ? normKey(p[0],p[1]) : null; }
+
+  function ingestLiveData(raw, term){
+    // accept the scraper dict (keyed by CRN) or an array of section objects
+    const sections = Array.isArray(raw) ? raw : Object.values(raw || {});
+    if(!sections.length) throw new Error('empty');
+    // quick shape check
+    if(!sections[0] || !('subject_code' in sections[0]) || !('course_number' in sections[0]))
+      throw new Error('unrecognized format');
+    const byKey = new Map();
+    for(const s of sections){
+      const k = normKey(s.subject_code, s.course_number);
+      if(!byKey.has(k)) byKey.set(k, []);
+      byKey.get(k).push(s);
+    }
+    liveData = { term: term || 'Imported schedule', sections, byKey };
+    if(state.terms.length && !el('workspace').hidden){ renderTimeline(false); runAdvisor(); }
+    refreshLiveUI();
+  }
+  function loadSampleLive(){ ingestLiveData(SAMPLE_LIVE, 'Fall 2026 · sample data'); toast(`Loaded ${liveData.sections.length} sections`); }
+  function onLiveFile(input){
+    const f = input.files && input.files[0]; if(!f) return;
+    const r = new FileReader();
+    r.onload = () => {
+      try { ingestLiveData(JSON.parse(r.result), 'Imported: '+f.name); refreshLiveUI(); }
+      catch(e){ toast('Could not read that file — expected the scraper’s data.json'); el('liveStatus').textContent = 'Import failed: '+(e.message||'invalid JSON'); }
+    };
+    r.readAsText(f);
+    input.value = '';
+  }
+
+  function matchedSections(id){ if(!liveData) return []; const k = courseKey(id); return (k && liveData.byKey.get(k)) || []; }
+  function isSectionOpen(s){ return !(s.enroll==='FULL' || s.max_enroll==='FULL' || Number(s.enroll) >= Number(s.max_enroll)); }
+  function liveBadgeHTML(id){
+    const secs = matchedSections(id); if(!secs.length) return '';
+    const open = secs.some(isSectionOpen);
+    return open
+      ? `<span class="badge" style="background:rgba(96,165,250,.16);color:var(--blue)">📡 ${secs.length}</span>`
+      : `<span class="badge" style="background:rgba(248,113,113,.14);color:var(--red)">📡 Full</span>`;
+  }
+
+  function t12(hhmm){ if(!hhmm) return ''; let [h,m]=hhmm.split(':').map(Number); const ap=h>=12?'PM':'AM'; h=h%12||12; return `${h}:${String(m).padStart(2,'0')} ${ap}`; }
+  function timeHTML(s){ if(!s.days || !s.start_time) return '<span style="color:var(--muted)">TBD / async</span>'; return `${s.days.map(d=>DAY_ABBR[d]||'').join('')} ${t12(s.start_time)}–${t12(s.end_time)}`; }
+  function instrHTML(list){
+    if(!list || !list.length) return '<span style="color:var(--muted)">STAFF</span>';
+    return list.map(i=>{
+      if(i.rating && (i.rating.quality!=null)){
+        const q = i.rating.quality; const col = q>=4?'var(--green)':q>=3?'var(--yellow)':'var(--red)';
+        return `<a class="accent-link" href="https://www.ratemyprofessors.com/search/professors?q=${encodeURIComponent(i.name)}" target="_blank" rel="noopener" data-tip="View on RateMyProfessors">${i.name}</a> <span class="rmp" style="color:${col}">★${q}</span>`;
+      }
+      return `<a class="accent-link" href="https://www.ratemyprofessors.com/search/professors?q=${encodeURIComponent(i.name)}" target="_blank" rel="noopener" data-tip="No rating yet — search RateMyProfessors">${i.name}</a> <span style="color:var(--muted);font-size:.72rem">—</span>`;
+    }).join(', ');
+  }
+  function crnHTML(s){ return `<a class="accent-link" href="javascript:void(0)" data-tip="Copy CRN for registration" onclick="copyCRN('${s.crn}')">${s.crn}</a>`; }
+  function copyCRN(crn){ try{ navigator.clipboard.writeText(crn); }catch(e){} toast('📋 Copied CRN '+crn); }
+  function seatCellHTML(s){
+    if(s.enroll==='FULL' || s.max_enroll==='FULL') return `<span style="color:var(--red);font-weight:700">Full</span>`;
+    const en=Number(s.enroll), mx=Number(s.max_enroll)||1; const open=Math.max(0,mx-en); const pct=Math.min(100,Math.round(en/mx*100));
+    const col = open===0?'var(--red)':open<=5?'var(--yellow)':'var(--green)';
+    return `<span style="color:${col};font-weight:700">${open} open</span><span style="color:var(--muted)"> / ${mx}</span>
+      <div class="seat-bar"><span style="width:${pct}%;background:${col}"></span></div>`;
+  }
+  function sectionRowHTML(s){
+    return `<div class="live-sec flex items-center justify-between gap-3">
+      <div><b>Sec ${s.section}</b> · CRN ${s.crn} · ${s.instruction_method||''}
+        <div style="color:var(--muted);margin-top:2px">${timeHTML(s)} · ${instrHTML(s.instructors)}</div></div>
+      <div style="text-align:right;white-space:nowrap">${seatCellHTML(s)}</div>
+    </div>`;
+  }
+
+  // primary + advanced filter helpers
+  function toggleChip(inputId){
+    const box = el(inputId); box.checked = !box.checked;
+    const chip = el(inputId==='liveMineOnly'?'liveMineChip':inputId==='advOpen'?'advOpenChip':'advBlankChip');
+    setChipActive(chip, box.checked);
+    renderLiveTable();
+  }
+  function setChipActive(chip, on){
+    if(!chip) return;
+    chip.style.background = on ? 'color-mix(in srgb,var(--accent) 16%,var(--panel))' : 'var(--panel)';
+    chip.style.borderColor = on ? 'var(--accent)' : 'var(--line)';
+    chip.style.color = on ? 'var(--accent)' : 'var(--text)';
+  }
+  function toggleAdvanced(){
+    const open = el('advDrawer').classList.toggle('open');
+    el('advChev').classList.toggle('open', open);
+  }
+  function resetAdvanced(){
+    ['advRating','advDiff','advPrereq'].forEach(id=> el(id).selectedIndex=0);
+    el('advStart').value=''; el('advEnd').value='';
+    el('advOpen').checked=false; el('advBlank').checked=true;
+    setChipActive(el('advOpenChip'),false); setChipActive(el('advBlankChip'),true);
+    renderLiveTable();
+  }
+  function onSubjectChange(){
+    if(apiMode){ apiRefetch(true); return; }   // server-side filter via URL params
+    // sample mode: repopulate course-number options client-side
+    const subj = el('liveSubject').value;
+    const nums = [...new Set(liveData.sections.filter(s=>!subj||s.subject_code===subj).map(s=>s.course_number))]
+      .sort((a,b)=>Number(a)-Number(b));
+    el('liveNumber').innerHTML = '<option value="">All numbers</option>' + nums.map(n=>`<option>${n}</option>`).join('');
+    renderLiveTable();
+  }
+  function refreshLiveUI(){
+    const has = !!liveData;
+    el('liveControls').hidden = !has;
+    el('liveTableWrap').hidden = !has;
+    el('liveEmpty').hidden = has;
+    if(!has){ el('liveStatus').textContent = 'No data loaded yet.'; return; }
+    el('liveStatus').textContent = `${liveData.sections.length} sections · ${liveData.term}`;
+    if(el('liveSubject').dataset.built !== liveData.term){
+      el('liveTerm').innerHTML = `<option>${liveData.term}</option>`;
+      const subjects = [...new Set(liveData.sections.map(s=>s.subject_code))].sort();
+      el('liveSubject').innerHTML = '<option value="">All subjects</option>' + subjects.map(x=>`<option>${x}</option>`).join('');
+      el('liveSubject').dataset.built = liveData.term;
+      onSubjectChange();
+    }
+    // reflect chip states
+    setChipActive(el('liveMineChip'), el('liveMineOnly').checked);
+    setChipActive(el('advOpenChip'), el('advOpen').checked);
+    setChipActive(el('advBlankChip'), el('advBlank').checked);
+    renderLiveTable();
+  }
+  function passesAdvanced(s){
+    const minR = Number(el('advRating').value||0);
+    const maxD = Number(el('advDiff').value||5);
+    const start = el('advStart').value, end = el('advEnd').value;
+    const prereq = el('advPrereq').value;
+    const showBlank = el('advBlank').checked;
+    const ratings = (s.instructors||[]).map(i=>i.rating).filter(Boolean);
+    if(minR>0){ if(!ratings.length || !ratings.some(r=>r.quality>=minR)) return false; }
+    if(maxD<5){ if(ratings.length && !ratings.some(r=>r.difficulty<=maxD)) return false; }
+    if(!showBlank){ const hasRating = (s.instructors||[]).some(i=>i.rating); if(!hasRating) return false; }
+    if(start && (!s.start_time || s.start_time < start)) return false;
+    if(end && (!s.end_time || s.end_time > end)) return false;
+    if(prereq==='none' && !(/^\s*(none)?\s*$/i.test(s.prereqs||''))) return false;
+    if(prereq==='has' && (/^\s*(none)?\s*$/i.test(s.prereqs||''))) return false;
+    return true;
+  }
+  // ===== sorting =====
+  let sortState = { key:null, dir:1 };
+  function setSort(key){
+    if(sortState.key===key) sortState.dir *= -1;
+    else sortState = { key, dir: (key==='rating'||key==='seats') ? -1 : 1 }; // ratings/seats default high→low
+    renderLiveTable();
+  }
+  const bestRating = (s)=>{ const rs=(s.instructors||[]).map(i=>i.rating&&i.rating.quality).filter(x=>x!=null); return rs.length?Math.max(...rs):-1; };
+  const openSeats  = (s)=>{ if(s.enroll==='FULL'||s.max_enroll==='FULL') return -1; return Math.max(0, Number(s.max_enroll)-Number(s.enroll)); };
+  function sortValue(s, key){
+    switch(key){
+      case 'course':  return s.subject_code+' '+String(s.course_number).padStart(4,'0');
+      case 'title':   return (s.course_title||'').toLowerCase();
+      case 'section': return s.section||'';
+      case 'crn':     return Number(s.crn)||0;
+      case 'rating':  return bestRating(s);
+      case 'seats':   return openSeats(s);
+      case 'cr':      return Number(s.credits)||0;
+      default: return 0;
+    }
+  }
+  function updateSortCarets(){
+    document.querySelectorAll('.sort-caret').forEach(el=>{
+      const active = el.dataset.k===sortState.key;
+      el.classList.toggle('active', active);
+      el.textContent = active ? (sortState.dir>0?'▲':'▼') : '↕';
+    });
+  }
+  function renderLiveTable(){
+    if(!liveData) return;
+    const q = (el('liveSearch').value||'').toLowerCase();
+    const subj = el('liveSubject').value;
+    const num = el('liveNumber').value;
+    const openOnly = el('advOpen').checked;
+    const mineOnly = el('liveMineOnly').checked;
+    const mineKeys = new Set();
+    if(mineOnly){ state.terms.forEach(t=> t.courses.forEach(id=>{ const k=courseKey(id); if(k) mineKeys.add(k); })); }
+    let rows = liveData.sections.filter(s=>{
+      if(subj && s.subject_code!==subj) return false;
+      if(num && s.course_number!==num) return false;
+      if(openOnly && !isSectionOpen(s)) return false;
+      if(mineOnly && !mineKeys.has(normKey(s.subject_code,s.course_number))) return false;
+      if(!passesAdvanced(s)) return false;
+      if(q){
+        const hay = `${s.subject_code} ${s.course_number} ${s.course_title} ${s.crn} ${(s.instructors||[]).map(i=>i.name).join(' ')}`.toLowerCase();
+        if(!hay.includes(q)) return false;
+      }
+      return true;
+    });
+    if(sortState.key){
+      rows = rows.slice().sort((a,b)=>{
+        const va=sortValue(a,sortState.key), vb=sortValue(b,sortState.key);
+        if(va<vb) return -1*sortState.dir; if(va>vb) return 1*sortState.dir; return 0;
+      });
+    }
+    el('liveCount').textContent = `Showing ${rows.length} of ${liveData.sections.length} sections`;
+    el('liveTableBody').innerHTML = rows.length ? rows.map(s=>{
+      const id = normKey(s.subject_code, s.course_number);
+      const placed = courseIsPlaced(id);
+      const lockedHere = placed && lockedSection[id] && String(lockedSection[id].crn)===String(s.crn);
+      return `<tr>
+        <td><button class="add-btn ${placed?'added':''}" data-tip="${placed?(lockedHere?'This CRN is in your schedule — click to remove':'Course added (different CRN) — click to remove'):'Add this section to your schedule'}" onclick="toggleRow('${s.crn}')"><span class="chk">${placed?'✓':'＋'}</span></button></td>
+        <td><span style="font-weight:800">${s.subject_code} ${s.course_number}</span></td>
+        <td style="color:var(--muted)">${s.course_title}</td>
+        <td>${s.section}</td>
+        <td>${crnHTML(s)}</td>
+        <td style="white-space:nowrap">${timeHTML(s)}</td>
+        <td>${instrHTML(s.instructors)}</td>
+        <td style="white-space:nowrap">${seatCellHTML(s)}</td>
+        <td style="text-align:right;font-weight:700">${s.credits||''}</td>
+      </tr>`; }).join('') : `<tr><td colspan="9" style="text-align:center;color:var(--muted);padding:28px">No sections match your filters.</td></tr>`;
+    updateSortCarets();
+  }
+
+  // advisor tip that references live availability of this year's planned courses
+  function liveAdvice(){
+    if(!liveData) return null;
+    const yi = currentYearIndex();
+    let matched=0, full=0, samples=[];
+    state.terms.filter(t=> t.type==='class' && t.year===yi+1).forEach(t=> t.courses.forEach(id=>{
+      const secs = matchedSections(id);
+      if(secs.length){ matched++; if(!secs.some(isSectionOpen)){ full++; samples.push(courseData()[id].code); } }
+    }));
+    if(!matched) return null;
+    return full
+      ? {sev:'warn', icon:'📡', h:`${full} of this year's courses are full`,
+         b:`${samples.join(', ')} ${full===1?'has':'have'} no open seats in ${liveData.term}. Register early or line up a backup section.`}
+      : {sev:'good', icon:'📡', h:`${matched} of this year's courses are offered now`,
+         b:`Live Drexel data shows open sections for your Year ${yi+1} plan in ${liveData.term}. Click a course to see times, seats, and professor ratings.`};
+  }
+
+  /* =========================================================================
+     LIVE BACKEND API — FastAPI + PostgreSQL (backend/main.py)
+     Primary data source. The embedded sample stays ONLY as an automatic
+     fallback when no API is reachable (hosted artifact / offline / file://),
+     so the shareable prototype keeps working.
+     ========================================================================= */
+  const API_BASE = 'http://localhost:8000';
+  let apiMode = false;          // true once the local API answers the health probe
+  let apiTerm = null;           // raw term string reported by the API (opaque — survives the 2027 semester-code change)
+
+  // Flat API rows (one per section+instructor) -> scraper-shaped sections,
+  // grouped by CRN with an instructors[] array. Times/days pass through
+  // unchanged ("HH:MM" + day-name arrays), so the conflict detection and
+  // week-grid logic work identically on live data.
+  function adaptApiRows(rows){
+    const byCrn = new Map();
+    for(const r of rows){
+      const key = String(r.crn);
+      let s = byCrn.get(key);
+      if(!s){
+        s = {
+          subject_code:r.subject_code, course_number:String(r.course_number),
+          instruction_type:r.instruction_type||'', instruction_method:r.instruction_method||'',
+          section:r.section||'', crn:r.crn,
+          enroll:r.enroll, max_enroll:r.max_enroll,
+          course_title:r.title || r.course_title || '',
+          days:r.days||null, start_time:r.start_time||null, end_time:r.end_time||null,
+          building:r.building||null, room:r.room||null,
+          prereqs:r.prereqs||'', credits:r.credits!=null?String(r.credits):'',
+          instructors:null
+        };
+        byCrn.set(key, s);
+      }
+      if(r.instructor_name){
+        if(!s.instructors) s.instructors = [];
+        if(!s.instructors.some(i=>i.name===r.instructor_name)){
+          s.instructors.push(r.rating!=null
+            ? { name:r.instructor_name, rating:{ quality:Number(r.rating), difficulty:r.difficulty!=null?Number(r.difficulty):null } }
+            : { name:r.instructor_name });
+        }
+      }
+    }
+    return [...byCrn.values()];
+  }
+
+  async function fetchLiveCourseData(term, subject, courseNumber){
+    const params = new URLSearchParams();
+    if(term) params.append('term', term);
+    if(subject) params.append('subject', subject);
+    if(courseNumber) params.append('course_number', courseNumber);
+    const res = await fetch(`${API_BASE}/api/sections?${params.toString()}`);
+    if(!res.ok) throw new Error('API '+res.status);
+    const result = await res.json();
+    if(result.status!=='success') throw new Error(result.detail||'API error');
+    return { sections: adaptApiRows(result.data), term: result.term };
+  }
+
+  function setSourceUI(live){
+    const pill = el('srcPill'), txt = el('srcPillText'), flag = el('demoFlag'), th = el('thInstr');
+    if(live){
+      pill.classList.add('live'); pill.classList.remove('sample');
+      pill.querySelector('.dot').style.background = 'var(--green)';
+      txt.textContent = 'live API';
+      pill.setAttribute('data-tip', `Connected to ${API_BASE} — data from the scraper's PostgreSQL (${apiTerm||'current term'})`);
+      flag.textContent = 'ℹ cached RMP ratings';
+      flag.setAttribute('data-tip', "Instructor ★ ratings come from the scraper's cached RateMyProfessors database — they can lag behind live RMP values. Seats reflect the last scrape, not this second.");
+      if(th) th.setAttribute('data-tip', "★ ratings are served from the cached RateMyProfessors DB (scraper's ratings_cache) — may lag live RMP");
+    } else {
+      pill.classList.remove('live'); pill.classList.add('sample');
+      pill.querySelector('.dot').style.background = 'var(--muted)';
+      txt.textContent = 'sample data';
+      pill.setAttribute('data-tip', `No local API found at ${API_BASE} — showing the bundled sample term. Run: uvicorn main:app --reload (see backend/)`);
+      flag.textContent = '⚠ demo ratings & seats';
+      flag.setAttribute('data-tip', 'Prototype notice: instructor ★ ratings and seat counts are placeholder/sample data — not real RateMyProfessors or live registrar values.');
+      if(th) th.setAttribute('data-tip', '⚠ Ratings are placeholder demo data — not real RateMyProfessors values');
+    }
+  }
+
+  // Probe the local API; if it answers, swap the table onto live data.
+  async function tryLiveApi(){
+    try{
+      const ctl = new AbortController();
+      const timer = setTimeout(()=>ctl.abort(), 1800);
+      const res = await fetch(`${API_BASE}/api/health`, { signal:ctl.signal });
+      clearTimeout(timer);
+      if(!res.ok) return false;
+      const h = await res.json();
+      if(h.status!=='ok') return false;
+      const { sections, term } = await fetchLiveCourseData();
+      if(!sections.length) return false;
+      apiMode = true; apiTerm = term || h.term || 'Live term';
+      ingestLiveData(sections, `${apiTerm} · live`);
+      setSourceUI(true);
+      toast(`🟢 Live API connected — ${sections.length} sections (${apiTerm})`);
+      return true;
+    }catch(e){ return false; }
+  }
+
+  // Server-side filtering: pass the select states as URL params and re-ingest.
+  let apiFetchSeq = 0, apiDebounce = null;
+  function apiRefetch(resetNumber){
+    if(!apiMode) return;
+    clearTimeout(apiDebounce);
+    apiDebounce = setTimeout(async ()=>{
+      const seq = ++apiFetchSeq;
+      const subj = el('liveSubject').value || null;
+      if(resetNumber) el('liveNumber').value = '';
+      const num = el('liveNumber').value || null;
+      try{
+        const { sections } = await fetchLiveCourseData(apiTerm, subj, num);
+        if(seq !== apiFetchSeq) return;                     // stale response
+        const byKey = new Map();
+        for(const s of sections){ const k = normKey(s.subject_code, s.course_number); if(!byKey.has(k)) byKey.set(k,[]); byKey.get(k).push(s); }
+        liveData.sections = sections; liveData.byKey = byKey;
+        if(resetNumber || subj){                            // rebuild number options from the server-filtered rows
+          const nums = [...new Set(sections.map(s=>s.course_number))].sort((a,b)=>Number(a)-Number(b));
+          const cur = el('liveNumber').value;
+          el('liveNumber').innerHTML = '<option value="">All numbers</option>' + nums.map(n=>`<option ${n===cur?'selected':''}>${n}</option>`).join('');
+        }
+        el('liveStatus').textContent = `${sections.length} sections · ${liveData.term}`;
+        renderLiveTable();
+      }catch(e){
+        toast('⚠ Live API request failed — check the backend'); console.error('Error fetching live Drexel data:', e);
+      }
+    }, 220);
+  }
+  function onTermChange(){ if(apiMode){ apiRefetch(false); } else renderLiveTable(); }
+  function onNumberChange(){ if(apiMode){ apiRefetch(false); } else renderLiveTable(); }
+
+  /* =========================================================================
+     WEEKLY CALENDAR GRID (drawer) — locked sections as overlapping blocks
+     ========================================================================= */
+  const WEEK_DAYS = ['Monday','Tuesday','Wednesday','Thursday','Friday'];
+  function renderWeekGrid(){
+    const wrap = el('pdWeekWrap'); if(!wrap) return;
+    const withLocked = state.terms.map((t,i)=>({t,i})).filter(x=> x.t.type==='class' && x.t.courses.some(id=>lockedSection[id]));
+    if(!withLocked.length){ wrap.hidden = true; return; }
+    wrap.hidden = false;
+    const sel = el('pdWeekTerm');
+    const opts = withLocked.map(({t,i})=>`<option value="${i}">${t.term} · Y${t.year}</option>`).join('');
+    if(sel.dataset.opts !== opts){ const keep = sel.value; sel.innerHTML = opts; sel.dataset.opts = opts; if([...sel.options].some(o=>o.value===keep)) sel.value = keep; }
+    let idx = Number(sel.value);
+    if(!withLocked.some(x=>x.i===idx)){ idx = withLocked[0].i; sel.value = String(idx); }
+
+    const c = courseData();
+    const clashIds = conflictIdsInTerm(idx);
+    const startH = 8, endH = 21, pxm = 0.42, H = (endH-startH)*60*pxm;
+    const ids = state.terms[idx].courses.filter(id=> lockedSection[id]);
+    const timed = ids.filter(id=> lockedSection[id].days && lockedSection[id].start);
+    const asyncs = ids.filter(id=> !(lockedSection[id].days && lockedSection[id].start));
+
+    const hourLabels = [];
+    for(let h=startH; h<=endH; h+=2) hourLabels.push(`<div style="position:absolute;top:${(h-startH)*60*pxm - 5}px;right:0;left:0">${h%12||12}${h<12?'a':'p'}</div>`);
+    const blocksFor = (day)=> timed.filter(id=> lockedSection[id].days.includes(day)).map(id=>{
+      const s = lockedSection[id];
+      const top = Math.max(0, (toMin(s.start)-startH*60)*pxm);
+      const h  = Math.max(15, Math.min(H-top, (toMin(s.end)-toMin(s.start))*pxm));
+      return `<div class="week-block ${clashIds.has(id)?'clash':''}" style="top:${top}px;height:${h}px">${c[id]?.code||id}<br>${t12(s.start)}</div>`;
+    }).join('');
+
+    el('pdWeekGrid').innerHTML = `<div class="week-grid">
+      <div class="week-col week-axis" style="border-left:none"><div class="wl">&nbsp;</div><div style="position:relative;height:${H}px">${hourLabels.join('')}</div></div>
+      ${WEEK_DAYS.map(d=>`<div class="week-col"><div class="wl">${d.slice(0,3)}</div><div style="position:relative;height:${H}px">${blocksFor(d)}</div></div>`).join('')}
+    </div>`;
+    el('pdWeekAsync').innerHTML = asyncs.length ? 'Async / TBD: ' + asyncs.map(id=>`<span>${c[id]?.code||id}</span>`).join('') : '';
+  }
+
+  /* =========================================================================
+     THEME — system preference + manual override, persisted to localStorage
+     ========================================================================= */
+  const THEME_KEY = 'majormap_theme';
+  const systemPrefersDark = () => window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
+  function applyTheme(mode){ // mode: 'dark' | 'light'
+    document.documentElement.classList.toggle('dark', mode === 'dark');
+    const btn = document.querySelector('.theme-toggle');
+    if(btn) btn.setAttribute('data-tip', mode === 'dark' ? 'Switch to light' : 'Switch to dark');
+  }
+  function currentTheme(){ return document.documentElement.classList.contains('dark') ? 'dark' : 'light'; }
+  function initTheme(){
+    const saved = localStorage.getItem(THEME_KEY);          // manual override wins
+    applyTheme(saved || (systemPrefersDark() ? 'dark' : 'light'));
+    // follow the system while the user hasn't set a manual preference
+    if(window.matchMedia){
+      window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', e=>{
+        if(!localStorage.getItem(THEME_KEY)) applyTheme(e.matches ? 'dark' : 'light');
+      });
+    }
+  }
+  function toggleTheme(){
+    const next = currentTheme() === 'dark' ? 'light' : 'dark';
+    localStorage.setItem(THEME_KEY, next);
+    applyTheme(next);
+  }
+
+  // Database-first: paint instantly, then upgrade to the live API when present.
+  (async function init(){
+    initTheme();
+    ingestLiveData(SAMPLE_LIVE, 'Fall 2026 · sample data');  // instant first paint (fallback dataset)
+    showDb();
+    setSourceUI(false);
+    updatePlanCount();
+    // optional deep-link: ?guided=1 opens the guided planner wizard
+    const params = new URLSearchParams(location.search);
+    const m = params.get('major');
+    if(m && MAJORS[m]) state.major = m;
+    if(params.get('guided')==='1'){ openGuided(); }
+    // probe the local FastAPI backend; if it answers, swap onto live PostgreSQL data
+    await tryLiveApi();
+  })();
+  </script>
+</body>
+</html>
