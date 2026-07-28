@@ -2123,8 +2123,16 @@
      fallback when no API is reachable (hosted artifact / offline / file://),
      so the shareable prototype keeps working.
      ========================================================================= */
-  const API_BASE = 'http://localhost:8000';
-  let apiMode = false;          // true once the local API answers the health probe
+  // Deployed API (Render blueprint: render.yaml). If Render assigns a suffixed
+  // URL on first deploy (name collision), update this one constant to match.
+  const API_BASE_PROD  = 'https://majormap-api.onrender.com';
+  const API_BASE_LOCAL = 'http://localhost:8000';
+  // On the https production site the browser blocks http://localhost (mixed
+  // content), so only the cloud API is probed there. In local/file dev, prefer
+  // the local API and fall back to the cloud one.
+  const API_BASES = location.protocol === 'https:' ? [API_BASE_PROD] : [API_BASE_LOCAL, API_BASE_PROD];
+  let API_BASE = API_BASES[0];  // set to whichever base answers the health probe
+  let apiMode = false;          // true once an API answers the health probe
   let apiTerm = null;           // raw term string reported by the API (opaque — survives the 2027 semester-code change)
 
   // Flat API rows (one per section+instructor) -> scraper-shaped sections,
@@ -2188,31 +2196,44 @@
       pill.classList.remove('live'); pill.classList.add('sample');
       pill.querySelector('.dot').style.background = 'var(--muted)';
       txt.textContent = 'sample data';
-      pill.setAttribute('data-tip', `No local API found at ${API_BASE} — showing the bundled sample term. Run: uvicorn main:app --reload (see backend/)`);
+      pill.setAttribute('data-tip', `No API reachable (${API_BASES.join(' · ')}) — showing the bundled sample term. See backend/ + render.yaml to run or deploy one.`);
       flag.textContent = '⚠ demo ratings & seats';
       flag.setAttribute('data-tip', 'Prototype notice: instructor ★ ratings and seat counts are placeholder/sample data — not real RateMyProfessors or live registrar values.');
       if(th) th.setAttribute('data-tip', '⚠ Ratings are placeholder demo data — not real RateMyProfessors values');
     }
   }
 
-  // Probe the local API; if it answers, swap the table onto live data.
-  async function tryLiveApi(){
+  // Probe each candidate API in order; first one that answers wins and the
+  // table swaps onto live data. The cloud probe gets a long timeout because
+  // free-tier hosts cold-start (the sample table is already painted meanwhile).
+  async function probeBase(base, timeoutMs){
+    const ctl = new AbortController();
+    const timer = setTimeout(()=>ctl.abort(), timeoutMs);
     try{
-      const ctl = new AbortController();
-      const timer = setTimeout(()=>ctl.abort(), 1800);
-      const res = await fetch(`${API_BASE}/api/health`, { signal:ctl.signal });
-      clearTimeout(timer);
-      if(!res.ok) return false;
+      const res = await fetch(`${base}/api/health`, { signal:ctl.signal });
+      if(!res.ok) return null;
       const h = await res.json();
-      if(h.status!=='ok') return false;
-      const { sections, term } = await fetchLiveCourseData();
-      if(!sections.length) return false;
-      apiMode = true; apiTerm = term || h.term || 'Live term';
-      ingestLiveData(sections, `${apiTerm} · live`);
-      setSourceUI(true);
-      toast(`🟢 Live API connected — ${sections.length} sections (${apiTerm})`);
-      return true;
-    }catch(e){ return false; }
+      return h.status==='ok' ? h : null;
+    }catch(e){ return null; }
+    finally{ clearTimeout(timer); }
+  }
+  async function tryLiveApi(){
+    for(const base of API_BASES){
+      const isLocal = base === API_BASE_LOCAL;
+      const h = await probeBase(base, isLocal ? 1800 : 45000);
+      if(!h) continue;
+      try{
+        API_BASE = base;
+        const { sections, term } = await fetchLiveCourseData();
+        if(!sections.length) continue;
+        apiMode = true; apiTerm = term || h.term || 'Live term';
+        ingestLiveData(sections, `${apiTerm} · live`);
+        setSourceUI(true);
+        toast(`🟢 Live API connected — ${sections.length} sections (${apiTerm})`);
+        return true;
+      }catch(e){ /* try the next base */ }
+    }
+    return false;
   }
 
   // Server-side filtering: pass the select states as URL params and re-ingest.

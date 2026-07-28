@@ -1,0 +1,36 @@
+# Render Blueprint — deploys the FastAPI backend + a managed PostgreSQL in one
+# click: Render dashboard → New → Blueprint → pick this repo.
+#
+# After the first deploy, note the service URL (e.g.
+# https://majormap-api.onrender.com — Render may append a suffix if the name is
+# taken) and make sure API_BASE_PROD in app.html matches it.
+#
+# The database starts EMPTY. Load it by running the drexel-scraper from your
+# own machine against this database (see "Deploying the backend" in README.md):
+# copy the External Database URL from the Render dashboard and run the
+# scraper's --db mode with that connection configured.
+
+services:
+  - type: web
+    name: majormap-api
+    runtime: python
+    rootDir: backend
+    plan: free
+    buildCommand: pip install -r requirements.txt
+    startCommand: uvicorn main:app --host 0.0.0.0 --port $PORT
+    healthCheckPath: /api/health
+    envVars:
+      - key: PYTHON_VERSION
+        value: 3.11.9
+      - key: ALLOWED_ORIGINS
+        value: https://majormapai.com,https://www.majormapai.com,https://geogarciaaa.github.io
+      - key: DATABASE_URL
+        fromDatabase:
+          name: majormap-db
+          property: connectionString
+
+databases:
+  - name: majormap-db
+    databaseName: schedulerdb
+    user: majormap
+    plan: free
