@@ -3,167 +3,192 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>MajorMap AI — Graduate on time</title>
-  <meta name="description" content="MajorMap AI helps students plan the right classes, avoid bad advising, and graduate on time with a semester-by-semester roadmap." />
+  <title>MajorMap AI — Find your classes. Map your degree.</title>
+  <meta name="description" content="Search every course section — real ratings, seats, and times — and build a conflict-checked degree plan that gets you out on time." />
+  <script>
+    (function(){ try{
+      var s = localStorage.getItem('majormap_theme');
+      var dark = s ? s === 'dark' : (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches);
+      if(dark) document.documentElement.classList.add('dark');
+    }catch(e){} })();
+  </script>
   <style>
-    :root {
-      --bg: #07111f;
-      --bg2: #0a1628;
-      --panel: rgba(13, 22, 39, 0.82);
-      --line: rgba(148,163,184,.14);
-      --text: #edf4ff;
-      --muted: #93a4bf;
-      --green: #4ade80;
-      --blue: #60a5fa;
-      --purple: #a78bfa;
-      --shadow: 0 30px 80px rgba(2,8,23,.45);
-      --radius: 24px;
-      --max: 1180px;
+    /* ===== Collegiate Modern tokens — shared with app.html ===== */
+    :root{
+      --bg:#f8f7f2; --bg2:#f1efe7;
+      --panel:#ffffff; --surface:#faf9f5; --surface-2:#f3f2ec;
+      --line:#e5e3d9; --line-strong:#cfccbe;
+      --text:#101c36; --muted:#5b6880;
+      --accent:#16305e; --accent-hover:#1e4180;
+      --gold:#a97e12; --gold-bright:#c9971c;
+      --green:#15803d;
+      --glass:rgba(248,247,242,.8);
+      --shadow:0 1px 2px rgba(16,28,54,.05),0 16px 40px rgba(16,28,54,.08);
+      --shadow-lg:0 2px 4px rgba(16,28,54,.04),0 30px 70px rgba(16,28,54,.12);
+      --grad-text:linear-gradient(120deg,#101c36 20%,#16305e 55%,#a97e12);
+      --font-display:"Iowan Old Style","Palatino Linotype",Palatino,Georgia,serif;
+      color-scheme:light;
     }
-    * { box-sizing: border-box; margin: 0; padding: 0; }
-    html { scroll-behavior: smooth; }
-    body {
-      font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
-      color: var(--text);
+    :root.dark{
+      --bg:#0a1128; --bg2:#0c1530;
+      --panel:#111c3a; --surface:#0f1934; --surface-2:#101d3d;
+      --line:#22305a; --line-strong:#35466f;
+      --text:#edf0fa; --muted:#94a2c2;
+      --accent:#8fb0ff; --accent-hover:#b1c7ff;
+      --gold:#e3b341; --gold-bright:#f2ca62;
+      --green:#4ade80;
+      --glass:rgba(10,17,40,.75);
+      --shadow:0 30px 80px rgba(3,7,24,.5);
+      --shadow-lg:0 40px 90px rgba(3,7,24,.6);
+      --grad-text:linear-gradient(120deg,#f5edd8 15%,#e3b341 50%,#8fb0ff);
+      color-scheme:dark;
+    }
+    *{box-sizing:border-box;margin:0;padding:0}
+    html{scroll-behavior:smooth}
+    body{
+      font-family:Inter,ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
+      color:var(--text); line-height:1.6; min-height:100vh; -webkit-font-smoothing:antialiased;
       background:
-        radial-gradient(circle at 0% 0%, rgba(96,165,250,.16), transparent 28%),
-        radial-gradient(circle at 100% 0%, rgba(167,139,250,.14), transparent 22%),
-        radial-gradient(circle at 50% 20%, rgba(74,222,128,.08), transparent 30%),
-        linear-gradient(180deg, var(--bg), var(--bg2));
-      min-height: 100vh;
-      line-height: 1.6;
-      overflow-x: hidden;
+        radial-gradient(circle at 8% 0%, color-mix(in srgb,var(--accent) 7%,transparent), transparent 32%),
+        radial-gradient(circle at 95% 4%, color-mix(in srgb,var(--gold) 9%,transparent), transparent 28%),
+        linear-gradient(180deg,var(--bg),var(--bg2));
+      background-attachment:fixed;
+      transition:background-color .4s ease,color .3s ease;
     }
-    a { text-decoration: none; color: inherit; }
-    .wrap { width: min(var(--max), calc(100% - 28px)); margin: 0 auto; }
-    .topbar {
-      position: sticky; top: 0; z-index: 20;
-      background: rgba(7,17,31,.72); backdrop-filter: blur(16px);
-      border-bottom: 1px solid rgba(148,163,184,.08);
+    a{text-decoration:none;color:inherit}
+    .wrap{width:min(1180px,calc(100% - 40px));margin:0 auto}
+    .display{font-family:var(--font-display);letter-spacing:-.015em;line-height:1.06;text-wrap:balance}
+    .gradient{background:var(--grad-text);-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent}
+    .gold-rule{width:56px;height:3px;border-radius:999px;background:linear-gradient(90deg,var(--gold),var(--gold-bright))}
+    .eyebrow{display:inline-flex;align-items:center;gap:8px;padding:6px 13px;border-radius:999px;font-size:.72rem;
+      font-weight:800;letter-spacing:.14em;text-transform:uppercase;color:var(--gold);
+      background:color-mix(in srgb,var(--gold) 10%,transparent);border:1px solid color-mix(in srgb,var(--gold) 30%,var(--line))}
+    /* nav */
+    .topbar{position:sticky;top:0;z-index:40;background:var(--glass);backdrop-filter:blur(16px);border-bottom:1px solid var(--line)}
+    nav{display:flex;justify-content:space-between;align-items:center;height:66px;gap:16px}
+    .brand{display:flex;align-items:center;gap:11px;font-weight:800;letter-spacing:-.03em;font-size:1.06rem}
+    .brand-mark{width:38px;height:38px;border-radius:12px;display:grid;place-items:center;font-size:1.15rem;
+      background:linear-gradient(140deg,color-mix(in srgb,var(--accent) 16%,transparent),color-mix(in srgb,var(--gold) 18%,transparent));
+      border:1px solid var(--line)}
+    .brand span{color:var(--gold)}
+    .nav-links{display:flex;align-items:center;gap:24px;color:var(--muted);font-size:.92rem;font-weight:500}
+    .nav-links a:hover{color:var(--text)}
+    .btn{display:inline-flex;align-items:center;justify-content:center;gap:9px;font-weight:700;border-radius:13px;
+      padding:12px 20px;font-size:.95rem;border:none;cursor:pointer;font-family:inherit;
+      transition:transform .16s ease,box-shadow .16s ease,border-color .16s ease,background .2s ease}
+    .btn:hover{transform:translateY(-2px)}
+    .btn-primary{background:linear-gradient(135deg,var(--accent),var(--accent-hover));color:#fff;
+      box-shadow:0 12px 30px color-mix(in srgb,var(--accent) 30%,transparent)}
+    :root.dark .btn-primary{color:#0a1128}
+    .btn-secondary{background:var(--panel);border:1px solid var(--line);color:var(--text);box-shadow:var(--shadow)}
+    .btn-secondary:hover{border-color:var(--accent)}
+    .theme-toggle{width:38px;height:38px;border-radius:12px;display:grid;place-items:center;flex-shrink:0;
+      border:1px solid var(--line);background:var(--panel);color:var(--text);cursor:pointer;transition:border-color .15s ease,transform .15s ease}
+    .theme-toggle:hover{border-color:var(--accent);transform:translateY(-1px)}
+    .theme-toggle .sun{display:none} .theme-toggle .moon{display:block}
+    :root.dark .theme-toggle .sun{display:block} :root.dark .theme-toggle .moon{display:none}
+    /* hero */
+    .hero{padding:76px 0 40px}
+    .hero-grid{display:grid;grid-template-columns:1.05fr .95fr;gap:44px;align-items:center}
+    h1{font-size:clamp(2.6rem,5.2vw,4.15rem);margin:18px 0 20px}
+    .lede{color:var(--muted);font-size:1.1rem;max-width:54ch;margin-bottom:28px}
+    .cta-row{display:flex;gap:12px;flex-wrap:wrap;margin-bottom:28px}
+    .trust{display:flex;gap:22px;flex-wrap:wrap;color:var(--muted);font-size:.85rem}
+    .trust b{color:var(--text);font-weight:700}
+    /* app preview card */
+    .preview{background:var(--panel);border:1px solid var(--line);border-radius:22px;box-shadow:var(--shadow-lg);overflow:hidden}
+    .preview-bar{display:flex;align-items:center;gap:7px;padding:13px 16px;border-bottom:1px solid var(--line);background:var(--surface-2)}
+    .dot{width:10px;height:10px;border-radius:999px;background:var(--line-strong)}
+    .preview-url{margin-left:8px;font-size:.72rem;color:var(--muted);font-family:ui-monospace,SFMono-Regular,Menlo,monospace}
+    .preview-body{padding:16px;display:grid;gap:10px}
+    .p-search{display:flex;align-items:center;gap:9px;padding:11px 14px;border-radius:12px;background:var(--surface);
+      border:1px solid var(--line);color:var(--muted);font-size:.86rem}
+    .p-card{border:1px solid var(--line);border-radius:14px;padding:13px;background:var(--surface);display:grid;gap:8px}
+    .p-card-top{display:flex;justify-content:space-between;align-items:flex-start;gap:10px}
+    .p-code{font-weight:800;font-size:.95rem}
+    .p-title{color:var(--muted);font-size:.78rem}
+    .p-plus{width:26px;height:26px;border-radius:8px;display:grid;place-items:center;flex-shrink:0;
+      border:1px solid color-mix(in srgb,var(--accent) 40%,var(--line));color:var(--accent);font-weight:700;font-size:.95rem}
+    .p-chips{display:flex;gap:6px;flex-wrap:wrap}
+    .chip{font-size:.68rem;font-weight:600;padding:3px 9px;border-radius:999px;background:var(--panel);border:1px solid var(--line)}
+    .chip.gold{color:var(--gold);border-color:color-mix(in srgb,var(--gold) 35%,var(--line))}
+    .chip.green{color:var(--green);border-color:color-mix(in srgb,var(--green) 32%,var(--line))}
+    .chip.clash{color:#b91c1c;border-color:color-mix(in srgb,#b91c1c 35%,var(--line));background:color-mix(in srgb,#b91c1c 8%,transparent)}
+    :root.dark .chip.clash{color:#f87171}
+    /* sections */
+    section{padding:56px 0}
+    .sec-head{max-width:660px;margin-bottom:34px}
+    .sec-title{font-size:clamp(1.9rem,3.2vw,2.7rem);margin:14px 0 12px}
+    .sec-copy{color:var(--muted);font-size:1.02rem}
+    .grid-3{display:grid;grid-template-columns:repeat(3,1fr);gap:18px}
+    .card{background:var(--panel);border:1px solid var(--line);border-radius:20px;padding:26px;box-shadow:var(--shadow);
+      transition:transform .18s ease,border-color .18s ease,box-shadow .18s ease}
+    .card:hover{transform:translateY(-4px);border-color:color-mix(in srgb,var(--accent) 32%,var(--line));box-shadow:var(--shadow-lg)}
+    .card-ico{width:46px;height:46px;border-radius:14px;display:grid;place-items:center;font-size:1.3rem;margin-bottom:16px;
+      background:linear-gradient(140deg,color-mix(in srgb,var(--accent) 12%,transparent),color-mix(in srgb,var(--gold) 14%,transparent));
+      border:1px solid var(--line)}
+    .card h3{font-size:1.12rem;margin-bottom:9px;letter-spacing:-.02em}
+    .card p{color:var(--muted);font-size:.94rem}
+    /* steps */
+    .steps{display:grid;grid-template-columns:repeat(3,1fr);gap:18px;counter-reset:step}
+    .step{position:relative;padding:26px;background:var(--panel);border:1px solid var(--line);border-radius:20px;box-shadow:var(--shadow)}
+    .step-n{font-family:var(--font-display);font-size:2.1rem;font-weight:700;color:var(--gold);line-height:1;margin-bottom:12px}
+    .step h3{font-size:1.06rem;margin-bottom:8px}
+    .step p{color:var(--muted);font-size:.93rem}
+    /* split feature */
+    .split{display:grid;grid-template-columns:1fr 1fr;gap:34px;align-items:center}
+    .feature-list{display:grid;gap:14px;margin-top:22px}
+    .fl-item{display:flex;gap:12px;align-items:flex-start}
+    .fl-check{width:22px;height:22px;border-radius:999px;flex-shrink:0;display:grid;place-items:center;font-size:.7rem;font-weight:800;
+      background:color-mix(in srgb,var(--gold) 16%,transparent);color:var(--gold);border:1px solid color-mix(in srgb,var(--gold) 32%,var(--line))}
+    .fl-item b{display:block;margin-bottom:2px}
+    .fl-item span{color:var(--muted);font-size:.92rem}
+    /* week grid mock */
+    .week{display:grid;grid-template-columns:repeat(5,1fr);gap:6px;background:var(--panel);border:1px solid var(--line);
+      border-radius:18px;padding:14px;box-shadow:var(--shadow-lg)}
+    .wk-col{display:grid;gap:6px}
+    .wk-h{font-size:.62rem;font-weight:800;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);text-align:center;padding-bottom:4px}
+    .wk-slot{height:26px;border-radius:7px;background:var(--surface-2)}
+    .wk-blk{height:44px;border-radius:7px;background:color-mix(in srgb,var(--accent) 82%,#000 6%);color:#fff;font-size:.6rem;
+      font-weight:700;padding:5px 6px;line-height:1.2}
+    :root.dark .wk-blk{color:#0a1128}
+    .wk-blk.clash{background:#c0392b;color:#fff}
+    /* CTA + waitlist */
+    .cta-shell{background:var(--panel);border:1px solid var(--line);border-radius:26px;padding:40px;box-shadow:var(--shadow-lg);
+      display:grid;grid-template-columns:1.05fr .95fr;gap:34px;align-items:center}
+    .field{margin-bottom:13px}
+    .field label{display:block;margin-bottom:7px;font-size:.85rem;font-weight:600}
+    .field input,.field textarea{width:100%;padding:12px 14px;border-radius:12px;border:1px solid var(--line);
+      background:var(--surface);color:var(--text);font:inherit;outline:none;transition:border-color .15s ease,box-shadow .15s ease}
+    .field input:focus,.field textarea:focus{border-color:var(--accent);box-shadow:0 0 0 3px color-mix(in srgb,var(--accent) 20%,transparent)}
+    .fine{color:var(--muted);font-size:.8rem;margin-top:11px}
+    .success{display:none;padding:22px;border-radius:16px;text-align:center;
+      background:color-mix(in srgb,var(--green) 10%,transparent);border:1px solid color-mix(in srgb,var(--green) 32%,var(--line))}
+    .success.show{display:block}
+    /* footer */
+    .footer{border-top:1px solid var(--line);padding:30px 0 40px;color:var(--muted);font-size:.9rem;margin-top:20px}
+    .footer-inner{display:flex;justify-content:space-between;gap:16px;flex-wrap:wrap}
+    /* reveal */
+    .reveal{opacity:0;transform:translateY(20px);transition:opacity .6s ease,transform .6s ease}
+    .reveal.show{opacity:1;transform:none}
+    @media (prefers-reduced-motion:reduce){
+      .reveal{opacity:1;transform:none;transition:none} .btn:hover,.card:hover{transform:none} html{scroll-behavior:auto}
     }
-    nav { display: flex; justify-content: space-between; align-items: center; padding: 16px 0; }
-    .brand { display: flex; align-items: center; gap: 12px; font-size: 1.05rem; font-weight: 800; letter-spacing: -.03em; }
-    .brand-mark {
-      width: 42px; height: 42px; border-radius: 14px; display: grid; place-items: center;
-      background: linear-gradient(135deg, rgba(74,222,128,.18), rgba(96,165,250,.18));
-      border: 1px solid var(--line); box-shadow: var(--shadow);
+    @media (max-width:960px){
+      .hero-grid,.grid-3,.steps,.split,.cta-shell{grid-template-columns:1fr}
+      .nav-links a:not(.nav-cta){display:none}
+      .hero{padding:48px 0 30px}
+      .cta-shell{padding:28px}
     }
-    .brand span { color: var(--green); }
-    .nav-links { display: flex; align-items: center; gap: 24px; color: var(--muted); font-size: .94rem; }
-    .nav-links a:hover { color: var(--text); }
-    .nav-cta {
-      padding: 10px 16px; border-radius: 12px; font-weight: 700;
-      background: linear-gradient(135deg, var(--green), #86efac); color: #05130b;
-      box-shadow: 0 10px 30px rgba(74,222,128,.18);
-    }
-    .hero { padding: 76px 0 40px; position: relative; }
-    .orbs::before, .orbs::after {
-      content: ""; position: absolute; border-radius: 999px; filter: blur(60px); pointer-events: none;
-    }
-    .orbs::before { width: 260px; height: 260px; background: rgba(96,165,250,.14); top: 40px; right: -80px; }
-    .orbs::after { width: 220px; height: 220px; background: rgba(74,222,128,.12); left: -80px; bottom: 0; }
-    .hero-grid { display: grid; grid-template-columns: 1.1fr .9fr; gap: 22px; align-items: stretch; }
-    .card {
-      background: var(--panel); border: 1px solid var(--line); border-radius: var(--radius);
-      box-shadow: var(--shadow); backdrop-filter: blur(14px);
-    }
-    .hero-copy { padding: 34px; position: relative; overflow: hidden; }
-    .hero-copy::after {
-      content: ""; position: absolute; right: -80px; top: -90px; width: 320px; height: 320px;
-      background: radial-gradient(circle, rgba(74,222,128,.14), transparent 62%);
-      pointer-events: none;
-    }
-    .eyebrow {
-      display: inline-flex; align-items: center; gap: 8px;
-      padding: 8px 12px; border-radius: 999px; font-size: .8rem; letter-spacing: .16em;
-      text-transform: uppercase; color: var(--green);
-      background: rgba(74,222,128,.08); border: 1px solid rgba(74,222,128,.16); margin-bottom: 18px;
-    }
-    h1 { font-size: clamp(2.5rem, 5vw, 4.7rem); line-height: .95; letter-spacing: -.06em; margin-bottom: 18px; max-width: 11ch; }
-    .gradient {
-      background: linear-gradient(135deg, #fff, #a7f3d0 50%, #93c5fd 100%);
-      -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
-    }
-    .subhead { color: var(--muted); font-size: 1.06rem; max-width: 60ch; margin-bottom: 26px; }
-    .actions { display: flex; gap: 12px; flex-wrap: wrap; margin-bottom: 24px; }
-    .btn-primary, .btn-secondary {
-      display: inline-flex; align-items: center; justify-content: center; gap: 10px;
-      padding: 14px 20px; border-radius: 14px; font-weight: 700; font-size: .98rem;
-      transition: transform .18s ease, opacity .18s ease, border-color .18s ease, box-shadow .18s ease;
-    }
-    .btn-primary { background: linear-gradient(135deg, var(--green), #86efac); color: #04110a; box-shadow: 0 14px 30px rgba(74,222,128,.18); }
-    .btn-secondary { border: 1px solid var(--line); background: rgba(255,255,255,.03); }
-    .btn-primary:hover, .btn-secondary:hover { transform: translateY(-2px); opacity: .96; }
-    .stats { display: grid; grid-template-columns: repeat(3,1fr); gap: 12px; }
-    .mini { padding: 16px; border-radius: 18px; background: rgba(255,255,255,.03); border: 1px solid rgba(148,163,184,.08); }
-    .mini .label { color: var(--muted); font-size: .76rem; text-transform: uppercase; letter-spacing: .14em; margin-bottom: 8px; }
-    .mini .value { font-size: 1.55rem; font-weight: 800; letter-spacing: -.04em; }
-    .hero-panel { padding: 26px; display: grid; gap: 14px; }
-    .flow-pill {
-      display: inline-flex; width: fit-content; padding: 8px 12px; border-radius: 999px;
-      border: 1px solid rgba(96,165,250,.18); background: rgba(96,165,250,.08); color: #bfdbfe;
-      font-size: .83rem; margin-bottom: 6px;
-    }
-    .panel-box { padding: 18px; border-radius: 20px; background: rgba(255,255,255,.03); border: 1px solid rgba(148,163,184,.08); }
-    .panel-box h3 { font-size: 1.1rem; margin-bottom: 8px; }
-    .panel-box p { color: var(--muted); font-size: .94rem; margin-bottom: 12px; }
-    .flow-list { display: grid; gap: 10px; font-size: .93rem; color: #d6e4f7; }
-    section { padding: 34px 0; }
-    .section-head { max-width: 760px; margin-bottom: 22px; }
-    .section-kicker { color: var(--green); text-transform: uppercase; letter-spacing: .16em; font-size: .8rem; font-weight: 700; margin-bottom: 10px; }
-    .section-title { font-size: clamp(1.9rem, 3vw, 3rem); line-height: 1; letter-spacing: -.05em; margin-bottom: 12px; }
-    .section-copy { color: var(--muted); max-width: 60ch; }
-    .grid-3 { display: grid; grid-template-columns: repeat(3,1fr); gap: 16px; }
-    .feature { padding: 22px; transition: transform .18s ease, border-color .18s ease; }
-    .feature:hover { transform: translateY(-4px); border-color: rgba(96,165,250,.22); }
-    .feature-icon {
-      width: 46px; height: 46px; border-radius: 14px; display: grid; place-items: center; margin-bottom: 16px;
-      background: linear-gradient(135deg, rgba(74,222,128,.15), rgba(96,165,250,.15)); border: 1px solid rgba(148,163,184,.12);
-    }
-    .feature h3 { font-size: 1.1rem; margin-bottom: 10px; letter-spacing: -.03em; }
-    .feature p, .feature li { color: var(--muted); font-size: .95rem; }
-    .feature ul { list-style: none; display: grid; gap: 8px; margin-top: 12px; }
-    .split { display: grid; grid-template-columns: 1.05fr .95fr; gap: 18px; }
-    .roadmap { padding: 24px; }
-    .roadmap-step { display: flex; gap: 14px; padding: 14px 0; border-top: 1px solid rgba(148,163,184,.08); }
-    .roadmap-step:first-child { border-top: 0; }
-    .num { width: 34px; height: 34px; border-radius: 12px; flex-shrink: 0; display: grid; place-items: center; background: rgba(74,222,128,.12); color: var(--green); font-weight: 800; }
-    .quote { padding: 24px; font-size: 1.06rem; color: #dce7f8; }
-    .quote strong { color: #fff; }
-    .pricing-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
-    .pricing { padding: 24px; }
-    .price { font-size: 2.2rem; font-weight: 800; letter-spacing: -.05em; margin: 8px 0 10px; }
-    .pricing ul { list-style: none; display: grid; gap: 10px; margin-top: 14px; color: var(--muted); }
-    .cta-shell { padding: 34px; position: relative; overflow: hidden; }
-    .cta-shell::before {
-      content: ""; position: absolute; left: -120px; bottom: -140px; width: 320px; height: 320px;
-      background: radial-gradient(circle, rgba(96,165,250,.14), transparent 62%);
-    }
-    .cta-grid { position: relative; display: grid; grid-template-columns: 1.05fr .95fr; gap: 20px; align-items: center; }
-    .cta-title { font-size: clamp(2rem, 4vw, 3.4rem); line-height: .96; letter-spacing: -.06em; margin-bottom: 14px; }
-    .waitlist-box { padding: 22px; }
-    .field { margin-bottom: 14px; }
-    .field label { display: block; margin-bottom: 8px; color: #d7e3f6; font-size: .9rem; }
-    .field input, .field select, .field textarea {
-      width: 100%; padding: 13px 14px; border-radius: 14px; border: 1px solid rgba(148,163,184,.12);
-      background: rgba(255,255,255,.03); color: var(--text); outline: none; font: inherit;
-    }
-    .field input:focus, .field select:focus, .field textarea:focus { border-color: rgba(96,165,250,.32); }
-    .fine { color: var(--muted); font-size: .82rem; margin-top: 12px; }
-    .success { display: none; padding: 24px; border-radius: 18px; background: rgba(74,222,128,.08); border: 1px solid rgba(74,222,128,.16); }
-    .success.show { display: block; }
-    .footer { border-top: 1px solid rgba(148,163,184,.08); padding: 26px 0 34px; color: var(--muted); font-size: .92rem; }
-    .footer-inner { display: flex; justify-content: space-between; gap: 16px; flex-wrap: wrap; }
-    .reveal { opacity: 0; transform: translateY(18px); transition: opacity .55s ease, transform .55s ease; }
-    .reveal.show { opacity: 1; transform: translateY(0); }
-    @media (max-width: 1024px) {
-      .hero-grid, .grid-3, .split, .pricing-grid, .cta-grid, .stats { grid-template-columns: 1fr; }
-      .nav-links { display: none; }
-    }
-    @media (max-width: 720px) {
-      .wrap { width: min(var(--max), calc(100% - 20px)); }
-      .hero-copy, .hero-panel, .feature, .roadmap, .pricing, .cta-shell, .quote, .waitlist-box { padding: 22px; }
-      h1 { max-width: 100%; }
+    @media (max-width:560px){
+      .wrap{width:min(1180px,calc(100% - 28px))}
+      .trust{gap:14px;font-size:.8rem}
+      .brand{font-size:.95rem;white-space:nowrap}
+      .brand-mark{width:32px;height:32px;font-size:1rem}
+      .nav-links{gap:10px}
+      .nav-cta{padding:9px 13px;font-size:.85rem;white-space:nowrap}
+      .theme-toggle{width:34px;height:34px}
+      h1{font-size:2.35rem}
     }
   </style>
 </head>
@@ -176,211 +201,200 @@
           <div>Major<span>Map</span> AI</div>
         </a>
         <div class="nav-links">
-          <a href="#problem">Problem</a>
-          <a href="#solution">Solution</a>
+          <a href="#features">Features</a>
           <a href="#how">How it works</a>
-          <a href="#pricing">Pricing</a>
-          <a class="nav-cta" href="./app.html">Launch Planner</a>
+          <a href="#waitlist">Waitlist</a>
+          <a class="btn btn-primary nav-cta" href="./app.html">Open the app</a>
+          <button class="theme-toggle" aria-label="Toggle light and dark mode" onclick="toggleTheme()">
+            <svg class="sun" width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/></svg>
+            <svg class="moon" width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8z"/></svg>
+          </button>
         </div>
       </nav>
     </div>
   </div>
 
-  <main id="top" class="orbs">
+  <main id="top">
+    <!-- ===== HERO ===== -->
     <section class="hero">
-      <div class="wrap">
-        <div class="hero-grid">
-          <div class="card hero-copy reveal">
-            <div class="eyebrow">Built for students who don't want to graduate late</div>
-            <h1>Stop guessing. <span class="gradient">Graduate on time.</span></h1>
-            <p class="subhead">
-              MajorMap AI builds a semester-by-semester academic plan based on your school, major, transfer credits, and future goals — so one bad advisor conversation doesn’t cost you a whole extra semester.
-            </p>
-            <div class="actions">
-              <a class="btn-primary" href="./app.html">Build your degree map →</a>
-              <a class="btn-secondary" href="#waitlist">Join the Waitlist</a>
-            </div>
-            <div class="stats">
-              <div class="mini">
-                <div class="label">Core Promise</div>
-                <div class="value">Graduate Faster</div>
-              </div>
-              <div class="mini">
-                <div class="label">Inputs</div>
-                <div class="value">School + Major</div>
-              </div>
-              <div class="mini">
-                <div class="label">Output</div>
-                <div class="value">Full Roadmap</div>
-              </div>
-            </div>
+      <div class="wrap hero-grid">
+        <div>
+          <div class="eyebrow">Built for Philly students</div>
+          <h1 class="display">Find your classes.<br/><span class="gradient">Map your degree.</span></h1>
+          <p class="lede">
+            Search every section this term — real seats, meeting times, and instructor ratings —
+            then build a schedule that checks itself for time conflicts and missing prerequisites.
+          </p>
+          <div class="cta-row">
+            <a class="btn btn-primary" href="./app.html">Search courses free →</a>
+            <a class="btn btn-secondary" href="#how">See how it works</a>
           </div>
+          <div class="trust">
+            <span><b>6</b> Philly universities</span>
+            <span><b>Drexel</b> co-op quarters supported</span>
+            <span><b>No</b> sign-up required</span>
+          </div>
+        </div>
 
-          <div class="card hero-panel reveal">
-            <div class="flow-pill">Example AI output</div>
-            <div class="panel-box">
-              <h3>Drexel student — Business & Engineering</h3>
-              <p>Goal: graduate on time, avoid advisor mistakes, and land strong internships.</p>
-              <div class="flow-list">
-                <div>✅ Fall: take prerequisite chain before bottlenecks fill up</div>
-                <div>⚠️ Warning: missing one class here pushes graduation by a semester</div>
-                <div>📆 Spring: recommended schedule based on major map + credits</div>
-                <div>💼 Opportunities: internship programs, clubs, certs, and recruiting windows</div>
+        <!-- app preview -->
+        <div class="preview reveal">
+          <div class="preview-bar">
+            <span class="dot"></span><span class="dot"></span><span class="dot"></span>
+            <span class="preview-url">majormapai.com/app</span>
+          </div>
+          <div class="preview-body">
+            <div class="p-search">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3.8-3.8"/></svg>
+              Search course, title, CRN, or instructor…
+            </div>
+            <div class="p-card">
+              <div class="p-card-top">
+                <div><div class="p-code">CS 260</div><div class="p-title">Data Structures</div></div>
+                <div class="p-plus">＋</div>
+              </div>
+              <div class="p-chips">
+                <span class="chip">MW 10:00 AM</span>
+                <span class="chip green">● 12 open</span>
+                <span class="chip">4.0 cr</span>
+                <span class="chip gold">★ 4.6</span>
               </div>
             </div>
-            <div class="panel-box">
-              <h3>Why this matters</h3>
-              <p>Students trust advisors to guide them. But one wrong class sequence can waste time, tuition, and momentum.</p>
-              <a class="btn-primary" href="./app.html" style="width:100%;">Open the interactive planner →</a>
+            <div class="p-card">
+              <div class="p-card-top">
+                <div><div class="p-code">MATH 200</div><div class="p-title">Multivariate Calculus</div></div>
+                <div class="p-plus">＋</div>
+              </div>
+              <div class="p-chips">
+                <span class="chip">MW 10:30 AM</span>
+                <span class="chip clash">⚠ Time conflict</span>
+                <span class="chip">4.0 cr</span>
+              </div>
             </div>
           </div>
         </div>
       </div>
     </section>
 
-    <section id="problem">
+    <!-- ===== FEATURES ===== -->
+    <section id="features">
       <div class="wrap">
-        <div class="section-head reveal">
-          <div class="section-kicker">The problem</div>
-          <h2 class="section-title">College planning is way too fragile.</h2>
-          <p class="section-copy">A lot of students don’t graduate late because they’re lazy. They graduate late because the system is messy, advising is inconsistent, and prerequisite chains are easy to mess up.</p>
+        <div class="sec-head reveal">
+          <div class="eyebrow">What you get</div>
+          <h2 class="display sec-title">Everything the registrar portal won't tell you.</h2>
+          <p class="sec-copy">Course search, professor ratings, seat counts, and a degree plan that catches mistakes — in one place, before registration opens.</p>
         </div>
         <div class="grid-3">
-          <div class="card feature reveal">
-            <div class="feature-icon">🧩</div>
-            <h3>Wrong class sequence</h3>
-            <p>Students take classes out of order, miss prerequisites, and don’t realize the damage until the next registration cycle.</p>
+          <div class="card reveal">
+            <div class="card-ico">🔎</div>
+            <h3>Instant course search</h3>
+            <p>Filter thousands of sections by subject, number, time window, open seats, difficulty, and instructor rating — results update as you type.</p>
           </div>
-          <div class="card feature reveal">
-            <div class="feature-icon">📞</div>
-            <h3>Bad advising</h3>
-            <p>Advisors are overloaded, inconsistent, or just wrong. Students assume the advice is safe and pay the price later.</p>
+          <div class="card reveal">
+            <div class="card-ico">⏰</div>
+            <h3>Conflict detection</h3>
+            <p>Lock in a specific CRN and we flag overlapping meeting times instantly, with a weekly grid so you can see the clash, not just read about it.</p>
           </div>
-          <div class="card feature reveal">
-            <div class="feature-icon">💸</div>
-            <h3>Extra semesters cost real money</h3>
-            <p>Tuition, housing, opportunity cost, and delayed career earnings make one mistake a lot more expensive than it looks.</p>
+          <div class="card reveal">
+            <div class="card-ico">🧭</div>
+            <h3>Co-op aware timelines</h3>
+            <p>Drexel's 5-year quarter system with full-time co-op blocks, or a standard 4-year semester grid — your plan matches your school's real calendar.</p>
+          </div>
+          <div class="card reveal">
+            <div class="card-ico">🧩</div>
+            <h3>Prerequisite guardrails</h3>
+            <p>Take a course before its prerequisite and the advisor catches it, then re-sequences your whole plan with one click.</p>
+          </div>
+          <div class="card reveal">
+            <div class="card-ico">⭐</div>
+            <h3>Ratings where you decide</h3>
+            <p>Instructor quality and difficulty scores sit right on the course card — no second tab, no guessing which section to take.</p>
+          </div>
+          <div class="card reveal">
+            <div class="card-ico">📤</div>
+            <h3>Export &amp; share</h3>
+            <p>Save your plan to the browser, export JSON, or print a clean PDF to bring to your advising appointment.</p>
           </div>
         </div>
       </div>
     </section>
 
-    <section id="solution">
-      <div class="wrap split">
-        <div class="card roadmap reveal">
-          <div class="section-kicker">The solution</div>
-          <h2 class="section-title">A personal academic roadmap, built by AI.</h2>
-          <p class="section-copy" style="margin-bottom:16px;">Import your school, major, credits, and goals. MajorMap AI turns that into an actual semester-by-semester plan instead of vague advice.</p>
-          <div class="roadmap-step"><div class="num">1</div><div><strong>Import your context</strong><div class="section-copy">School, major, current year, AP/transfer credits, and future goals.</div></div></div>
-          <div class="roadmap-step"><div class="num">2</div><div><strong>Generate the roadmap</strong><div class="section-copy">A clean semester plan that respects prerequisites, bottlenecks, and graduation targets.</div></div></div>
-          <div class="roadmap-step"><div class="num">3</div><div><strong>Get opportunity suggestions</strong><div class="section-copy">Internships, clubs, recruiting windows, certifications, and useful next steps for your major.</div></div></div>
-          <div class="roadmap-step"><div class="num">4</div><div><strong>Catch mistakes early</strong><div class="section-copy">See risks before registration season burns a whole semester.</div></div></div>
-        </div>
-        <div class="card quote reveal">
-          <strong>“Your advisor says one thing. Your degree audit says another. The course catalog says something else.”</strong><br><br>
-          MajorMap AI is built for that exact mess. The goal is to give students a second brain for academic planning — one that doesn’t forget prerequisites, graduation requirements, or career timing.
-        </div>
-      </div>
-    </section>
-
+    <!-- ===== HOW IT WORKS ===== -->
     <section id="how">
       <div class="wrap">
-        <div class="section-head reveal">
-          <div class="section-kicker">What students get</div>
-          <h2 class="section-title">More than a chatbot. A real plan.</h2>
-          <p class="section-copy" style="margin-bottom:18px;">This isn’t just “ask AI a question.” It’s structured academic planning with school-specific logic and future-focused recommendations.</p>
-          <a class="btn-primary" href="./app.html">Try the live degree planner →</a>
+        <div class="sec-head reveal">
+          <div class="eyebrow">How it works</div>
+          <h2 class="display sec-title">Three steps. No account.</h2>
         </div>
-        <div class="grid-3">
-          <div class="card feature reveal">
-            <div class="feature-icon">🗂️</div>
-            <h3>Semester planner</h3>
-            <p>See what to take and when to take it, with warnings if you’re about to mess up your sequence.</p>
-            <ul><li>Prerequisite-aware roadmap</li><li>Graduation timeline</li><li>Course bottleneck warnings</li></ul>
+        <div class="steps">
+          <div class="step reveal">
+            <div class="step-n">01</div>
+            <h3>Search the term</h3>
+            <p>Open the app and every section is already loaded. Filter down to exactly the classes you're considering.</p>
           </div>
-          <div class="card feature reveal">
-            <div class="feature-icon">🎯</div>
-            <h3>Future planning</h3>
-            <p>Tell the app where you want to go and it points you toward the classes and opportunities that matter.</p>
-            <ul><li>Career-based recommendations</li><li>Internship timing suggestions</li><li>Clubs / research / cert ideas</li></ul>
+          <div class="step reveal">
+            <div class="step-n">02</div>
+            <h3>Add with one click</h3>
+            <p>Hit ＋ on a section and it locks that CRN into your schedule, then slides open a timeline you can rearrange.</p>
           </div>
-          <div class="card feature reveal">
-            <div class="feature-icon">🚨</div>
-            <h3>Risk alerts</h3>
-            <p>See when you’re off track before it gets expensive.</p>
-            <ul><li>Late graduation risk</li><li>Missing requirements</li><li>Class availability bottlenecks</li></ul>
+          <div class="step reveal">
+            <div class="step-n">03</div>
+            <h3>Let it check your work</h3>
+            <p>Time conflicts, overloaded terms, and missing prerequisites get flagged before they cost you a semester.</p>
           </div>
         </div>
       </div>
     </section>
 
-    <section id="pricing">
-      <div class="wrap">
-        <div class="section-head reveal">
-          <div class="section-kicker">Initial pricing idea</div>
-          <h2 class="section-title">Start simple. Earn trust first.</h2>
-          <p class="section-copy">You can always move upmarket later. The first version should feel like a no-brainer for students and parents.</p>
+    <!-- ===== CONFLICT SPLIT ===== -->
+    <section>
+      <div class="wrap split">
+        <div class="reveal">
+          <div class="eyebrow">See the clash</div>
+          <h2 class="display sec-title">Two classes, same 10 a.m.</h2>
+          <p class="sec-copy">Registration portals let you find out the hard way. MajorMap shows overlapping sections as blocks on a real week — and tells you which ones collide.</p>
+          <div class="feature-list">
+            <div class="fl-item"><span class="fl-check">✓</span><div><b>Async-safe</b><span>Online and TBD sections never trigger false conflicts.</span></div></div>
+            <div class="fl-item"><span class="fl-check">✓</span><div><b>Section-specific</b><span>Swap to a different CRN and the grid updates instantly.</span></div></div>
+            <div class="fl-item"><span class="fl-check">✓</span><div><b>Plan health</b><span>One glance tells you if your term is clean, heavy, or clashing.</span></div></div>
+          </div>
         </div>
-        <div class="pricing-grid">
-          <div class="card pricing reveal">
-            <div class="section-kicker">For students</div>
-            <h3>MajorMap AI</h3>
-            <div class="price">$9–19/mo</div>
-            <p class="section-copy">Affordable enough for students, useful enough to save them a semester.</p>
-            <ul><li>Roadmap generation</li><li>Prereq checks</li><li>Semester-by-semester planning</li><li>Opportunity recommendations</li></ul>
-          </div>
-          <div class="card pricing reveal">
-            <div class="section-kicker">Later expansion</div>
-            <h3>University / Advisor version</h3>
-            <div class="price">B2B</div>
-            <p class="section-copy">Once the student version proves itself, the same engine can power advising teams or school partnerships.</p>
-            <ul><li>Bulk student planning</li><li>Advisor dashboards</li><li>Risk flags for delayed graduation</li><li>School-specific deployment</li></ul>
-          </div>
+        <div class="week reveal" aria-hidden="true">
+          <div class="wk-col"><div class="wk-h">Mon</div><div class="wk-slot"></div><div class="wk-blk clash">CS 260<br>10:00</div><div class="wk-slot"></div></div>
+          <div class="wk-col"><div class="wk-h">Tue</div><div class="wk-slot"></div><div class="wk-slot"></div><div class="wk-blk">ENGL 102<br>2:00</div></div>
+          <div class="wk-col"><div class="wk-h">Wed</div><div class="wk-slot"></div><div class="wk-blk clash">MATH 200<br>10:30</div><div class="wk-slot"></div></div>
+          <div class="wk-col"><div class="wk-h">Thu</div><div class="wk-slot"></div><div class="wk-slot"></div><div class="wk-blk">ENGL 102<br>2:00</div></div>
+          <div class="wk-col"><div class="wk-h">Fri</div><div class="wk-blk">PHYS 101<br>8:00</div><div class="wk-slot"></div><div class="wk-slot"></div></div>
         </div>
       </div>
     </section>
 
+    <!-- ===== WAITLIST / CTA ===== -->
     <section id="waitlist">
       <div class="wrap">
-        <div class="card cta-shell reveal">
-          <div class="cta-grid">
-            <div>
-              <div class="section-kicker">Waitlist</div>
-              <h2 class="cta-title">Want early access when MajorMap AI launches?</h2>
-              <p class="section-copy" style="margin-bottom:20px;">Join the early list and get updates when the first version is ready. Start with one school, one major set, and prove the demand.</p>
-              <div class="actions">
-                <a class="btn-secondary" href="mailto:geo@geoflowai.com?subject=MajorMap%20AI%20Questions">Talk to Geo</a>
-              </div>
+        <div class="cta-shell reveal">
+          <div>
+            <div class="eyebrow">Early access</div>
+            <h2 class="display sec-title">Try it now — or get told when your school lands.</h2>
+            <p class="sec-copy" style="margin-bottom:22px">The course search is live and free to use. Drop your info and we'll let you know as we add more Philadelphia schools and majors.</p>
+            <div class="cta-row" style="margin-bottom:0">
+              <a class="btn btn-primary" href="./app.html">Open the app →</a>
+              <a class="btn btn-secondary" href="mailto:geo@geoflowai.com?subject=MajorMap%20AI">Talk to Geo</a>
             </div>
-            <div class="card waitlist-box" style="background: rgba(255,255,255,.03);">
-              <form id="waitlist-form">
-                <div class="field">
-                  <label>Name</label>
-                  <input type="text" id="name" placeholder="Geo" required />
-                </div>
-                <div class="field">
-                  <label>Email</label>
-                  <input type="email" id="email" placeholder="you@school.edu" required />
-                </div>
-                <div class="field">
-                  <label>School</label>
-                  <input type="text" id="school" placeholder="Drexel University" required />
-                </div>
-                <div class="field">
-                  <label>Major</label>
-                  <input type="text" id="major" placeholder="Business & Engineering" required />
-                </div>
-                <div class="field">
-                  <label>Biggest problem right now?</label>
-                  <textarea id="problem-input" rows="4" placeholder="My advisor gave me confusing info, and I don't know if I'm on track."></textarea>
-                </div>
-                <button class="btn-primary" type="submit" style="width:100%; border:none; cursor:pointer;">Join Waitlist</button>
-                <div class="fine">No spam. Just updates when the product is ready.</div>
-              </form>
-              <div class="success" id="success-box">
-                <strong>✅ You're on the list.</strong><br><br>
-                We got your info. When MajorMap AI is ready, you'll be first to know.
-              </div>
+          </div>
+          <div>
+            <form id="waitlist-form">
+              <div class="field"><label for="name">Name</label><input type="text" id="name" placeholder="Geo" required /></div>
+              <div class="field"><label for="email">Email</label><input type="email" id="email" placeholder="you@school.edu" required /></div>
+              <div class="field"><label for="school">School</label><input type="text" id="school" placeholder="Drexel University" required /></div>
+              <div class="field"><label for="major">Major</label><input type="text" id="major" placeholder="Computer Science" required /></div>
+              <div class="field"><label for="problem-input">Biggest problem right now?</label><textarea id="problem-input" rows="3" placeholder="I don't know if I'm on track to graduate on time."></textarea></div>
+              <button class="btn btn-primary" type="submit" style="width:100%">Join the waitlist</button>
+              <div class="fine">No spam. Just updates when your school is supported.</div>
+            </form>
+            <div class="success" id="success-box">
+              <strong>✅ You're on the list.</strong>
+              <p style="margin-top:8px;color:var(--muted);font-size:.92rem">We got your info. Meanwhile, the course search is already open.</p>
+              <a class="btn btn-primary" href="./app.html" style="margin-top:14px">Open the app →</a>
             </div>
           </div>
         </div>
@@ -391,51 +405,48 @@
   <footer class="footer">
     <div class="wrap footer-inner">
       <div>© 2026 MajorMap AI · Student planning, done right</div>
-      <div>Built by Geo · Contact: geo@geoflowai.com</div>
+      <div>Built by Geo · <a href="mailto:geo@geoflowai.com" style="color:var(--accent);font-weight:600">geo@geoflowai.com</a></div>
     </div>
   </footer>
 
   <script>
-    const observer = new IntersectionObserver((entries) => {
-      entries.forEach(entry => {
-        if (entry.isIntersecting) entry.target.classList.add('show');
-      });
-    }, { threshold: 0.12 });
-    document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
-
-    async function sendForm(data) {
-      await fetch('https://formspree.io/f/xojkgevw', {
-        method: 'POST',
-        headers: {
-          'Accept': 'application/json',
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify(data)
+    function toggleTheme(){
+      var dark = document.documentElement.classList.toggle('dark');
+      try{ localStorage.setItem('majormap_theme', dark ? 'dark' : 'light'); }catch(e){}
+    }
+    if(window.matchMedia){
+      window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', function(e){
+        try{ if(!localStorage.getItem('majormap_theme')) document.documentElement.classList.toggle('dark', e.matches); }catch(err){}
       });
     }
 
-    document.getElementById('waitlist-form').addEventListener('submit', async (e) => {
-      e.preventDefault();
-      const btn = e.target.querySelector('button');
-      btn.disabled = true;
-      btn.textContent = 'Joining...';
+    var observer = new IntersectionObserver(function(entries){
+      entries.forEach(function(entry){ if(entry.isIntersecting) entry.target.classList.add('show'); });
+    }, { threshold: 0.12 });
+    document.querySelectorAll('.reveal').forEach(function(el){ observer.observe(el); });
 
-      const data = {
+    document.getElementById('waitlist-form').addEventListener('submit', async function(e){
+      e.preventDefault();
+      var btn = e.target.querySelector('button');
+      btn.disabled = true; btn.textContent = 'Joining…';
+      var data = {
         product: 'MajorMap AI',
         name: document.getElementById('name').value,
         email: document.getElementById('email').value,
         school: document.getElementById('school').value,
         major: document.getElementById('major').value,
-        problem: document.getElementById('problem-input').value,
+        problem: document.getElementById('problem-input').value
       };
-
-      try {
-        await sendForm(data);
+      try{
+        await fetch('https://formspree.io/f/xojkgevw', {
+          method: 'POST',
+          headers: { 'Accept': 'application/json', 'Content-Type': 'application/json' },
+          body: JSON.stringify(data)
+        });
         document.getElementById('waitlist-form').style.display = 'none';
         document.getElementById('success-box').classList.add('show');
-      } catch (err) {
-        btn.disabled = false;
-        btn.textContent = 'Join Waitlist';
+      }catch(err){
+        btn.disabled = false; btn.textContent = 'Join the waitlist';
         alert('Something went wrong. Try again in a sec.');
       }
     });

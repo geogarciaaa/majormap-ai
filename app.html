@@ -55,32 +55,35 @@
     }
   </style>
   <style>
-    /* ===== THEME TOKENS — light is the default; .dark overrides (Tailwind class strategy) ===== */
+    /* ===== THEME TOKENS — "Collegiate Modern": navy ink + gold accents.
+       Light = warm paper + white cards; dark = deep navy (never gray).
+       Light is the default; .dark overrides (Tailwind class strategy). ===== */
     :root{
-      --bg:#f8fafc; --bg2:#eef2f7;                 /* slate-50 ground */
+      --bg:#f8f7f2; --bg2:#f1efe7;                  /* warm paper ground */
       --panel:#ffffff; --panel-solid:#ffffff;       /* pure white cards */
-      --surface:#f8fafc; --surface-2:#f1f5f9; --hover:#f1f5f9;  /* slate-50/100 */
-      --line:#e2e8f0; --line-strong:#cbd5e1;        /* slate-200/300 */
-      --text:#0f172a; --muted:#64748b;              /* slate-900 / slate-500 */
-      --green:#16a34a; --blue:#2563eb; --purple:#7c3aed; --red:#dc2626; --yellow:#ca8a04;
-      --accent:#6366f1; --accent-hover:#4f46e5;     /* indigo-500 */
-      --glass:rgba(255,255,255,.72); --option-bg:#ffffff;
-      --shadow:0 1px 2px rgba(15,23,42,.04),0 12px 34px rgba(15,23,42,.08);
-      --grad-text:linear-gradient(135deg,#0f172a,#4338ca 55%,#0ea5e9);
-      --ambient:.05;
+      --surface:#faf9f5; --surface-2:#f3f2ec; --hover:#eef0f6;
+      --line:#e5e3d9; --line-strong:#cfccbe;        /* warm slate lines */
+      --text:#101c36; --muted:#5b6880;              /* navy ink / slate */
+      --green:#15803d; --blue:#1d4ed8; --purple:#6d28d9; --red:#b91c1c; --yellow:#a16207;
+      --accent:#16305e; --accent-hover:#1e4180;     /* primary: navy */
+      --gold:#a97e12; --gold-bright:#c9971c;        /* accents: gold (AA on white) */
+      --glass:rgba(248,247,242,.8); --option-bg:#ffffff;
+      --shadow:0 1px 2px rgba(16,28,54,.05),0 16px 40px rgba(16,28,54,.08);
+      --grad-text:linear-gradient(120deg,#101c36 20%,#16305e 55%,#a97e12);
+      --font-display:"Iowan Old Style","Palatino Linotype",Palatino,Georgia,serif;
     }
     :root.dark{
-      --bg:#0B0F19; --bg2:#0d1322;                  /* requested deep gray */
-      --panel:#111726; --panel-solid:#0f1524;
-      --surface:rgba(255,255,255,.03); --surface-2:rgba(255,255,255,.02); --hover:rgba(255,255,255,.05);
-      --line:#1e293b; --line-strong:#334155;        /* slate-800/700 */
-      --text:#e6edf7; --muted:#94a3b8;              /* slate-400 */
-      --green:#4ade80; --blue:#60a5fa; --purple:#a78bfa; --red:#f87171; --yellow:#facc15;
-      --accent:#818cf8; --accent-hover:#a5b4fc;     /* indigo-400 */
-      --glass:rgba(11,15,25,.72); --option-bg:#0f1524;
-      --shadow:0 30px 80px rgba(2,8,23,.45);
-      --grad-text:linear-gradient(135deg,#fff,#a7f3d0 50%,#93c5fd 100%);
-      --ambient:.16;
+      --bg:#0a1128; --bg2:#0c1530;                  /* deep navy ground */
+      --panel:#111c3a; --panel-solid:#0f1934;
+      --surface:rgba(255,255,255,.035); --surface-2:rgba(255,255,255,.025); --hover:rgba(255,255,255,.06);
+      --line:#22305a; --line-strong:#35466f;
+      --text:#edf0fa; --muted:#94a2c2;
+      --green:#4ade80; --blue:#7ca6ff; --purple:#b195f8; --red:#f87171; --yellow:#f0c24b;
+      --accent:#8fb0ff; --accent-hover:#b1c7ff;     /* lifted navy-blue for dark */
+      --gold:#e3b341; --gold-bright:#f2ca62;
+      --glass:rgba(10,17,40,.75); --option-bg:#0f1934;
+      --shadow:0 30px 80px rgba(3,7,24,.5);
+      --grad-text:linear-gradient(120deg,#f5edd8 15%,#e3b341 50%,#8fb0ff);
     }
     :root{color-scheme:light} :root.dark{color-scheme:dark}
     *{box-sizing:border-box}
@@ -95,15 +98,14 @@
     }
     :root{
       --app-bg:
-        radial-gradient(circle at 0% 0%, rgba(99,102,241,.06), transparent 26%),
-        radial-gradient(circle at 100% 0%, rgba(20,184,166,.05), transparent 22%),
+        radial-gradient(circle at 8% 0%, rgba(22,48,94,.05), transparent 30%),
+        radial-gradient(circle at 95% 4%, rgba(169,126,18,.06), transparent 26%),
         linear-gradient(180deg,var(--bg),var(--bg2));
     }
     :root.dark{
       --app-bg:
-        radial-gradient(circle at 0% 0%, rgba(96,165,250,.16), transparent 26%),
-        radial-gradient(circle at 100% 0%, rgba(167,139,250,.14), transparent 22%),
-        radial-gradient(circle at 50% 120%, rgba(74,222,128,.08), transparent 34%),
+        radial-gradient(circle at 8% 0%, rgba(143,176,255,.10), transparent 30%),
+        radial-gradient(circle at 95% 4%, rgba(227,179,65,.08), transparent 26%),
         linear-gradient(180deg,var(--bg),var(--bg2));
     }
     ::-webkit-scrollbar{width:10px;height:10px}
@@ -119,7 +121,11 @@
     .btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;font-weight:700;border-radius:14px;transition:transform .16s ease,opacity .16s ease,box-shadow .16s ease,border-color .16s ease;cursor:pointer;border:none;font:inherit}
     .btn:hover{transform:translateY(-1px)}
     .btn:active{transform:translateY(0)}
-    .btn-primary{background:linear-gradient(135deg,var(--green),#86efac);color:#04110a;box-shadow:0 12px 30px rgba(74,222,128,.20)}
+    .btn-primary{background:linear-gradient(135deg,var(--accent),var(--accent-hover));color:#fff;box-shadow:0 12px 30px color-mix(in srgb,var(--accent) 30%,transparent)}
+    .btn-primary:hover{box-shadow:0 14px 34px color-mix(in srgb,var(--accent) 42%,transparent)}
+    .btn-gold{background:linear-gradient(135deg,var(--gold),var(--gold-bright));color:#231a02;box-shadow:0 12px 30px color-mix(in srgb,var(--gold) 34%,transparent)}
+    .font-display{font-family:var(--font-display);letter-spacing:-.01em}
+    .gold-rule{width:56px;height:3px;border-radius:999px;background:linear-gradient(90deg,var(--gold),var(--gold-bright))}
     .btn-secondary{background:var(--panel);border:1px solid var(--line);color:var(--text)}
     .btn-secondary:hover{border-color:var(--accent)}
     .btn-ghost{background:transparent;border:1px solid var(--line);color:var(--muted)}
@@ -212,7 +218,7 @@
     .rmp{font-weight:700}
     .live-sec{padding:10px 11px;border-radius:12px;border:1px solid var(--line);background:var(--surface);font-size:.8rem}
     .step-dot{height:7px;border-radius:999px;background:rgba(148,163,184,.16);overflow:hidden;flex:1}
-    .step-dot span{display:block;height:100%;width:0;background:linear-gradient(90deg,var(--green),#86efac);transition:width .3s ease}
+    .step-dot span{display:block;height:100%;width:0;background:linear-gradient(90deg,var(--accent),var(--gold));transition:width .3s ease}
     .toast{position:fixed;bottom:22px;left:50%;transform:translateX(-50%) translateY(20px);background:var(--panel-solid);border:1px solid var(--line);padding:12px 18px;border-radius:14px;font-size:.9rem;font-weight:600;opacity:0;pointer-events:none;transition:all .25s ease;z-index:80;box-shadow:0 20px 50px rgba(2,8,23,.6)}
     .toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
     .prereq-line{font-size:.8rem;color:var(--muted)}
@@ -270,6 +276,26 @@
     @keyframes pulseClash{0%,100%{box-shadow:0 0 0 0 color-mix(in srgb,var(--red) 45%,transparent)}50%{box-shadow:0 0 0 4px color-mix(in srgb,var(--red) 18%,transparent)}}
     .week-async{display:flex;flex-wrap:wrap;gap:5px;margin-top:8px;font-size:.66rem;color:var(--muted)}
     .week-async span{border:1px dashed var(--line-strong);border-radius:999px;padding:2px 8px}
+    /* hero search field */
+    .search-hero{position:relative}
+    .search-hero .search-ico{position:absolute;left:16px;top:50%;transform:translateY(-50%);color:var(--muted);pointer-events:none}
+    .search-hero input{padding:16px 16px 16px 46px;font-size:1.02rem;border-radius:16px;background:var(--panel);box-shadow:var(--shadow)}
+    /* view toggle (cards / table) */
+    .view-toggle{display:inline-flex;border:1px solid var(--line);border-radius:999px;background:var(--surface-2);padding:3px;gap:2px}
+    .view-toggle button{border:none;background:transparent;font:inherit;font-size:.78rem;font-weight:700;color:var(--muted);padding:6px 13px;border-radius:999px;cursor:pointer;display:inline-flex;align-items:center;gap:6px}
+    .view-toggle button.active{background:var(--panel);color:var(--text);box-shadow:0 2px 8px rgba(16,28,54,.10)}
+    /* course result cards */
+    #cardGrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(290px,1fr));gap:14px;padding:4px 2px 8px}
+    .ccard{position:relative;background:var(--panel);border:1px solid var(--line);border-radius:18px;padding:16px;box-shadow:var(--shadow);transition:transform .16s ease,border-color .16s ease,box-shadow .16s ease;display:flex;flex-direction:column;gap:10px}
+    .ccard:hover{transform:translateY(-3px);border-color:color-mix(in srgb,var(--accent) 35%,var(--line))}
+    .ccard .top{display:flex;align-items:flex-start;justify-content:space-between;gap:10px}
+    .ccard .codeln{font-weight:800;font-size:1.02rem;letter-spacing:-.01em}
+    .ccard .titleln{color:var(--muted);font-size:.85rem;line-height:1.35;margin-top:2px}
+    .ccard .chips{display:flex;flex-wrap:wrap;gap:6px}
+    .cchip{display:inline-flex;align-items:center;gap:5px;font-size:.72rem;font-weight:600;padding:4px 9px;border-radius:999px;background:var(--surface-2);border:1px solid var(--line);color:var(--text);font-variant-numeric:tabular-nums}
+    .cchip.gold{color:var(--gold);border-color:color-mix(in srgb,var(--gold) 35%,var(--line));background:color-mix(in srgb,var(--gold) 9%,transparent)}
+    .ccard .foot{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-top:auto;padding-top:10px;border-top:1px solid var(--line)}
+    .ccard .instr{font-size:.8rem;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
     /* data-source pill */
     .src-pill{display:inline-flex;align-items:center;gap:6px;font-size:.7rem;font-weight:700;border-radius:999px;padding:3px 10px;border:1px solid var(--line)}
     .src-pill .dot{width:7px;height:7px;border-radius:999px}
@@ -296,7 +322,7 @@
     <div class="main-push max-w-[1320px] mx-auto px-4 sm:px-6 flex items-center justify-between h-16">
       <a href="./index.html" class="flex items-center gap-3">
         <div class="w-10 h-10 rounded-2xl grid place-items-center glass text-xl">🎓</div>
-        <div class="font-extrabold tracking-tight text-lg">Major<span style="color:var(--green)">Map</span> AI</div>
+        <div class="font-extrabold tracking-tight text-lg">Major<span style="color:var(--gold)">Map</span> AI</div>
       </a>
       <div class="flex items-center gap-2">
         <button id="navDb" class="btn btn-ghost text-sm px-3 py-2" hidden onclick="showDb()">🔍 Courses</button>
@@ -529,20 +555,25 @@
 
   <!-- ===== COURSE DATABASE (default home) ===== -->
   <section id="dbview" class="main-push max-w-[1320px] mx-auto px-4 sm:px-6 py-5">
-    <div class="flex flex-col lg:flex-row lg:items-end justify-between gap-3 mb-4">
-      <div>
-        <div class="text-2xl sm:text-3xl font-extrabold tracking-tight">Course Database</div>
-        <div id="liveSub" class="text-sm mt-1" style="color:var(--muted)">Search every section — ratings, seats, and times. Add any class straight to your schedule.</div>
+    <!-- hero -->
+    <div class="mb-5">
+      <div class="font-display text-3xl sm:text-[2.6rem] font-bold tracking-tight leading-[1.08]" style="text-wrap:balance">Find your classes.<br/><span class="gradient-text">Map your degree.</span></div>
+      <div class="gold-rule mt-3 mb-3"></div>
+      <div class="flex flex-wrap items-end justify-between gap-x-6 gap-y-3">
+        <div id="liveSub" class="text-sm" style="color:var(--muted);max-width:54ch">Every section this term — real ratings, seats, and times. One click adds a class to a conflict-checked schedule.</div>
+        <div class="flex flex-wrap items-center gap-2">
+          <label class="btn btn-secondary px-3.5 py-2 text-sm" style="cursor:pointer" data-tip="Import a data.json from the Drexel scraper">
+            📂 Import
+            <input type="file" accept="application/json,.json" onchange="onLiveFile(this)" style="display:none" />
+          </label>
+          <button class="btn btn-secondary px-3.5 py-2 text-sm" onclick="loadSampleLive()" data-tip="Reload the bundled sample term">⚡ Sample term</button>
+        </div>
       </div>
-      <div class="flex flex-wrap items-center gap-2">
-        <span id="srcPill" class="src-pill sample" data-tip="Checking for a local API…"><span class="dot" style="background:var(--muted)"></span><span id="srcPillText">sample data</span></span>
+      <!-- data provenance strip -->
+      <div class="flex flex-wrap items-center gap-2 mt-3 pt-3" style="border-top:1px solid var(--line)">
+        <span id="srcPill" class="src-pill sample" data-tip="Checking for the live API…"><span class="dot" style="background:var(--muted)"></span><span id="srcPillText">sample data</span></span>
         <span id="demoFlag" class="demo-flag" data-tip="Prototype notice: instructor ★ ratings and seat counts are placeholder/sample data — not real RateMyProfessors or live registrar values.">⚠ demo ratings &amp; seats</span>
-        <span id="liveStatus" class="text-xs mr-1" style="color:var(--muted)"></span>
-        <label class="btn btn-secondary px-3.5 py-2 text-sm" style="cursor:pointer" data-tip="Import a data.json from the Drexel scraper">
-          📂 Import
-          <input type="file" accept="application/json,.json" onchange="onLiveFile(this)" style="display:none" />
-        </label>
-        <button class="btn btn-secondary px-3.5 py-2 text-sm" onclick="loadSampleLive()" data-tip="Reload the bundled sample term">⚡ Sample term</button>
+        <span id="liveStatus" class="text-xs" style="color:var(--muted)"></span>
       </div>
     </div>
 
@@ -550,8 +581,9 @@
     <div class="glass rounded-3xl p-4 sm:p-5 mb-4" style="position:sticky;top:72px;z-index:20">
       <!-- ===== PRIMARY FILTER BAR ===== -->
       <div id="liveControls">
-        <div class="mb-3">
-          <input id="liveSearch" placeholder="🔍  Search course, title, CRN, or instructor…" oninput="renderLiveTable()" />
+        <div class="mb-3 search-hero">
+          <svg class="search-ico" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3.8-3.8"/></svg>
+          <input id="liveSearch" placeholder="Search course, title, CRN, or instructor…" oninput="renderLiveTable()" />
         </div>
         <div class="flex flex-wrap items-center gap-2 mb-1">
           <div class="flex flex-col">
@@ -617,12 +649,25 @@
       </div><!-- /liveControls -->
     </div><!-- /sticky filter bar -->
 
-    <!-- results table -->
+    <!-- results -->
     <div class="glass rounded-3xl p-2 sm:p-3">
-      <div class="flex items-center justify-between px-2 pt-1 pb-2">
+      <div class="flex items-center justify-between px-2 pt-1 pb-2 gap-3 flex-wrap">
         <div id="liveCount" class="text-xs" style="color:var(--muted)"></div>
+        <div class="view-toggle no-print" role="group" aria-label="Result layout">
+          <button id="viewCardsBtn" class="active" onclick="setView('cards')" data-tip="Card grid">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><rect x="3" y="3" width="7" height="7" rx="1.6"/><rect x="14" y="3" width="7" height="7" rx="1.6"/><rect x="3" y="14" width="7" height="7" rx="1.6"/><rect x="14" y="14" width="7" height="7" rx="1.6"/></svg>
+            Cards
+          </button>
+          <button id="viewTableBtn" onclick="setView('table')" data-tip="Dense table">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M3 6h18M3 12h18M3 18h18"/></svg>
+            Table
+          </button>
+        </div>
       </div>
-      <div id="liveTableWrap" style="max-height:calc(100dvh - 300px);overflow:auto;border-radius:16px;border:1px solid var(--line)">
+      <div id="cardWrap" style="max-height:calc(100dvh - 320px);overflow:auto">
+        <div id="cardGrid"></div>
+      </div>
+      <div id="liveTableWrap" hidden style="max-height:calc(100dvh - 300px);overflow:auto;border-radius:16px;border:1px solid var(--line)">
         <table class="saas-table">
           <thead><tr>
             <th style="width:46px"></th>
@@ -1396,7 +1441,7 @@
           <span class="cat-dot" style="background:${cat.color}"></span>
           <span class="text-[.66rem]" style="color:var(--muted)">${cat.label}</span>
           <span class="ml-auto flex items-center gap-1.5">
-            ${c.careers && c.careers.includes(state.career) ? '<span class="badge" style="background:rgba(74,222,128,.14);color:var(--green)">★ Goal</span>':''}
+            ${c.careers && c.careers.includes(state.career) ? '<span class="badge" style="background:color-mix(in srgb,var(--gold) 16%,transparent);color:var(--gold)">★ Goal</span>':''}
             ${liveBadgeHTML(id)}
           </span>
         </div>
@@ -1993,7 +2038,8 @@
   function refreshLiveUI(){
     const has = !!liveData;
     el('liveControls').hidden = !has;
-    el('liveTableWrap').hidden = !has;
+    el('cardWrap').hidden = !has || resultView!=='cards';
+    el('liveTableWrap').hidden = !has || resultView!=='table';
     el('liveEmpty').hidden = has;
     if(!has){ el('liveStatus').textContent = 'No data loaded yet.'; return; }
     el('liveStatus').textContent = `${liveData.sections.length} sections · ${liveData.term}`;
@@ -2097,7 +2143,55 @@
         <td style="white-space:nowrap">${seatCellHTML(s)}</td>
         <td style="text-align:right;font-weight:700">${s.credits||''}</td>
       </tr>`; }).join('') : `<tr><td colspan="9" style="text-align:center;color:var(--muted);padding:28px">No sections match your filters.</td></tr>`;
+    renderCards(rows);
     updateSortCarets();
+  }
+
+  /* ===== card grid view (default) ===== */
+  let resultView = 'cards';
+  function setView(v){
+    resultView = v;
+    el('cardWrap').hidden      = (v!=='cards');
+    el('liveTableWrap').hidden = (v!=='table');
+    el('viewCardsBtn').classList.toggle('active', v==='cards');
+    el('viewTableBtn').classList.toggle('active', v==='table');
+    try{ localStorage.setItem('majormap_view', v); }catch(e){}
+  }
+  function renderCards(rows){
+    const grid = el('cardGrid');
+    if(!rows.length){
+      grid.innerHTML = `<div class="text-center text-sm py-10" style="color:var(--muted);grid-column:1/-1">No sections match your filters.</div>`;
+      return;
+    }
+    grid.innerHTML = rows.map(s=>{
+      const id = normKey(s.subject_code, s.course_number);
+      const placed = courseIsPlaced(id);
+      const lockedHere = placed && lockedSection[id] && String(lockedSection[id].crn)===String(s.crn);
+      const open = isSectionOpen(s);
+      const seatTxt = (s.enroll==='FULL'||s.max_enroll==='FULL')
+        ? 'Full'
+        : `${Math.max(0, Number(s.max_enroll)-Number(s.enroll))} open`;
+      const best = bestRating(s);
+      return `<article class="ccard">
+        <div class="top">
+          <div style="min-width:0">
+            <div class="codeln">${s.subject_code} ${s.course_number}</div>
+            <div class="titleln">${s.course_title}</div>
+          </div>
+          <button class="add-btn ${placed?'added':''}" data-tip="${placed?(lockedHere?'This CRN is in your schedule — click to remove':'Course added (different CRN) — click to remove'):'Add this section to your schedule'}" onclick="toggleRow('${s.crn}')"><span class="chk">${placed?'✓':'＋'}</span></button>
+        </div>
+        <div class="chips">
+          <span class="cchip">🕒 ${s.days&&s.start_time ? `${s.days.map(d=>DAY_ABBR[d]||'').join('')} ${t12(s.start_time)}` : 'Async / TBD'}</span>
+          <span class="cchip" style="color:${open?'var(--green)':'var(--red)'};border-color:color-mix(in srgb,${open?'var(--green)':'var(--red)'} 32%,var(--line))">${open?'●':'○'} ${seatTxt}</span>
+          <span class="cchip">${s.credits||'—'} cr</span>
+          ${best>0?`<span class="cchip gold">★ ${best.toFixed(1)}</span>`:''}
+        </div>
+        <div class="foot">
+          <span class="instr">${instrHTML(s.instructors)}</span>
+          <span class="text-xs" style="color:var(--muted);white-space:nowrap">Sec ${s.section} · ${crnHTML(s)}</span>
+        </div>
+      </article>`;
+    }).join('');
   }
 
   // advisor tip that references live availability of this year's planned courses
@@ -2335,6 +2429,7 @@
   // Database-first: paint instantly, then upgrade to the live API when present.
   (async function init(){
     initTheme();
+    try{ const v = localStorage.getItem('majormap_view'); if(v==='table'||v==='cards') setView(v); }catch(e){}
     ingestLiveData(SAMPLE_LIVE, 'Fall 2026 · sample data');  // instant first paint (fallback dataset)
     showDb();
     setSourceUI(false);
